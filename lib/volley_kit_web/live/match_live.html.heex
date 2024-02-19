@@ -1,0 +1,9 @@
+<div class="flex flex-nowrap overflow-hidden rounded-lg m-3 shadow-md">
+  <.score_card
+    :for={{team, id} <- enum_teams(team_ids(), @teams)}
+    id={id}
+    value={team.score}
+    class={team.color}
+    on_click={increment(id)}
+  />
+</div>

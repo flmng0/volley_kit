@@ -1,1 +1,1 @@
-export { Flip } from './gsap'
+export { FlipContainer } from './gsap'

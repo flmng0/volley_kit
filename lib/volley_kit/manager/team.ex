@@ -18,7 +18,7 @@ defmodule VolleyKit.Manager.Team do
   def changeset(team, attrs) do
     team
     |> cast(attrs, [:name, :sets, :points])
-    |> cast_embed(:players, with: &Player.changeset/2, required: true)
+    |> cast_embed(:players, with: &Player.changeset/2, required: false)
     |> validate_required([:name, :sets, :points])
   end
 end

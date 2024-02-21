@@ -2,7 +2,6 @@ defmodule VolleyKit.Manager.Team do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias VolleyKit.Manager.Match
   alias VolleyKit.Manager.Player
 
   schema "teams" do

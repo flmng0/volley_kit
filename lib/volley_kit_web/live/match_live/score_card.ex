@@ -4,14 +4,17 @@ defmodule VolleyKitWeb.MatchLive.ScoreCard do
 
   def render(assigns) do
     ~H"""
-    <section class={["flex-1 w-full aspect-square", color(@variant)]} id={@id}>
+    <section class={["flex-1 w-full aspect-square", color(@variant)]} id={@id} phx-hook="ScoreCard">
       <button
         class="w-full h-full flex flex-col justify-center gap-6"
         phx-click="increment"
         phx-target={@myself}
       >
         <span class="text-lg"><%= @team.sets %></span>
-        <span class="score text-4xl"><%= @team.points %></span>
+        <div class="text-4xl relative">
+          <span class="old-score absolute inset-0" id={@id <> "-old-score"} phx-update="ignore"></span>
+          <span class="score"><%= @team.points %></span>
+        </div>
         <span><%= @team.name %></span>
       </button>
     </section>

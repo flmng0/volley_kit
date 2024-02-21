@@ -22,3 +22,23 @@ export const FlipContainer = {
     Flip.from(this.state, this.getConfig())
   }
 }
+
+export const ScoreCard = {
+  beforeUpdate() {
+    const score = this.el.querySelector(".score")
+
+    this.oldScoreValue = score.innerText.trim()
+  },
+
+  updated() {
+    const score = this.el.querySelector(".score")
+    const oldScore = this.el.querySelector(".old-score")
+
+    oldScore.textContent = this.oldScoreValue
+
+    gsap.set(oldScore, { y: 0, opacity: 100, rotateX: 0 })
+    gsap.to(oldScore, { y: 20, opacity: 0, rotateX: 60 })
+
+    gsap.from(score, { y: -20, opacity: 0 })
+  }
+}

@@ -18,6 +18,21 @@ defmodule VolleyKitWeb.MatchLive do
   end
 
   @impl true
+  def handle_event("reset", _params, socket) do
+    match = socket.assigns.match
+
+    case Manager.update_match(match, %{
+           "team_a" => %{points: 0, sets: 0},
+           "team_b" => %{points: 0, sets: 0}
+         }) do
+      {:ok, match} ->
+        VolleyKitWeb.Endpoint.broadcast!("match:#{match.id}", "reset", nil)
+
+        {:noreply, assign(socket, :match, match)}
+    end
+  end
+
+  @impl true
   def handle_info({ScoreCard, {:increment, variant, points}}, socket) do
     match = socket.assigns.match
 
@@ -53,7 +68,7 @@ defmodule VolleyKitWeb.MatchLive do
 
   def handle_info(%Phoenix.Socket.Broadcast{} = msg, socket) do
     case msg.event do
-      "set_change" ->
+      event when event in ["reset", "set_change"] ->
         socket = update(socket, :match, &Manager.reload_match(&1))
 
         {:noreply, socket}

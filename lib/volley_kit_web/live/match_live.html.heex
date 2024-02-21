@@ -1,15 +1,16 @@
 <div class="flex flex-nowrap overflow-hidden rounded-lg m-3 shadow-md">
-  <.live_component
-    module={ScoreCard}
-    id="team-a"
-    variant={:a}
-    team={@match.team_a}
-  />
+  <.live_component module={ScoreCard} id="team-a" variant={:a} team={@match.team_a} />
 
-  <.live_component
-    module={ScoreCard}
-    id="team-b"
-    variant={:b}
-    team={@match.team_b}
-  />
+  <.live_component module={ScoreCard} id="team-b" variant={:b} team={@match.team_b} />
+</div>
+
+<div class="grid grid-cols-2">
+  <.button
+    phx-click="reset"
+    data-confirm="Are you sure you want to reset the match?"
+    class="col-span-2"
+    background="bg-red-700 hover:bg-red-800"
+  >
+    Reset Match
+  </.button>
 </div>

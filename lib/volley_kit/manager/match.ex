@@ -5,8 +5,8 @@ defmodule VolleyKit.Manager.Match do
   alias VolleyKit.Manager.Team
 
   schema "matches" do
-    belongs_to :team_a, Team
-    belongs_to :team_b, Team
+    belongs_to :team_a, Team, on_replace: :update
+    belongs_to :team_b, Team, on_replace: :update
 
     timestamps(type: :utc_datetime)
   end

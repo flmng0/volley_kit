@@ -7,12 +7,10 @@ defmodule VolleyKit.Manager.Team do
 
   schema "teams" do
     field :name, :string
-    field :sets, :integer
-    field :points, :integer
+    field :sets, :integer, default: 0
+    field :points, :integer, default: 0
 
     embeds_many :players, Player
-
-    belongs_to :match, Match
 
     timestamps(type: :utc_datetime)
   end
@@ -20,7 +18,8 @@ defmodule VolleyKit.Manager.Team do
   @doc false
   def changeset(team, attrs) do
     team
-    |> cast(attrs, [:name, :sets, :points, :players])
+    |> cast(attrs, [:name, :sets, :points])
+    |> cast_embed(:players, with: &Player.changeset/2, required: true)
     |> validate_required([:name, :sets, :points])
   end
 end

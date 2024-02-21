@@ -5,10 +5,8 @@ defmodule VolleyKit.Manager.Match do
   alias VolleyKit.Manager.Team
 
   schema "matches" do
-    field :code, :string
-
-    has_one :team_a, Team
-    has_one :team_b, Team
+    belongs_to :team_a, Team
+    belongs_to :team_b, Team
 
     timestamps(type: :utc_datetime)
   end
@@ -17,7 +15,7 @@ defmodule VolleyKit.Manager.Match do
   def changeset(match, attrs) do
     match
     |> cast(attrs, [])
-    |> validate_required([])
-    |> unique_constraint(:code)
+    |> cast_assoc(:team_a, with: &Team.changeset/2, required: true)
+    |> cast_assoc(:team_b, with: &Team.changeset/2, required: true)
   end
 end

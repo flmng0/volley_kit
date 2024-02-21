@@ -8,8 +8,5 @@ defmodule VolleyKit.Repo.Migrations.CreateMatches do
 
       timestamps(type: :utc_datetime)
     end
-
-    create index(:matches, [:team_a_id])
-    create index(:matches, [:team_b_id])
   end
 end

@@ -1,8 +1,15 @@
 <div class="flex flex-nowrap overflow-hidden rounded-lg m-3 shadow-md">
   <.live_component
-    :for={variant <- team_variants()}
     module={ScoreCard}
-    id={"team-#{variant}"}
-    variant={variant}
+    id="team-a"
+    variant={:a}
+    team={@match.team_a}
+  />
+
+  <.live_component
+    module={ScoreCard}
+    id="team-b"
+    variant={:b}
+    team={@match.team_b}
   />
 </div>

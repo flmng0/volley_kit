@@ -1,32 +1,30 @@
 defmodule VolleyKitWeb.MatchLive.ScoreCard do
+  alias VolleyKit.Manager
   use VolleyKitWeb, :live_component
-
-  def mount(socket) do
-    socket =
-      socket
-      |> assign(:score, 0)
-
-    {:ok, socket}
-  end
 
   def render(assigns) do
     ~H"""
     <section class={["flex-1 w-full aspect-square", color(@variant)]} id={@id}>
-      <button class="w-full h-full grid place-items-center" phx-click="increment" phx-target={@myself}>
-        <span class="score text-4xl"><%= @score %></span>
+      <button
+        class="w-full h-full flex flex-col justify-center gap-6"
+        phx-click="increment"
+        phx-target={@myself}
+      >
+        <span class="text-lg"><%= @team.sets %></span>
+        <span class="score text-4xl"><%= @team.points %></span>
+        <span><%= @team.name %></span>
       </button>
     </section>
     """
   end
 
   def handle_event("increment", _params, socket) do
-    notify_parent({:increment, socket.assigns.variant})
+    {:ok, team} =
+      Manager.update_team(socket.assigns.team, %{points: socket.assigns.team.points + 1})
 
-    socket =
-      socket
-      |> update(:score, &(&1 + 1))
+    notify_parent(:increment)
 
-    {:noreply, socket}
+    {:noreply, assign(socket, :team, team)}
   end
 
   def notify_parent(msg) do

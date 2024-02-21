@@ -17,7 +17,7 @@ defmodule VolleyKitWeb.Router do
   scope "/", VolleyKitWeb do
     pipe_through :browser
 
-    live "/", MatchLive
+    live "/:id", MatchLive
   end
 
   # Other scopes may use custom stacks.

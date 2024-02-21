@@ -9,53 +9,6 @@ defmodule VolleyKit.Manager do
   alias VolleyKit.Manager.Team
 
   @doc """
-  Returns the list of teams.
-
-  ## Examples
-
-      iex> list_teams()
-      [%Team{}, ...]
-
-  """
-  def list_teams do
-    Repo.all(Team)
-  end
-
-  @doc """
-  Gets a single team.
-
-  Raises `Ecto.NoResultsError` if the Team does not exist.
-
-  ## Examples
-
-      iex> get_team!(123)
-      %Team{}
-
-      iex> get_team!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_team!(id), do: Repo.get!(Team, id)
-
-  @doc """
-  Creates a team.
-
-  ## Examples
-
-      iex> create_team(%{field: value})
-      {:ok, %Team{}}
-
-      iex> create_team(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_team(attrs \\ %{}) do
-    %Team{}
-    |> Team.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  @doc """
   Updates a team.
 
   ## Examples
@@ -71,22 +24,6 @@ defmodule VolleyKit.Manager do
     team
     |> Team.changeset(attrs)
     |> Repo.update()
-  end
-
-  @doc """
-  Deletes a team.
-
-  ## Examples
-
-      iex> delete_team(team)
-      {:ok, %Team{}}
-
-      iex> delete_team(team)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_team(%Team{} = team) do
-    Repo.delete(team)
   end
 
   @doc """
@@ -131,7 +68,7 @@ defmodule VolleyKit.Manager do
       ** (Ecto.NoResultsError)
 
   """
-  def get_match!(id), do: Repo.get!(Match, id)
+  def get_match!(id), do: Repo.get!(Match, id) |> Repo.preload([:team_a, :team_b])
 
   @doc """
   Creates a match.

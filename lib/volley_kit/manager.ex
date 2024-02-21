@@ -41,6 +41,12 @@ defmodule VolleyKit.Manager do
 
   alias VolleyKit.Manager.Match
 
+  def reload_match(%Match{} = match) do
+    Repo.reload(match) |> load_match_teams()
+  end
+
+  def load_match_teams(%Match{} = match), do: Repo.preload(match, [:team_a, :team_b])
+
   @doc """
   Returns the list of matches.
 
@@ -68,7 +74,7 @@ defmodule VolleyKit.Manager do
       ** (Ecto.NoResultsError)
 
   """
-  def get_match!(id), do: Repo.get!(Match, id) |> Repo.preload([:team_a, :team_b])
+  def get_match!(id), do: Repo.get!(Match, id) |> load_match_teams()
 
   @doc """
   Creates a match.

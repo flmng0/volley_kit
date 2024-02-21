@@ -36,9 +36,19 @@ export const ScoreCard = {
 
     oldScore.textContent = this.oldScoreValue
 
-    gsap.set(oldScore, { y: 0, opacity: 100, rotateX: 0 })
-    gsap.to(oldScore, { y: 20, opacity: 0, rotateX: 60 })
+    const tl = gsap.timeline()
 
-    gsap.from(score, { y: -20, opacity: 0 })
+    tl.fromTo(
+      oldScore,
+      { yPercent: 0, opacity: 1, rotateX: 0 },
+      { yPercent: 20, opacity: 0, rotateX: 60, duration: 0.1 }
+    )
+
+    tl.fromTo(
+      score,
+      { yPercent: -20, opacity: 0, rotateX: -60 },
+      { yPercent: 0, opacity: 1, rotateX: 0, duration: 0.3 },
+      "-=30%"
+    )
   }
 }

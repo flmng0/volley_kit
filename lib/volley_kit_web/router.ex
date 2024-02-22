@@ -8,6 +8,8 @@ defmodule VolleyKitWeb.Router do
     plug :put_root_layout, html: {VolleyKitWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+
+    plug VolleyKitWeb.SessionTest
   end
 
   pipeline :api do
@@ -16,6 +18,12 @@ defmodule VolleyKitWeb.Router do
 
   scope "/", VolleyKitWeb do
     pipe_through :browser
+
+    live_session :testing,
+      session: {VolleyKitWeb.SessionTest, :init_session, []},
+      on_mount: VolleyKitWeb.SessionTest do
+      live "/test-session/:id", MatchLive
+    end
 
     live "/:id", MatchLive
   end

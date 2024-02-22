@@ -6,13 +6,18 @@ defmodule VolleyKitWeb.MatchLive do
   alias VolleyKit.Manager
 
   @impl true
-  def mount(%{"id" => id}, _session, socket) do
+  def mount(%{"id" => id}, %{ "user_id" => user_id }, socket) do
     VolleyKitWeb.Endpoint.subscribe("match:#{id}")
 
+    match = Manager.get_match!(id)
+
+    is_owner = Ecto.UUID.equal?(Ecto.UUID.dump!(match.owner), user_id)
+    
     socket =
       socket
       |> assign(:page_title, "Showing Match")
-      |> assign(:match, Manager.get_match!(id))
+      |> assign(:match, match)
+      |> assign(:is_owner, is_owner)
 
     {:ok, socket}
   end

@@ -5,10 +5,11 @@ defmodule VolleyKitWeb.MatchLive.ScoreCard do
   def render(assigns) do
     ~H"""
     <section class={["flex-1 w-full aspect-square", color(@variant)]} id={@id} phx-hook="ScoreCard">
-      <button
+      <.dynamic_tag
+        name={if @is_owner, do: "button", else: "div"}
         class="w-full h-full flex flex-col justify-center items-center gap-6"
-        phx-click="increment"
-        phx-target={@myself}
+        phx-click={@is_owner && "increment"}
+        phx-target={@is_owner && @myself}
       >
         <span class="text-lg"><%= @team.sets %></span>
         <div class="text-4xl relative">
@@ -16,7 +17,7 @@ defmodule VolleyKitWeb.MatchLive.ScoreCard do
           <span class="score block"><%= @team.points %></span>
         </div>
         <span><%= @team.name %></span>
-      </button>
+      </.dynamic_tag>
     </section>
     """
   end

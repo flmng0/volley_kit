@@ -9,7 +9,7 @@ defmodule VolleyKitWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
 
-    plug VolleyKitWeb.SessionTest
+    plug VolleyKitWeb.SessionUser
   end
 
   pipeline :api do
@@ -19,13 +19,18 @@ defmodule VolleyKitWeb.Router do
   scope "/", VolleyKitWeb do
     pipe_through :browser
 
-    live_session :testing,
-      session: {VolleyKitWeb.SessionTest, :init_session, []},
-      on_mount: VolleyKitWeb.SessionTest do
-      live "/test-session/:id", MatchLive
-    end
+    get "/", PageController, :home
+  end
 
-    live "/:id", MatchLive
+  scope "/match", VolleyKitWeb do
+    pipe_through :browser
+
+    post "/", MatchController, :new
+    get "/join", MatchController, :join
+
+    live_session :testing, session: {VolleyKitWeb.SessionUser, :init_session, []} do
+      live "/:id", MatchLive
+    end
   end
 
   # Other scopes may use custom stacks.

@@ -1,1 +1,35 @@
 <.flash_group flash={@flash} />
+
+<div class="max-w-prose mx-auto space-y-10">
+  <div class="p-10 shadow-lg">
+    <.header>
+      Join an Ongoing Match
+    </.header>
+
+    <form action={~p"/match/join"} class="mt-10 space-y-8 bg-white">
+      <input type="hidden" name="_csrf_token" type="hidden" hidden value={get_csrf_token()} />
+      <.input type="text" name="match-code" value="" label="Match Share Code" />
+
+      <.button class="w-full">Join!</.button>
+    </form>
+  </div>
+
+  <div class="grid grid-cols-[1fr_auto_1fr] gap-3 place-items-center w-full text-gray-400">
+    <div class="border-b border-current w-full opacity-50"></div>
+    <span class="uppercase font-bold">OR</span>
+    <div class="border-b border-current w-full opacity-50"></div>
+  </div>
+
+  <div class="p-10 shadow-lg">
+    <.header>
+      Start a New Match
+    </.header>
+    <form method="post" action={~p"/match"} class="mt-10 space-y-8 bg-white">
+      <input type="hidden" name="_csrf_token" type="hidden" hidden value={get_csrf_token()} />
+      <.input type="text" name="team-a-name" value="" label="Team A's Name" />
+      <.input type="text" name="team-b-name" value="" label="Team B's Name" />
+
+      <.button class="w-full">Start!</.button>
+    </form>
+  </div>
+</div>

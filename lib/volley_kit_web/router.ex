@@ -19,19 +19,14 @@ defmodule VolleyKitWeb.Router do
   scope "/", VolleyKitWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", HomeLive
   end
 
   scope "/match", VolleyKitWeb do
     pipe_through :browser
 
-    post "/", MatchController, :new
-    delete "/:id", MatchController, :delete
-    get "/join", MatchController, :join
-
-    live_session :testing, session: {VolleyKitWeb.SessionUser, :init_session, []} do
-      live "/:id", MatchLive
-    end
+    live "/current", MatchLive, :current
+    live "/id/:id", MatchLive, :id
   end
 
   # Other scopes may use custom stacks.

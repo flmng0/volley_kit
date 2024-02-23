@@ -8,14 +8,6 @@ defmodule VolleyKitWeb.SessionUser do
 
   defp gen_uuid, do: Ecto.UUID.bingenerate()
 
-  def init_session(conn) do
-    user_id = get_user(conn)
-
-    if user_id == nil, do: raise("Somehow no user ID in session?")
-
-    %{@user_session_key => user_id}
-  end
-
   # Plug callbacks
   def init(opts), do: opts
 

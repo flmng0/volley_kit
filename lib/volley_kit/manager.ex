@@ -134,8 +134,16 @@ defmodule VolleyKit.Manager do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_match(%Match{} = match) do
-    Repo.delete(match)
+  def delete_match!(%Match{} = match) do
+    team_a_id = match.team_a_id
+    team_b_id = match.team_b_id
+
+    match = Repo.delete!(match)
+
+    Repo.get!(Team, team_a_id) |> Repo.delete!()
+    Repo.get!(Team, team_b_id) |> Repo.delete!()
+
+    match
   end
 
   @doc """

@@ -6,20 +6,47 @@ defmodule VolleyKitWeb.MatchLive do
   alias VolleyKit.Manager
 
   @impl true
-  def mount(%{"id" => id}, %{"user_id" => user_id}, socket) do
-    VolleyKitWeb.Endpoint.subscribe("match:#{id}")
+  def mount(_params, %{"user_id" => user_id}, socket) do
+    {:ok, assign(socket, :user_id, user_id)}
+  end
+
+  @impl true
+  def handle_params(params, _uri, socket) do
+    {:noreply, apply_action(params, socket.assigns.live_action, socket)}
+  end
+
+  def apply_action(_params, :current, socket) do
+    case Manager.get_owned_match(socket.assigns.user_id) do
+      nil ->
+        socket
+        |> put_flash(:error, "Could not find current match!")
+        |> push_navigate(to: ~p"/")
+
+      match ->
+        apply_match(match, true, socket)
+    end
+  end
+
+  def apply_action(%{"id" => id}, :id, socket) do
+    user_id = socket.assigns.user_id
 
     match = Manager.get_match!(id)
+    is_owner = match.owner == Ecto.UUID.cast!(user_id)
 
-    is_owner = Ecto.UUID.equal?(Ecto.UUID.dump!(match.owner), user_id)
+    apply_match(match, is_owner, socket)
+  end
 
-    socket =
-      socket
-      |> assign(:page_title, "Showing Match")
-      |> assign(:match, match)
-      |> assign(:is_owner, is_owner)
+  def apply_match(%Manager.Match{} = match, is_owner, socket) do
+    if Map.get(socket.assigns, :match) do
+      VolleyKitWeb.Endpoint.unsubscribe("match:#{socket.assigns.match.id}")
+    end
 
-    {:ok, socket}
+    VolleyKitWeb.Endpoint.subscribe("match:#{match.id}")
+    
+    socket
+    |> assign(:page_title, "#{match.team_a.name} vs. #{match.team_b.name}")
+    |> assign(:match, match)
+    |> assign(:is_owner, is_owner)
   end
 
   @impl true
@@ -29,7 +56,7 @@ defmodule VolleyKitWeb.MatchLive do
     else
       socket =
         put_flash(socket, :error, "You are not the owner of this match. Action not allowed.")
-      
+
       {:noreply, socket}
     end
   end

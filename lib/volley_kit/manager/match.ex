@@ -16,8 +16,8 @@ defmodule VolleyKit.Manager.Match do
   def changeset(match, attrs) do
     match
     |> cast(attrs, [:owner])
-    |> cast_assoc(:team_a, with: &Team.changeset/2, required: true)
-    |> cast_assoc(:team_b, with: &Team.changeset/2, required: true)
+    |> cast_assoc(:team_a, required: true)
+    |> cast_assoc(:team_b, required: true)
     |> validate_required(:owner)
   end
 end

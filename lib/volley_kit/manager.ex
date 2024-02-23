@@ -47,6 +47,16 @@ defmodule VolleyKit.Manager do
 
   def load_match_teams(%Match{} = match), do: Repo.preload(match, [:team_a, :team_b])
 
+  def get_owned_match(user_id) do
+    case Repo.get_by(Match, owner: user_id) do
+      nil ->
+        nil
+
+      match ->
+        load_match_teams(match)
+    end
+  end
+
   @doc """
   Returns the list of matches.
 

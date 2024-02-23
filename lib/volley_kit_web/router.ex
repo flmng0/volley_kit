@@ -26,6 +26,7 @@ defmodule VolleyKitWeb.Router do
     pipe_through :browser
 
     post "/", MatchController, :new
+    delete "/:id", MatchController, :delete
     get "/join", MatchController, :join
 
     live_session :testing, session: {VolleyKitWeb.SessionUser, :init_session, []} do

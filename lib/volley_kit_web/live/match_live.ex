@@ -6,13 +6,13 @@ defmodule VolleyKitWeb.MatchLive do
   alias VolleyKit.Manager
 
   @impl true
-  def mount(%{"id" => id}, %{ "user_id" => user_id }, socket) do
+  def mount(%{"id" => id}, %{"user_id" => user_id}, socket) do
     VolleyKitWeb.Endpoint.subscribe("match:#{id}")
 
     match = Manager.get_match!(id)
 
     is_owner = Ecto.UUID.equal?(Ecto.UUID.dump!(match.owner), user_id)
-    
+
     socket =
       socket
       |> assign(:page_title, "Showing Match")
@@ -23,7 +23,18 @@ defmodule VolleyKitWeb.MatchLive do
   end
 
   @impl true
-  def handle_event("reset", _params, socket) do
+  def handle_event(event, params, socket) do
+    if socket.assigns.is_owner do
+      apply_event(event, params, socket)
+    else
+      socket =
+        put_flash(socket, :error, "You are not the owner of this match. Action not allowed.")
+      
+      {:noreply, socket}
+    end
+  end
+
+  def apply_event("reset", _params, socket) do
     match = socket.assigns.match
 
     case Manager.update_match(match, %{

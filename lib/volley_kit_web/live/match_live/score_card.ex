@@ -2,6 +2,7 @@ defmodule VolleyKitWeb.MatchLive.ScoreCard do
   alias VolleyKit.Manager
   use VolleyKitWeb, :live_component
 
+  @impl true
   def render(assigns) do
     ~H"""
     <section class={["flex-1 w-full aspect-square", color(@variant)]} id={@id} phx-hook="ScoreCard">
@@ -13,7 +14,8 @@ defmodule VolleyKitWeb.MatchLive.ScoreCard do
       >
         <span class="text-lg"><%= @team.sets %></span>
         <div class="text-4xl relative">
-          <span class="old-score absolute inset-0" id={@id <> "-old-score"} phx-update="ignore"></span>
+          <span class="old-score absolute inset-0" id={@id <> "-old-score"} phx-update="ignore">
+          </span>
           <span class="score block"><%= @team.points %></span>
         </div>
         <span><%= @team.name %></span>
@@ -22,7 +24,19 @@ defmodule VolleyKitWeb.MatchLive.ScoreCard do
     """
   end
 
-  def handle_event("increment", _params, socket) do
+  @impl true
+  def handle_event(event, params, socket) do
+    if socket.assigns.is_owner do
+      apply_event(event, params, socket)
+    else
+      socket =
+        put_flash(socket, :error, "You are not the owner of this match. Action not allowed.")
+
+      {:noreply, socket}
+    end
+  end
+
+  def apply_event("increment", _params, socket) do
     {:ok, team} =
       Manager.update_team(socket.assigns.team, %{points: socket.assigns.team.points + 1})
 

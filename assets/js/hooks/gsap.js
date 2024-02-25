@@ -1,5 +1,5 @@
-import { gsap } from "gsap"
-import { Flip } from "gsap/Flip"
+import { gsap } from "../../vendor/gsap.min.js"
+import { Flip } from "../../vendor/gsap/Flip.min.js"
 
 gsap.registerPlugin(Flip)
 

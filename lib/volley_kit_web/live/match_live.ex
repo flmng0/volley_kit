@@ -31,7 +31,7 @@ defmodule VolleyKitWeb.MatchLive do
     case Manager.get_shared_match(code) do
       nil ->
         socket
-        |> put_flash(:error, "Could not find current match!")
+        |> put_flash(:error, "Could not find match with given code!")
         |> push_navigate(to: ~p"/")
 
       match ->

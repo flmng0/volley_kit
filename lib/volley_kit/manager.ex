@@ -46,6 +46,7 @@ defmodule VolleyKit.Manager do
     Repo.reload(match) |> load_match_teams()
   end
 
+  def load_match_teams(nil), do: nil
   def load_match_teams(%Match{} = match), do: Repo.preload(match, [:team_a, :team_b])
 
   def get_owned_match(user_id) do

@@ -17,7 +17,7 @@
     />
   </div>
 
-  <div :if={@is_owner} class="grid grid-cols-2">
+  <div :if={@is_owner} class="grid grid-cols-2 gap-2">
     <.button
       phx-click="reset"
       data-confirm="Are you sure you want to reset the match?"
@@ -26,10 +26,22 @@
     >
       Reset Match
     </.button>
-  </div>
 
-  <p>
-    Share Code:
-    <%= Manager.get_share_code(@match) %>
-  </p>
+    <.button
+      phx-click={show_modal("share-code-modal")}
+      class="col-span-2"
+      background="bg-sky-700 hover:bg-sky-800"
+    >
+      Show Share Code
+    </.button>
+  </div>
 </main>
+
+<.modal id="share-code-modal">
+  <div class="grid place-items-center">
+    <span class="font-mono tracking-wider text-3xl lg:text-4xl font-semibold">
+      <%= Manager.get_share_code(@match) %>
+    </span>
+    <%= share_code_qr(@match) %>
+  </div>
+</.modal>

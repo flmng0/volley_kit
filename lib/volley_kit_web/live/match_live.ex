@@ -137,4 +137,16 @@ defmodule VolleyKitWeb.MatchLive do
         {:noreply, socket}
     end
   end
+
+  def share_code_qr(match) do
+    share_code = Manager.get_share_code(match)
+    share_url = VolleyKitWeb.Endpoint.struct_url()
+      |> URI.append_path(~p"/#{share_code}")
+      |> URI.to_string()
+
+    {:ok, qr_svg} = QRCode.create(share_url)
+      |> QRCode.render()
+
+    raw(qr_svg)
+  end
 end

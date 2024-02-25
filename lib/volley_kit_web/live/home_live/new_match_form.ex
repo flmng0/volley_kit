@@ -51,7 +51,7 @@ defmodule VolleyKitWeb.HomeLive.NewMatchForm do
            team_b: %{name: new_match["team_b_name"]}
          }) do
       {:ok, _} ->
-        {:noreply, push_navigate(socket, to: ~p"/match/current")}
+        {:noreply, push_navigate(socket, to: ~p"/current")}
 
       {:error, %Ecto.Changeset{}} ->
         changeset = form_changeset(new_match) |> Map.put(:action, :validate)

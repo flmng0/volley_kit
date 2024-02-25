@@ -4,6 +4,7 @@ defmodule VolleyKit.Manager do
   """
 
   import Ecto.Query, warn: false
+  alias VolleyKit.Sqids
   alias VolleyKit.Repo
 
   alias VolleyKit.Manager.Team
@@ -54,6 +55,18 @@ defmodule VolleyKit.Manager do
 
       match ->
         load_match_teams(match)
+    end
+  end
+
+  def get_share_code(%Match{} = match), do: Sqids.encode!([match.id])
+
+  def get_shared_match(id) do
+    case Sqids.decode!(id) do
+      [id] ->
+        Repo.get(Match, id) |> load_match_teams()
+
+      _ ->
+        nil
     end
   end
 

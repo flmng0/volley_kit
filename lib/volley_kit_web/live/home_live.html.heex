@@ -9,7 +9,7 @@
         Return to Your Ongoing Match
       </.header>
 
-      <.link navigate={~p"/match/current"} class="inline-block w-full mt-8">
+      <.link navigate={~p"/current"} class="inline-block w-full mt-8">
         <.button class="w-full">
           <%= @owned_match.team_a.name %> vs. <%= @owned_match.team_b.name %>
         </.button>
@@ -37,7 +37,7 @@
       Join an Ongoing Match
     </.header>
 
-    <form action={~p"/match/join"} class="mt-10 space-y-8 bg-white">
+    <form action={~p"/join"} class="mt-10 space-y-8 bg-white">
       <.input type="text" name="match-code" value="" label="Match Share Code" />
 
       <.button class="w-full">Join!</.button>

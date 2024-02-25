@@ -22,11 +22,14 @@ defmodule VolleyKitWeb.Router do
     live "/", HomeLive
   end
 
-  scope "/match", VolleyKitWeb do
+  scope "/", VolleyKitWeb do
     pipe_through :browser
 
+    # Temporary. TODO: Figure out a nice way to make this into a live form.
+    get "/join", PageController, :join
+
     live "/current", MatchLive, :current
-    live "/id/:id", MatchLive, :id
+    live "/:code", MatchLive, :code
   end
 
   # Other scopes may use custom stacks.

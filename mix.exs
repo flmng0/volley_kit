@@ -58,7 +58,8 @@ defmodule VolleyKit.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.2"},
-      {:sqids, "~> 0.1.3"}
+      {:sqids, "~> 0.1.3"},
+      {:qr_code, "~> 3.0.0"}
     ]
   end
 

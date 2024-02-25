@@ -27,13 +27,17 @@ defmodule VolleyKitWeb.MatchLive do
     end
   end
 
-  def apply_action(%{"id" => id}, :id, socket) do
-    user_id = socket.assigns.user_id
+  def apply_action(%{"code" => code}, :code, socket) do
+    case Manager.get_shared_match(code) do
+      nil ->
+        socket
+        |> put_flash(:error, "Could not find current match!")
+        |> push_navigate(to: ~p"/")
 
-    match = Manager.get_match!(id)
-    is_owner = match.owner == Ecto.UUID.cast!(user_id)
-
-    apply_match(match, is_owner, socket)
+      match ->
+        is_owner = match.owner == Ecto.UUID.cast!(socket.assigns.user_id)
+        apply_match(match, is_owner, socket)
+    end
   end
 
   def apply_match(%Manager.Match{} = match, is_owner, socket) do

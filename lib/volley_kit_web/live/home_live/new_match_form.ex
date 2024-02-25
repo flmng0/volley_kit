@@ -1,6 +1,7 @@
 defmodule VolleyKitWeb.HomeLive.NewMatchForm do
-  alias VolleyKit.Manager
   use VolleyKitWeb, :live_component
+
+  alias VolleyKit.Manager
 
   @impl true
   def render(assigns) do

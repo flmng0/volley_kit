@@ -1,4 +1,5 @@
 defmodule VolleyKitWeb.MatchLive do
+  alias VolleyKit.Policy
   use VolleyKitWeb, :live_view
 
   alias VolleyKitWeb.MatchLive.ScoreCard
@@ -35,8 +36,9 @@ defmodule VolleyKitWeb.MatchLive do
         |> push_navigate(to: ~p"/")
 
       match ->
-        is_owner = match.owner == Ecto.UUID.cast!(socket.assigns.user_id)
-        apply_match(match, is_owner, socket)
+        can_score = Policy.authorize?(:match_score, code, match)
+        # is_owner = match.owner == Ecto.UUID.cast!(socket.assigns.user_id)
+        apply_match(match, can_score, socket)
     end
   end
 

@@ -59,15 +59,34 @@ defmodule VolleyKit.Manager do
     end
   end
 
-  def get_share_code(%Match{} = match), do: Sqids.encode!([match.id])
+  @type share_level :: :view | :score
 
-  def get_shared_match(id) do
-    case Sqids.decode!(id) do
-      [id] ->
-        Repo.get(Match, id) |> load_match_teams()
+  @spec share_level_val(share_level()) :: integer()
+  defp share_level_val(:view), do: 0
+  defp share_level_val(:score), do: 1
 
-      _ ->
-        nil
+  @spec get_share_level(integer()) :: {:ok, share_level()} | :error
+  def get_share_level(0), do: {:ok, :view}
+  def get_share_level(1), do: {:ok, :score}
+  def get_share_level(_), do: :error
+
+  @spec get_share_code(%Match{}, share_level()) :: String.t()
+
+  def get_share_code(%Match{} = match, level \\ :view) do
+    level_val = share_level_val(level)
+    Sqids.encode!([match.id, level_val])
+  end
+
+  def decode_share_code(share_code) do
+    with [match_id, level] <- Sqids.decode!(share_code),
+         {:ok, share_level} <- get_share_level(level) do
+      {match_id, share_level}
+    end
+  end
+
+  def get_shared_match(share_code) do
+    with {id, _} <- decode_share_code(share_code) do
+      Repo.get(Match, id) |> load_match_teams()
     end
   end
 

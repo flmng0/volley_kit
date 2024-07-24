@@ -1,18 +1,29 @@
 # VolleyKit
 
-To start your Phoenix server:
+## Todo:
 
-  * Run `mix setup` to install and setup dependencies
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+### Desired User Workflow
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+#### Anonymous Users
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+1. Navigate to the home page
+2. Click Start Scratch Match
+  - Optionally click a "more options" button before starting.
 
-## Learn more
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+#### Logged In Users
+
+Part 1: Configuration
+
+1. Select Court Count
+2. Select Time Slot Count
+3. Select Exceptions (Times when a court is not used)
+4. Configure Teams for Each Court (should be optional)
+5. Press Go
+
+Part 2: Ongoing
+
+TODO: Figure this part out.
+I think the main idea will be to be able to finish matches early with a press of a button.
+
+1. 

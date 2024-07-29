@@ -1,11 +1,11 @@
 <div>
   <.score_card team_name={@match.options.a_name} score={@match.a_score} />
-  <.button phx-click="score" phx-value-team="a">Score A</.button>
+  <.button :if={@scorer?} phx-click="score" phx-value-team="a">Score A</.button>
 </div>
 
 <div>
   <.score_card team_name={@match.options.b_name} score={@match.b_score} />
-  <.button phx-click="score" phx-value-team="b">Score B</.button>
+  <.button :if={@scorer?} phx-click="score" phx-value-team="b">Score B</.button>
 </div>
 
 <p>Can score? <%= @scorer? %></p>

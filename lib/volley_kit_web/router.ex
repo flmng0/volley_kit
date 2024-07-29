@@ -8,6 +8,17 @@ defmodule VolleyKitWeb.Router do
     plug :put_root_layout, html: {VolleyKitWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+
+    plug :put_session_user
+  end
+
+  defp put_session_user(conn, _opts) do
+    if Plug.Conn.get_session(conn, :user_id) do
+      conn
+    else
+      uuid = Ecto.UUID.generate()
+      Plug.Conn.put_session(conn, :user_id, uuid)
+    end
   end
 
   pipeline :api do
@@ -16,10 +27,12 @@ defmodule VolleyKitWeb.Router do
 
   scope "/", VolleyKitWeb do
     pipe_through :browser
-  end
 
-  scope "/match", VolleyKitWeb do
-    # post "/", MatchController, :create
+    live_session :default, on_mount: VolleyKitWeb.UserLive do
+      live "/", HomeLive
+
+      live "/scratch/:id", ScratchMatchLive
+    end
   end
 
   # Other scopes may use custom stacks.

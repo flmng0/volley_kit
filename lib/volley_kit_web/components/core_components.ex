@@ -272,6 +272,7 @@ defmodule VolleyKitWeb.CoreComponents do
   attr :name, :any
   attr :label, :string, default: nil
   attr :value, :any
+  attr :class, :string, default: ""
 
   attr :type, :string,
     default: "text",
@@ -309,7 +310,7 @@ defmodule VolleyKitWeb.CoreComponents do
       end)
 
     ~H"""
-    <div>
+    <div class={@class}>
       <label class="flex items-center gap-4 text-sm leading-6 text-zinc-600">
         <input type="hidden" name={@name} value="false" disabled={@rest[:disabled]} />
         <input
@@ -330,7 +331,7 @@ defmodule VolleyKitWeb.CoreComponents do
 
   def input(%{type: "select"} = assigns) do
     ~H"""
-    <div>
+    <div class={@class}>
       <.label for={@id}><%= @label %></.label>
       <select
         id={@id}
@@ -349,7 +350,7 @@ defmodule VolleyKitWeb.CoreComponents do
 
   def input(%{type: "textarea"} = assigns) do
     ~H"""
-    <div>
+    <div class={@class}>
       <.label for={@id}><%= @label %></.label>
       <textarea
         id={@id}
@@ -369,7 +370,7 @@ defmodule VolleyKitWeb.CoreComponents do
   # All other inputs text, datetime-local, url, password, etc. are handled here...
   def input(assigns) do
     ~H"""
-    <div>
+    <div class={@class}>
       <.label for={@id}><%= @label %></.label>
       <input
         type={@type}

@@ -1,12 +1,13 @@
-<div>
-  <.score_card team_name={@match.options.a_name} score={@match.a_score} />
-  <.button :if={@scorer?} phx-click="score" phx-value-team="a">Score A</.button>
+<div class={[
+  "grid md:mt-8 md:mx-auto md:grid-cols-2 md:max-w-2xl md:gap-4",
+  "max-md:w-screen max-md:h-screen",
+  "max-md:portrait:grid-rows-2",
+  "max-md:landscape:grid-cols-2"
+]}>
+  <.wrapper scorer?={@scorer?} team="a">
+    <.score_card class="bg-a" team_name={@match.options.a_name} score={@match.a_score} />
+  </.wrapper>
+  <.wrapper scorer?={@scorer?} team="b">
+    <.score_card class="bg-b" team_name={@match.options.b_name} score={@match.b_score} />
+  </.wrapper>
 </div>
-
-<div>
-  <.score_card team_name={@match.options.b_name} score={@match.b_score} />
-  <.button :if={@scorer?} phx-click="score" phx-value-team="b">Score B</.button>
-</div>
-
-<p>Can score? <%= @scorer? %></p>
-

@@ -77,6 +77,7 @@ defmodule VolleyKitWeb.ScratchMatchLive do
 
   attr :team_name, :string
   attr :score, :integer
+  attr :sets, :integer
 
   attr :class, :string, default: nil
 
@@ -86,6 +87,9 @@ defmodule VolleyKitWeb.ScratchMatchLive do
       "w-full h-full md:aspect-square text-center outline text-white flex flex-col justify-center gap-4",
       @class
     ]}>
+      <span class="text-[1.25em]">
+        <%= @sets %>
+      </span>
       <span class="text-[2.5em]">
         <%= @score %>
       </span>

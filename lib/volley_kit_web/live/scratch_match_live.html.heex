@@ -6,10 +6,20 @@
     "max-md:landscape:grid-cols-2"
   ]}>
     <.wrapper scorer?={@scorer?} team="a">
-      <.score_card class="bg-a" team_name={@match.options.a_name} score={@match.a_score} />
+      <.score_card
+        class="bg-a"
+        team_name={@match.options.a_name}
+        score={@match.a_score}
+        sets={@match.a_sets}
+      />
     </.wrapper>
     <.wrapper scorer?={@scorer?} team="b">
-      <.score_card class="bg-b" team_name={@match.options.b_name} score={@match.b_score} />
+      <.score_card
+        class="bg-b"
+        team_name={@match.options.b_name}
+        score={@match.b_score}
+        sets={@match.b_sets}
+      />
     </.wrapper>
   </div>
 

@@ -4,7 +4,10 @@ defmodule VolleyKit.Repo.Migrations.CreateScratchMatches do
   def change do
     create table(:scratch_matches) do
       add :a_score, :integer
+      add :a_sets, :integer
+
       add :b_score, :integer
+      add :b_sets, :integer
 
       add :options, :map
 

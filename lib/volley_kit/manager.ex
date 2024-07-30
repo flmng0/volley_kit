@@ -33,7 +33,7 @@ defmodule VolleyKit.Manager do
   def get_scratch_match!(id), do: Repo.get!(ScratchMatch, id)
 
   def create_scratch_match(created_by, options \\ %{}) do
-    %ScratchMatch{created_by: created_by, a_score: 0, b_score: 0}
+    %ScratchMatch{created_by: created_by}
     |> ScratchMatch.changeset(%{"options" => options})
     |> Repo.insert()
   end

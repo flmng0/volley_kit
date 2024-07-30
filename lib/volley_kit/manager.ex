@@ -3,10 +3,27 @@ defmodule VolleyKit.Manager do
   The Manager context.
   """
 
-  import Ecto.Query, warn: false
-  alias VolleyKit.Repo
+  use Phoenix.VerifiedRoutes, endpoint: VolleyKitWeb.Endpoint, router: VolleyKitWeb.Router
 
+  import Ecto.Query, warn: false
+
+  alias VolleyKit.Repo
   alias VolleyKit.Manager.ScratchMatch
+
+  def share_code(%ScratchMatch{} = match, :viewer) do
+    url(~p"/scratch/#{match.id}")
+  end
+
+  def share_code(%ScratchMatch{} = match, :scorer) do
+    token = Phoenix.Token.sign(VolleyKitWeb.Endpoint, "score code", match.id)
+    params = %{"token" => token}
+
+    url(~p"/scratch/#{match.id}?#{params}")
+  end
+
+  def verify_scratch_match_token(token) do
+    Phoenix.Token.verify(VolleyKitWeb.Endpoint, "score code", token)
+  end
 
   def list_scratch_matches do
     Repo.all(ScratchMatch)

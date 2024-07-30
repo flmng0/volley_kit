@@ -1,13 +1,43 @@
-<div class={[
-  "grid md:mt-8 md:mx-auto md:grid-cols-2 md:max-w-2xl md:gap-4",
-  "max-md:w-screen max-md:h-screen",
-  "max-md:portrait:grid-rows-2",
-  "max-md:landscape:grid-cols-2"
-]}>
-  <.wrapper scorer?={@scorer?} team="a">
-    <.score_card class="bg-a" team_name={@match.options.a_name} score={@match.a_score} />
-  </.wrapper>
-  <.wrapper scorer?={@scorer?} team="b">
-    <.score_card class="bg-b" team_name={@match.options.b_name} score={@match.b_score} />
-  </.wrapper>
-</div>
+<main class="flex flex-col md:items-center md:gap-8 max-md:w-screen max-md:h-screen">
+  <div class={[
+    "grid w-full md:mt-8 md:mx-auto md:grid-cols-2 md:max-w-2xl md:gap-4",
+    "max-md:w-full max-md:h-full",
+    "max-md:portrait:grid-rows-2",
+    "max-md:landscape:grid-cols-2"
+  ]}>
+    <.wrapper scorer?={@scorer?} team="a">
+      <.score_card class="bg-a" team_name={@match.options.a_name} score={@match.a_score} />
+    </.wrapper>
+    <.wrapper scorer?={@scorer?} team="b">
+      <.score_card class="bg-b" team_name={@match.options.b_name} score={@match.b_score} />
+    </.wrapper>
+  </div>
+
+  <.button class="max-md:!rounded-none" phx-click={show_modal("scratch-match-share-modal")}>
+    Show Share Code
+  </.button>
+</main>
+
+<.modal id="scratch-match-share-modal">
+  <div class="max-w-xl">
+    <span class="text-xl">QR Code to View</span>
+    <.qr_code content={@view_code} />
+    <a class="text-blue-600 underline" href={@view_code}><%= @view_code %></a>
+  </div>
+
+  <div :if={@owner?} class="mt-8">
+    <span class="mr-2 text-xl">QR Code for Scorers</span>
+    <.button phx-click="toggle_scorer_code">
+      <%= if @showing_scorer_code do %>
+        Hide
+      <% else %>
+        Show
+      <% end %>
+    </.button>
+
+    <div :if={@showing_scorer_code}>
+      <.qr_code id="scorer-share-code" content={@score_code} />
+      <a class="break-all text-blue-600 underline" href={@score_code}><%= @score_code %></a>
+    </div>
+  </div>
+</.modal>

@@ -33,15 +33,19 @@ defmodule VolleyKitWeb.HomeLive.ScratchMatchForm do
           <div id={@form.id <> "-options"} class="group bg-gray-100 rounded-md">
             <button
               type="button"
-              class="text-center px-4 py-3 font-bold tracking-wide w-full"
+              class="flex justify-between items-center px-4 py-3 tracking-wide w-full"
               phx-click={
                 JS.toggle_attribute({"aria-expanded", "true"}, to: "#" <> @form.id <> "-options")
               }
             >
+              <hgroup class="flex gap-3 items-center">
+                <h3 class="font-bold">Settings</h3>
+                <span class="text-xs group-aria-expanded:hidden">Team A Name, Team B Name...</span>
+              </hgroup>
               <.icon
                 name="hero-chevron-right"
                 class="w-4 h-4 group-aria-expanded:rotate-90 transition-transform"
-              /> More Options
+              />
             </button>
             <div class="hidden group-aria-expanded:flex border-t border-gray-200 px-4 py-3 flex-col gap-y-4">
               <fieldset class="flex flex-row flex-wrap gap-x-6">
@@ -50,14 +54,15 @@ defmodule VolleyKitWeb.HomeLive.ScratchMatchForm do
               </fieldset>
 
               <%!-- Note to self: re-add set count in when you can be bothered to implement it --%>
-              <%!-- <.input --%>
-              <%!--   field={@form[:set_count]} --%>
-              <%!--   type="number" --%>
-              <%!--   min={1} --%>
-              <%!--   max={99} --%>
-              <%!--   step={1} --%>
-              <%!--   label="Set Count:" --%>
-              <%!-- /> --%>
+              <.input
+                field={@form[:set_count]}
+                type="number"
+                class="hidden"
+                min={1}
+                max={99}
+                step={1}
+                label="Set Count:"
+              />
             </div>
           </div>
 

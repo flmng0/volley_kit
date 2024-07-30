@@ -4,10 +4,12 @@ defmodule VolleyKitWeb.HomeLive.ScratchMatchList do
   alias VolleyKit.Manager
   alias VolleyKitWeb.HomeLive
 
+  @impl true
   def mount(socket) do
     {:ok, socket}
   end
 
+  @impl true
   def update(%{user_id: user_id} = _assigns, socket) do
     scratch_matches = Manager.list_scratch_matches(user_id)
 
@@ -19,6 +21,7 @@ defmodule VolleyKitWeb.HomeLive.ScratchMatchList do
     {:ok, socket}
   end
 
+  @impl true
   def render(assigns) do
     ~H"""
     <nav>
@@ -33,6 +36,7 @@ defmodule VolleyKitWeb.HomeLive.ScratchMatchList do
           >
             <p class="italic">Uh oh! You haven't started any matches yet!</p>
           </li>
+
           <li
             :for={{dom_id, m} <- @streams.scratch_matches}
             id={dom_id}
@@ -47,9 +51,23 @@ defmodule VolleyKitWeb.HomeLive.ScratchMatchList do
               <span><%= m.options.b_name %></span>
             </.link>
 
-            <.button class="bg-red-600" phx-click="delete" phx-value-id={m.id} phx-target={@myself}>
+            <.button
+              class="bg-red-600 border-2 border-red-800 text-black"
+              phx-click="delete"
+              phx-value-id={m.id}
+              phx-target={@myself}
+            >
               <.icon name="hero-trash" />
             </.button>
+
+            <span
+              class="col-span-2 text-sm text-gray-500 italic tracking-wide -mt-2 px-2"
+              data-time={m.updated_at}
+              id={dom_id <> "-last-used"}
+              phx-hook="ScratchLastUsed"
+            >
+              Last Used:
+            </span>
           </li>
         </ul>
       </HomeLive.section_card>
@@ -64,7 +82,12 @@ defmodule VolleyKitWeb.HomeLive.ScratchMatchList do
     socket =
       with ^user_id <- match.created_by,
            {:ok, match} <- Manager.delete_scratch_match(match) do
-        stream_delete(socket, :scratch_matches, match)
+        socket
+        |> stream_delete(:scratch_matches, match)
+        |> put_flash(
+          :info,
+          "Successfully deleted match #{match.options.a_name} v. #{match.options.b_name}"
+        )
       else
         false ->
           put_flash(socket, :error, "You are not the owner of this match!")

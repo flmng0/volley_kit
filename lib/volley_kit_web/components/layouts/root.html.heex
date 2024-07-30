@@ -8,6 +8,9 @@
       <%= assigns[:page_title] || "Volley Kit" %>
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
+    <script>
+      window.userId = "<%= @user_id %>";
+    </script>
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
   </head>

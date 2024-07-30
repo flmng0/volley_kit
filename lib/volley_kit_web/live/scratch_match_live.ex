@@ -46,10 +46,13 @@ defmodule VolleyKitWeb.ScratchMatchLive do
       Manager.subscribe_scratch_match(match)
     end
 
+    {set_complete?, winner} = Manager.set_complete(match)
+
     socket
     |> assign(match: match, owner?: owner?, scorer?: scorer?)
     |> assign(view_code: Manager.share_code(match, :viewer))
     |> assign(score_code: Manager.share_code(match, :scorer))
+    |> assign(set_complete?: set_complete?, winner: winner)
     |> assign(show_score_code?: false)
   end
 
@@ -57,22 +60,33 @@ defmodule VolleyKitWeb.ScratchMatchLive do
     {:noreply, assign(socket, match: Map.merge(match, update_map))}
   end
 
+  def handle_info(%{event: "set_won", payload: winner}, socket) do
+    {:noreply, assign(socket, set_complete?: true, winner: winner)}
+  end
+
   def handle_event("score", %{"team" => team}, socket) do
-    {:noreply, score(socket, socket.assigns.match, team)}
+    {:ok, match} = Manager.score_scratch_match(socket.assigns.match, team)
+
+    {:noreply, assign(socket, match: match)}
+  end
+
+  def handle_event("next_set", _params, socket) do
+    {:ok, match} = Manager.next_set(socket.assigns.match, socket.assigns.winner)
+
+    {:noreply, assign(socket, match: match, set_complete?: false, winner: nil)}
   end
 
   def handle_event("toggle_scorer_code", _params, socket) do
     %{score_code: score_code, show_score_code?: current, match: match} = socket.assigns
 
-    score_code = if current, do: score_code, else: Manager.share_code(match, :scorer)
+    score_code =
+      if current do
+        score_code
+      else
+        Manager.share_code(match, :scorer)
+      end
 
     {:noreply, assign(socket, score_code: score_code, show_score_code?: !current)}
-  end
-
-  def score(socket, %ScratchMatch{} = match, team) do
-    {:ok, match} = Manager.score_scratch_match(match, team)
-
-    assign(socket, match: match)
   end
 
   attr :team_name, :string

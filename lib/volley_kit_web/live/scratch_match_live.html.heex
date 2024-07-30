@@ -5,7 +5,7 @@
     "max-md:portrait:grid-rows-2",
     "max-md:landscape:grid-cols-2"
   ]}>
-    <.wrapper scorer?={@scorer?} team="a">
+    <.wrapper scorer?={@scorer? and not @set_complete?} team="a">
       <.score_card
         class="bg-a"
         team_name={@match.options.a_name}
@@ -13,7 +13,7 @@
         sets={@match.a_sets}
       />
     </.wrapper>
-    <.wrapper scorer?={@scorer?} team="b">
+    <.wrapper scorer?={@scorer? and not @set_complete?} team="b">
       <.score_card
         class="bg-b"
         team_name={@match.options.b_name}
@@ -27,6 +27,29 @@
     Show Share <%= pluralize("Code", "Codes", @owner?) %>
   </.button>
 </main>
+
+<.modal
+  :if={@scorer? and @set_complete?}
+  id="scratch-match-set-complete"
+  show={true}
+  on_cancel={JS.push("next_set")}
+>
+  <div class="text-center space-y-6">
+    <h2 class="text-2xl">Set Complete!</h2>
+    <p>
+      <%= case @winner do %>
+        <% :a -> %>
+          <%= @match.options.a_name %> has won the set. <%= "#{@match.a_score}-#{@match.b_score}" %>
+        <% :b -> %>
+          <%= @match.options.b_name %> has won the set. <%= "#{@match.b_score}-#{@match.a_score}" %>
+      <% end %>
+    </p>
+
+    <.button phx-click={JS.push("next_set")}>
+      Click Here to Start The Next Set
+    </.button>
+  </div>
+</.modal>
 
 <.modal id="scratch-match-share-modal">
   <div class="max-w-xl">

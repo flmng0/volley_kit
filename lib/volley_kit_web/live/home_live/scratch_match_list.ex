@@ -44,7 +44,7 @@ defmodule VolleyKitWeb.HomeLive.ScratchMatchList do
           >
             <.link
               navigate={~p"/scratch/#{m.id}"}
-              class="flex flex-row justify-evenly w-full bg-gray-900 text-white rounded-md px-4 py-4"
+              class="flex flex-row justify-evenly w-full hover:bg-zinc-700 bg-gray-900 text-white rounded-md px-4 py-4"
             >
               <span><%= m.options.a_name %></span>
               <span>v.</span>
@@ -52,7 +52,8 @@ defmodule VolleyKitWeb.HomeLive.ScratchMatchList do
             </.link>
 
             <.button
-              class="bg-red-600 border-2 border-red-800 text-black"
+              colors="bg-red-600 hover:bg-red-700 text-black"
+              class="border-2 border-red-800"
               phx-click="delete"
               phx-value-id={m.id}
               phx-target={@myself}

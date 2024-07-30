@@ -9,17 +9,28 @@ defmodule VolleyKitWeb.ScratchMatchLive do
   end
 
   def handle_params(%{"id" => id}, uri, socket) do
+    case Manager.get_scratch_match(id) do
+      nil ->
+        socket =
+          socket
+          |> put_flash(:error, "Match with ID #{id} was not found")
+          |> push_navigate(to: ~p"/")
+
+        {:noreply, socket}
+
+      match ->
+        {:noreply, apply_match(match, uri, socket)}
+    end
+  end
+
+  def apply_match(%ScratchMatch{} = match, uri, socket) do
     %URI{query: query} = URI.parse(uri)
 
-    match = Manager.get_scratch_match!(id)
-
     owner? = match.created_by == socket.assigns.user_id
-    IO.puts("AM I NOT THE OWNER???????? #{owner?}")
 
     has_token? =
       with %{"token" => token} <- URI.decode_query(query || ""),
            {:ok, id} <- Manager.verify_scratch_match_token(token) do
-        IO.puts("User has joined with valid scorer token")
         match.id == id
       else
         _ -> false
@@ -35,14 +46,11 @@ defmodule VolleyKitWeb.ScratchMatchLive do
       Manager.subscribe_scratch_match(match)
     end
 
-    socket =
-      socket
-      |> assign(match: match, owner?: owner?, scorer?: scorer?)
-      |> assign(view_code: Manager.share_code(match, :viewer))
-      |> assign(score_code: Manager.share_code(match, :scorer))
-      |> assign(showing_scorer_code: false)
-
-    {:noreply, assign(socket, match: match, owner?: owner?, scorer?: scorer?)}
+    socket
+    |> assign(match: match, owner?: owner?, scorer?: scorer?)
+    |> assign(view_code: Manager.share_code(match, :viewer))
+    |> assign(score_code: Manager.share_code(match, :scorer))
+    |> assign(show_score_code?: false)
   end
 
   def handle_info(%{event: "score", payload: update_map}, %{assigns: %{match: match}} = socket) do
@@ -54,38 +62,17 @@ defmodule VolleyKitWeb.ScratchMatchLive do
   end
 
   def handle_event("toggle_scorer_code", _params, socket) do
-    %{score_code: score_code, showing_scorer_code: current, match: match} = socket.assigns
+    %{score_code: score_code, show_score_code?: current, match: match} = socket.assigns
 
     score_code = if current, do: score_code, else: Manager.share_code(match, :scorer)
 
-    {:noreply, assign(socket, score_code: score_code, showing_scorer_code: !current)}
+    {:noreply, assign(socket, score_code: score_code, show_score_code?: !current)}
   end
 
   def score(socket, %ScratchMatch{} = match, team) do
     {:ok, match} = Manager.score_scratch_match(match, team)
 
     assign(socket, match: match)
-  end
-
-  attr :content, :string
-  attr :link?, :boolean, default: true
-  attr :class, :string, default: nil
-
-  attr :rest, :global
-
-  def qr_code(assigns) do
-    {:ok, qr_svg} =
-      assigns.content
-      |> QRCode.create(:medium)
-      |> QRCode.render(:svg, %QRCode.Render.SvgSettings{scale: 6})
-
-    assigns = assign(assigns, qr_svg: qr_svg)
-
-    ~H"""
-    <div class={["w-min h-min mx-auto p-8 bg-white", @class]} {@rest}>
-      <%= raw(@qr_svg) %>
-    </div>
-    """
   end
 
   attr :team_name, :string

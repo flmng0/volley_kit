@@ -19,6 +19,40 @@ defmodule VolleyKitWeb.CoreComponents do
   alias Phoenix.LiveView.JS
   import VolleyKitWeb.Gettext
 
+  def pluralize(singular, _plural, false), do: singular
+  def pluralize(_singular, plural, true), do: plural
+
+  @doc """
+  Render a QR Code (as an SVG).
+
+  ## Examples
+
+      <.qr_code content="https://google.com" />
+
+  The above will show a QR code that, when scanned, will go to
+  Google's home page.
+  """
+
+  attr :content, :string
+  attr :class, :string, default: nil
+
+  attr :rest, :global
+
+  def qr_code(assigns) do
+    {:ok, qr_svg} =
+      assigns.content
+      |> QRCode.create(:medium)
+      |> QRCode.render(:svg, %QRCode.Render.SvgSettings{scale: 6})
+
+    assigns = assign(assigns, qr_svg: qr_svg)
+
+    ~H"""
+    <div class={["w-min h-min mx-auto p-8 bg-white", @class]} {@rest}>
+      <%= Phoenix.HTML.raw(@qr_svg) %>
+    </div>
+    """
+  end
+
   @doc """
   Renders a modal.
 

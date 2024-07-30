@@ -14,7 +14,7 @@
   </div>
 
   <.button class="max-md:!rounded-none" phx-click={show_modal("scratch-match-share-modal")}>
-    Show Share Code
+    Show Share <%= pluralize("Code", "Codes", @owner?) %>
   </.button>
 </main>
 
@@ -25,17 +25,23 @@
     <a class="text-blue-600 underline" href={@view_code}><%= @view_code %></a>
   </div>
 
-  <div :if={@owner?} class="mt-8">
-    <span class="mr-2 text-xl">QR Code for Scorers</span>
-    <.button phx-click="toggle_scorer_code">
-      <%= if @showing_scorer_code do %>
+  <div :if={@owner?} class="mt-10">
+    <hgroup>
+      <h2 class="mr-2 text-xl">QR Code for Scorers</h2>
+      <p class="italic text-sm">
+        Anyone with this link will be able to score for this match. Use wisely!
+      </p>
+    </hgroup>
+
+    <.button phx-click="toggle_scorer_code" class="block my-3 mx-auto">
+      <%= if @show_score_code? do %>
         Hide
       <% else %>
         Show
       <% end %>
     </.button>
 
-    <div :if={@showing_scorer_code}>
+    <div :if={@show_score_code?}>
       <.qr_code id="scorer-share-code" content={@score_code} />
       <a class="break-all text-blue-600 underline" href={@score_code}><%= @score_code %></a>
     </div>

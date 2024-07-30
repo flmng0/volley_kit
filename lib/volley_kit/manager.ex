@@ -29,6 +29,7 @@ defmodule VolleyKit.Manager do
     Repo.all(ScratchMatch)
   end
 
+  def get_scratch_match(id), do: Repo.get(ScratchMatch, id)
   def get_scratch_match!(id), do: Repo.get!(ScratchMatch, id)
 
   def create_scratch_match(created_by, options \\ %{}) do

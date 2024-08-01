@@ -38,7 +38,10 @@
     <h2 class="text-2xl">Set Will Finish!</h2>
     <p>Are you ready to start the next set?</p>
 
-    <.button phx-click={JS.push("cancel_set_finish")}>
+    <.button
+      phx-click={JS.push("cancel_set_finish")}
+      colors="bg-zinc-300 hover:bg-zinc-400 text-black active:text-white/80"
+    >
       Cancel
     </.button>
     <.button phx-click={JS.push("next_set")}>

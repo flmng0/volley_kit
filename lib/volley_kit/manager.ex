@@ -10,15 +10,17 @@ defmodule VolleyKit.Manager do
   alias VolleyKit.Repo
   alias VolleyKit.Manager.ScratchMatch
 
-  def share_code(%ScratchMatch{} = match, :viewer) do
+  def scratch_match_view_code(%ScratchMatch{} = match) do
     url(~p"/scratch/#{match.id}")
   end
 
-  def share_code(%ScratchMatch{} = match, :scorer) do
-    token = Phoenix.Token.sign(VolleyKitWeb.Endpoint, "score code", match.id)
+  def scratch_match_score_code(%ScratchMatch{} = match, token) do
     params = %{"token" => token}
-
     url(~p"/scratch/#{match.id}?#{params}")
+  end
+
+  def sign_scratch_match_token(%ScratchMatch{id: id} = _match) do
+    Phoenix.Token.sign(VolleyKitWeb.Endpoint, "score code", id)
   end
 
   def verify_scratch_match_token(token) do
@@ -85,26 +87,26 @@ defmodule VolleyKit.Manager do
     with {:ok, scratch_match} <- update_scratch_match(scratch_match, update_map) do
       VolleyKitWeb.Endpoint.broadcast(topic(scratch_match), "score", update_map)
 
-      with {true, winner} <- set_complete(scratch_match) do
-        VolleyKitWeb.Endpoint.broadcast(topic(scratch_match), "set_won", winner)
-      end
-
       {:ok, scratch_match}
     end
   end
 
-  def set_complete(%ScratchMatch{a_score: a, b_score: b})
-      when (a >= 25 or b >= 25) and abs(a - b) >= 2 do
-    if a > b do
-      {true, :a}
-    else
-      {true, :b}
-    end
+  def would_complete_set?(%ScratchMatch{a_score: a, b_score: b}, team) when team in ~w(a b) do
+    {winner_score, opponent_score} =
+      case team do
+        "a" ->
+          {a, b}
+
+        "b" ->
+          {b, a}
+      end
+
+    winner_score >= 24 && winner_score >= opponent_score + 1
   end
 
-  def set_complete(_match), do: {false, nil}
+  def next_set(%ScratchMatch{a_score: a, b_score: b} = match) do
+    winner = if a > b, do: :a, else: :b
 
-  def next_set(%ScratchMatch{} = match, winner) when winner in [:a, :b] do
     update_map =
       case winner do
         :a ->
@@ -116,6 +118,7 @@ defmodule VolleyKit.Manager do
       |> Map.merge(%{a_score: 0, b_score: 0})
 
     with {:ok, match} <- update_scratch_match(match, update_map) do
+      VolleyKitWeb.Endpoint.broadcast(topic(match), "set_won", winner)
       VolleyKitWeb.Endpoint.broadcast(topic(match), "score", update_map)
 
       {:ok, match}

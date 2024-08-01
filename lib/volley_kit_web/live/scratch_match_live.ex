@@ -46,14 +46,17 @@ defmodule VolleyKitWeb.ScratchMatchLive do
       Manager.subscribe_scratch_match(match)
     end
 
-    {set_complete?, winner} = Manager.set_complete(match)
+    token = Manager.sign_scratch_match_token(match)
 
     socket
     |> assign(match: match, owner?: owner?, scorer?: scorer?)
-    |> assign(view_code: Manager.share_code(match, :viewer))
-    |> assign(score_code: Manager.share_code(match, :scorer))
-    |> assign(set_complete?: set_complete?, winner: winner)
-    |> assign(show_score_code?: false)
+    |> assign(view_code: Manager.scratch_match_view_code(match))
+    |> assign(set_finishing?: false)
+    |> assign_score_token(token, match)
+  end
+
+  def assign_score_token(socket, token, match) do
+    assign(socket, score_token: token, score_code: Manager.scratch_match_score_code(match, token))
   end
 
   def handle_info(%{event: "score", payload: update_map}, %{assigns: %{match: match}} = socket) do
@@ -61,32 +64,47 @@ defmodule VolleyKitWeb.ScratchMatchLive do
   end
 
   def handle_info(%{event: "set_won", payload: winner}, socket) do
-    {:noreply, assign(socket, set_complete?: true, winner: winner)}
+    {:noreply, assign(socket, set_finishing?: false, winner: winner)}
   end
 
   def handle_event("score", %{"team" => team}, socket) do
-    {:ok, match} = Manager.score_scratch_match(socket.assigns.match, team)
+    %{match: match} = socket.assigns
 
-    {:noreply, assign(socket, match: match)}
+    if Manager.would_complete_set?(match, team) do
+      {:noreply, assign(socket, set_finishing?: true)}
+    else
+      {:ok, match} = Manager.score_scratch_match(socket.assigns.match, team)
+      {:noreply, assign(socket, match: match)}
+    end
+  end
+
+  def handle_event("cancel_set_finish", _params, socket) do
+    {:noreply, assign(socket, set_finishing?: false)}
   end
 
   def handle_event("next_set", _params, socket) do
-    {:ok, match} = Manager.next_set(socket.assigns.match, socket.assigns.winner)
+    {:ok, match} = Manager.next_set(socket.assigns.match)
 
-    {:noreply, assign(socket, match: match, set_complete?: false, winner: nil)}
+    {:noreply, assign(socket, match: match, set_finishing?: false)}
   end
 
-  def handle_event("toggle_scorer_code", _params, socket) do
-    %{score_code: score_code, show_score_code?: current, match: match} = socket.assigns
+  def handle_event("maybe_refresh_score_code", _params, socket) do
+    %{score_token: token, match: match} = socket.assigns
 
-    score_code =
-      if current do
-        score_code
-      else
-        Manager.share_code(match, :scorer)
-      end
+    id = match.id
 
-    {:noreply, assign(socket, score_code: score_code, show_score_code?: !current)}
+    case Manager.verify_scratch_match_token(token) do
+      {:ok, ^id} ->
+        {:noreply, socket}
+
+      {:error, :expired} ->
+        token = Manager.sign_scratch_match_token(match)
+
+        {:noreply, assign_score_token(socket, token, match)}
+
+      _ ->
+        {:noreply, put_flash(socket, :error, "Unable to refresh scorer token!")}
+    end
   end
 
   attr :team_name, :string

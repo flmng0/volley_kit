@@ -5,7 +5,7 @@
     "max-md:portrait:grid-rows-2",
     "max-md:landscape:grid-cols-2"
   ]}>
-    <.wrapper scorer?={@scorer? and not @set_complete?} team="a">
+    <.wrapper scorer?={@scorer?} team="a">
       <.score_card
         class="bg-a"
         team_name={@match.options.a_name}
@@ -13,7 +13,7 @@
         sets={@match.a_sets}
       />
     </.wrapper>
-    <.wrapper scorer?={@scorer? and not @set_complete?} team="b">
+    <.wrapper scorer?={@scorer?} team="b">
       <.score_card
         class="bg-b"
         team_name={@match.options.b_name}
@@ -29,24 +29,20 @@
 </main>
 
 <.modal
-  :if={@scorer? and @set_complete?}
+  :if={@scorer? and @set_finishing?}
   id="scratch-match-set-complete"
   show={true}
-  on_cancel={JS.push("next_set")}
+  on_cancel={JS.push("cancel_set_finish")}
 >
   <div class="text-center space-y-6">
-    <h2 class="text-2xl">Set Complete!</h2>
-    <p>
-      <%= case @winner do %>
-        <% :a -> %>
-          <%= @match.options.a_name %> has won the set. <%= "#{@match.a_score}-#{@match.b_score}" %>
-        <% :b -> %>
-          <%= @match.options.b_name %> has won the set. <%= "#{@match.b_score}-#{@match.a_score}" %>
-      <% end %>
-    </p>
+    <h2 class="text-2xl">Set Will Finish!</h2>
+    <p>Are you ready to start the next set?</p>
 
+    <.button phx-click={JS.push("cancel_set_finish")}>
+      Cancel
+    </.button>
     <.button phx-click={JS.push("next_set")}>
-      Click Here to Start The Next Set
+      Go To Next Set
     </.button>
   </div>
 </.modal>
@@ -66,15 +62,20 @@
       </p>
     </hgroup>
 
-    <.button phx-click="toggle_scorer_code" class="block my-3 mx-auto">
-      <%= if @show_score_code? do %>
-        Hide
-      <% else %>
-        Show
-      <% end %>
+    <.button
+      phx-click={
+        JS.push("maybe_refresh_score_code")
+        |> JS.toggle_class("hidden",
+          to: [".scorer-code-toggle-btn > *", ".scorer-share-code-container"]
+        )
+      }
+      class="scorer-code-toggle-btn block my-3 mx-auto"
+    >
+      <span>Show</span>
+      <span class="hidden">Hide</span>
     </.button>
 
-    <div :if={@show_score_code?}>
+    <div class="hidden scorer-share-code-container">
       <.qr_code id="scorer-share-code" content={@score_code} />
       <a class="break-all text-blue-600 underline" href={@score_code}><%= @score_code %></a>
     </div>

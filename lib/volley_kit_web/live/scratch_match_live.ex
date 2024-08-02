@@ -60,7 +60,18 @@ defmodule VolleyKitWeb.ScratchMatchLive do
   end
 
   def handle_info(%{event: "score", payload: update_map}, %{assigns: %{match: match}} = socket) do
-    {:noreply, assign(socket, match: Map.merge(match, update_map))}
+    match = Map.merge(match, update_map)
+
+    socket =
+      if socket.assigns.set_finishing? do
+        put_flash(socket, :info, "Cancelled prompt because somebody else scored")
+      else
+        socket
+      end
+
+    socket = assign(socket, match: match, set_finishing?: false)
+
+    {:noreply, socket}
   end
 
   def handle_info(%{event: "set_won", payload: winner}, socket) do

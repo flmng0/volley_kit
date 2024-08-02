@@ -49,8 +49,20 @@ defmodule VolleyKitWeb.HomeLive.ScratchMatchForm do
             </button>
             <div class="hidden group-aria-expanded:flex border-t border-gray-200 px-4 py-3 flex-col gap-y-4">
               <fieldset class="flex flex-row flex-wrap gap-x-6">
-                <.input class="grow basis-32" field={@form[:a_name]} type="text" label="Team A Name:" />
-                <.input class="grow basis-32" field={@form[:b_name]} type="text" label="Team B Name:" />
+                <.input
+                  class="grow basis-32"
+                  field={@form[:a_name]}
+                  type="text"
+                  label="Team A Name:"
+                  onfocus="select()"
+                />
+                <.input
+                  class="grow basis-32"
+                  field={@form[:b_name]}
+                  type="text"
+                  label="Team B Name:"
+                  onfocus="select()"
+                />
               </fieldset>
 
               <%!-- Note to self: re-add set count in when you can be bothered to implement it --%>

@@ -1,17 +1,17 @@
 <.flash_group flash={@flash} />
 
-<main class="flex flex-col md:items-center md:gap-8 max-md:w-screen max-md:h-svh">
+<main class="flex flex-col lg:items-center lg:gap-8 max-lg:w-screen max-lg:h-lvh">
   <div class={[
-    "grid w-full md:mt-8 md:mx-auto md:grid-cols-2 md:max-w-2xl md:gap-4",
-    "max-md:w-full max-md:h-full",
-    "max-md:portrait:grid-rows-2",
-    "max-md:landscape:grid-cols-2"
+    "grid w-full lg:mt-8 lg:mx-auto lg:grid-cols-2 lg:max-w-2xl lg:gap-4",
+    "max-lg:w-full max-lg:h-full",
+    "max-lg:portrait:grid-rows-2",
+    "max-lg:landscape:grid-cols-2"
   ]}>
     <.score_card scorer?={@scorer?} team="a" match={@match} />
     <.score_card scorer?={@scorer?} team="b" match={@match} />
   </div>
 
-  <.button class="max-md:!rounded-none" phx-click={show_modal("scratch-match-share-modal")}>
+  <.button class="max-lg:!rounded-none" phx-click={show_modal("scratch-match-share-modal")}>
     Show Share <%= pluralize("Code", "Codes", @owner?) %>
   </.button>
 </main>

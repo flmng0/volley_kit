@@ -151,14 +151,14 @@ defmodule VolleyKitWeb.ScratchMatchLive do
       phx-value-action="add"
       role={@scorer? && "button"}
       class={[
-        "block select-none w-full h-full md:aspect-square text-center outline text-white flex flex-col justify-center gap-4",
+        "block select-none w-full h-full lg:aspect-square text-center outline text-white flex flex-col justify-center gap-4",
         "bg-" <> @team
       ]}
     >
       <span class="text-[1.25em]">
         <%= @sets %>
       </span>
-      <span class="text-[2.5em]">
+      <span class="text-[8em] font-mono">
         <%= @score %>
       </span>
       <span class="text-[1em]">

@@ -89,6 +89,10 @@ defmodule VolleyKitWeb.ScratchMatchLive do
     end
   end
 
+  def handle_event("put_copy_flash", _params, socket) do
+    {:noreply, put_flash(socket, :success, "Copied")}
+  end
+
   def handle_event("cancel_set_finish", _params, socket) do
     {:noreply, assign(socket, set_finishing?: false)}
   end
@@ -157,6 +161,22 @@ defmodule VolleyKitWeb.ScratchMatchLive do
     <% else %>
       <%= render_slot(@inner_block) %>
     <% end %>
+    """
+  end
+
+  attr :id, :string, required: true
+  attr :href, :string, required: true
+  attr :label, :string, required: true
+
+  defp copy_link_button(assigns) do
+    ~H"""
+    <.button
+      class="block mx-auto"
+      phx-click={JS.dispatch("vk:clipcopy") |> JS.push("put_copy_flash")}
+      data-href={@href}
+    >
+      <%= @label %>
+    </.button>
     """
   end
 end

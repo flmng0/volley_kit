@@ -1,6 +1,6 @@
 <.flash_group flash={@flash} />
 
-<main class="flex flex-col md:items-center md:gap-8 max-md:w-screen max-md:h-screen">
+<main class="flex flex-col md:items-center md:gap-8 max-md:w-screen max-md:h-svh">
   <div class={[
     "grid w-full md:mt-8 md:mx-auto md:grid-cols-2 md:max-w-2xl md:gap-4",
     "max-md:w-full max-md:h-full",
@@ -56,7 +56,7 @@
   <div class="max-w-xl">
     <span class="text-xl">QR Code to View</span>
     <.qr_code content={@view_code} />
-    <a class="text-blue-600 underline" href={@view_code}><%= @view_code %></a>
+    <.copy_link_button id="view-share-code-btn" href={@view_code} label="Copy View Link" />
   </div>
 
   <div :if={@owner?} class="mt-10">
@@ -82,7 +82,11 @@
 
     <div class="hidden scorer-share-code-container">
       <.qr_code id="scorer-share-code" content={@score_code} />
-      <a class="break-all text-blue-600 underline" href={@score_code}><%= @score_code %></a>
+      <.copy_link_button
+        id="scorer-share-code-copy-btn"
+        href={@score_code}
+        label="Copy Scorer Link"
+      />
     </div>
   </div>
 </.modal>

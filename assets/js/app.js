@@ -22,6 +22,11 @@ import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import topbar from "../vendor/topbar";
 
+window.addEventListener("vk:clipcopy", (event) => {
+  const content = event.target.dataset.href;
+  navigator.clipboard.writeText(content);
+});
+
 let hooks = {
   ScratchLastUsed: {
     mounted() {

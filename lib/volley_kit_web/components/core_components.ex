@@ -82,7 +82,7 @@ defmodule VolleyKitWeb.CoreComponents do
       phx-mounted={@show && show_modal(@id)}
       phx-remove={hide_modal(@id)}
       data-cancel={JS.exec(@on_cancel, "phx-remove")}
-      class="relative z-50 hidden"
+      class="relative z-40 hidden"
     >
       <div id={"#{@id}-bg"} class="bg-zinc-50/90 fixed inset-0 transition-opacity" aria-hidden="true" />
       <div
@@ -99,9 +99,9 @@ defmodule VolleyKitWeb.CoreComponents do
               id={"#{@id}-container"}
               phx-window-keydown={JS.exec("data-cancel", to: "##{@id}")}
               phx-key="escape"
-              phx-click-away={JS.exec("data-cancel", to: "##{@id}")}
               class="shadow-zinc-700/10 ring-zinc-700/10 relative hidden rounded-2xl bg-white p-14 shadow-lg ring-1 transition"
             >
+              <%!-- phx-click-away={JS.exec("data-cancel", to: "##{@id}")} --%>
               <div class="absolute top-6 right-5">
                 <button
                   phx-click={JS.exec("data-cancel", to: "##{@id}")}
@@ -149,7 +149,9 @@ defmodule VolleyKitWeb.CoreComponents do
       phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
       role="alert"
       class={[
-        "fixed top-2 right-2 mr-2 w-80 sm:w-96 z-50 rounded-lg p-3 ring-1",
+        "fixed w-80 sm:w-96 z-50 md:rounded-lg p-3 ring-1 flex flex-row md:flex-col",
+        "md:top-2 md:right-2 md:mr-2",
+        "max-md:bottom-2 max-md:left-1/2 max-md:-translate-x-1/2",
         @kind == :info && "bg-amber-50 text-amber-800 ring-amber-500 fill-orange-900",
         @kind == :error && "bg-rose-50 text-rose-900 shadow-md ring-rose-500 fill-rose-900",
         @kind == :success && "bg-emerald-50 text-emerald-800 ring-emerald-500 fill-cyan-900"
@@ -159,8 +161,10 @@ defmodule VolleyKitWeb.CoreComponents do
       <p :if={@title} class="flex items-center gap-1.5 text-sm font-semibold leading-6">
         <.icon :if={@kind == :info} name="hero-information-circle-mini" class="h-4 w-4" />
         <.icon :if={@kind == :error} name="hero-exclamation-circle-mini" class="h-4 w-4" />
-        <.icon :if={@kind == :success} name="hero-information-circle-mini" class="h-4 w-4" />
-        <%= @title %>
+        <.icon :if={@kind == :success} name="hero-check-circle-mini" class="h-4 w-4" />
+        <span class="hidden md:inline">
+          <%= @title %>
+        </span>
       </p>
       <p class="mt-2 text-sm leading-5"><%= msg %></p>
       <button type="button" class="group absolute top-1 right-1 p-2" aria-label={gettext("close")}>

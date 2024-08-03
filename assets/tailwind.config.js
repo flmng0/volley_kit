@@ -11,6 +11,7 @@ module.exports = {
     "../lib/volley_kit_web.ex",
     "../lib/volley_kit_web/**/*.*ex",
   ],
+  safelist: ["bg-a", "bg-b"],
   theme: {
     extend: {
       colors: {

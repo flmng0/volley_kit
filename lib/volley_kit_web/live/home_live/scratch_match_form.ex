@@ -100,7 +100,7 @@ defmodule VolleyKitWeb.HomeLive.ScratchMatchForm do
 
         socket =
           socket
-          |> put_flash(:info, "Starting scratch match between #{a_name} vs. #{b_name}")
+          |> put_flash(:success, "Starting scratch match between #{a_name} vs. #{b_name}")
           |> push_navigate(to: ~p"/scratch/#{scratch_match.id}")
 
         {:noreply, socket}

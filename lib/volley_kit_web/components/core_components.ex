@@ -89,6 +89,7 @@ defmodule VolleyKitWeb.CoreComponents do
         class="fixed inset-0 overflow-y-auto"
         aria-labelledby={"#{@id}-title"}
         aria-describedby={"#{@id}-description"}
+        phx-click={JS.exec("data-cancel", to: "##{@id}")}
         role="dialog"
         aria-modal="true"
         tabindex="0"

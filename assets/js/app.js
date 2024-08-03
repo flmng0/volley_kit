@@ -27,11 +27,38 @@ window.addEventListener("vk:clipcopy", (event) => {
   navigator.clipboard.writeText(content);
 });
 
+window.addEventListener("vk:fullscreen", (_event) => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+});
+
 let hooks = {
   ScratchLastUsed: {
     mounted() {
       const timeString = new Date(this.el.dataset.time).toLocaleString();
       this.el.innerText += " " + timeString;
+    },
+  },
+
+  FullscreenButton: {
+    mounted() {
+      this.onFullscreenChanged = () => {
+        const isFullscreen = !!document.fullscreenElement;
+        console.log(
+          "Got fullscreenchanged event! Is fullscreen:",
+          isFullscreen,
+        );
+        this.el.setAttribute("aria-selected", isFullscreen);
+      };
+
+      window.addEventListener("fullscreenchange", this.onFullscreenChanged);
+    },
+
+    destroyed() {
+      window.removeEventListener("fullscreenchange", this.onFullscreenChanged);
     },
   },
 };

@@ -1,6 +1,6 @@
 <.flash_group flash={@flash} />
 
-<main class="flex flex-col lg:items-center lg:gap-8 max-lg:w-screen max-lg:h-lvh">
+<main class="flex flex-col lg:items-center lg:gap-8 max-lg:w-screen max-lg:h-dvh">
   <div class={[
     "grid w-full lg:mt-8 lg:mx-auto lg:grid-cols-2 lg:max-w-2xl lg:gap-4",
     "max-lg:w-full max-lg:h-full",
@@ -11,9 +11,26 @@
     <.score_card scorer?={@scorer?} team="b" match={@match} />
   </div>
 
-  <.button class="max-lg:!rounded-none" phx-click={show_modal("scratch-match-share-modal")}>
-    Show Share <%= pluralize("Code", "Codes", @owner?) %>
-  </.button>
+  <div class="fixed top-2 left-2 flex flex-col gap-2 lg:relative lg:top-0 lg:left-0">
+    <.button
+      class="aspect-square lg:aspect-auto"
+      phx-click={show_modal("scratch-match-share-modal")}
+    >
+      <.icon name="hero-share-mini" />
+      <span class="hidden lg:inline-block pl-2">Show Share Codes</span>
+    </.button>
+    <.button
+      id="toggle-fullscreen-button"
+      class="aspect-square group lg:hidden"
+      phx-hook="FullscreenButton"
+      phx-click={JS.dispatch("vk:fullscreen")}
+      aria-selected="false"
+    >
+      <.icon class="hidden group-aria-selected:inline-block" name="hero-arrows-pointing-in-mini" />
+      <.icon class="inline-block group-aria-selected:hidden" name="hero-arrows-pointing-out-mini" />
+      <span class="hidden lg:inline-block pl-2">Toggle Fullscreen</span>
+    </.button>
+  </div>
 </main>
 
 <.modal

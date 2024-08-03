@@ -53,13 +53,13 @@
 </.modal>
 
 <.modal id="scratch-match-share-modal">
-  <div class="max-w-xl">
+  <div class="max-w-xl mx-auto">
     <span class="text-xl">QR Code to View</span>
     <.qr_code content={@view_code} />
     <.copy_link_button id="view-share-code-btn" href={@view_code} label="Copy View Link" />
   </div>
 
-  <div :if={@owner?} class="mt-10">
+  <div :if={@owner?} class="mt-10 max-w-xl mx-auto">
     <hgroup>
       <h2 class="mr-2 text-xl">QR Code for Scorers</h2>
       <p class="italic text-sm">

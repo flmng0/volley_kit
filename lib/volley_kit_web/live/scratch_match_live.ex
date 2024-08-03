@@ -171,10 +171,12 @@ defmodule VolleyKitWeb.ScratchMatchLive do
   defp copy_link_button(assigns) do
     ~H"""
     <.button
-      class="block mx-auto"
+      class="block mx-auto outline outline-1"
+      colors="bg-zinc-300 hover:bg-zinc-400 text-gray-800 active:text-white/80"
       phx-click={JS.dispatch("vk:clipcopy") |> JS.push("put_copy_flash")}
       data-href={@href}
     >
+      <.icon name="hero-link-micro" />
       <%= @label %>
     </.button>
     """

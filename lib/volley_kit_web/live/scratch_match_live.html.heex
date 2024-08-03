@@ -7,22 +7,8 @@
     "max-md:portrait:grid-rows-2",
     "max-md:landscape:grid-cols-2"
   ]}>
-    <.wrapper scorer?={@scorer?} team="a">
-      <.score_card
-        class="bg-a"
-        team_name={@match.options.a_name}
-        score={@match.a_score}
-        sets={@match.a_sets}
-      />
-    </.wrapper>
-    <.wrapper scorer?={@scorer?} team="b">
-      <.score_card
-        class="bg-b"
-        team_name={@match.options.b_name}
-        score={@match.b_score}
-        sets={@match.b_sets}
-      />
-    </.wrapper>
+    <.score_card scorer?={@scorer?} team="a" match={@match} />
+    <.score_card scorer?={@scorer?} team="b" match={@match} />
   </div>
 
   <.button class="max-md:!rounded-none" phx-click={show_modal("scratch-match-share-modal")}>

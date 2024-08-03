@@ -61,6 +61,8 @@ defmodule VolleyKit.Manager do
   The broadcast is done to the `scratch_match:\<ID\>` topic.
   The event payload is a map of the changes made to the match.
 
+  Can also be used with :retract to remove a point.
+
   ## Example
 
       iex> match = %ScratchMatch{id: 2, a_score: 12, b_score: 13}
@@ -78,11 +80,21 @@ defmodule VolleyKit.Manager do
   This can be used to merge with the current match in a LiveView.
 
   """
-  def score_scratch_match(%ScratchMatch{} = scratch_match, team) when team in ~w(a b) do
+  def score_scratch_match(%ScratchMatch{} = scratch_match, team, action \\ :add)
+      when team in ~w(a b) do
     atom = String.to_atom(team <> "_score")
     current = Map.get(scratch_match, atom, 0)
 
-    update_map = %{atom => current + 1}
+    delta =
+      case action do
+        :add ->
+          1
+
+        :retract ->
+          -1
+      end
+
+    update_map = %{atom => max(0, current + delta)}
 
     with {:ok, scratch_match} <- update_scratch_match(scratch_match, update_map) do
       VolleyKitWeb.Endpoint.broadcast(topic(scratch_match), "score", update_map)

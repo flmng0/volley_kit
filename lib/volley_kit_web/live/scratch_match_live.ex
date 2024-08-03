@@ -84,9 +84,16 @@ defmodule VolleyKitWeb.ScratchMatchLive do
     if Manager.would_complete_set?(match, team) do
       {:noreply, assign(socket, set_finishing?: true)}
     else
-      {:ok, match} = Manager.score_scratch_match(socket.assigns.match, team)
+      {:ok, match} = Manager.score_scratch_match(match, team)
       {:noreply, assign(socket, match: match)}
     end
+  end
+
+  def handle_event("retract", %{"team" => team}, socket) do
+    %{match: match} = socket.assigns
+
+    {:ok, match} = Manager.score_scratch_match(match, team, :retract)
+    {:noreply, assign(socket, match: match)}
   end
 
   def handle_event("put_copy_flash", _params, socket) do
@@ -122,18 +129,39 @@ defmodule VolleyKitWeb.ScratchMatchLive do
     end
   end
 
-  attr :team_name, :string
-  attr :score, :integer
-  attr :sets, :integer
+  attr :scorer?, :boolean
+  attr :team, :string, values: ~w(a b)
+  attr :match, ScratchMatch
+  # attr :team_name, :string
+  # attr :score, :integer
+  # attr :sets, :integer
+  # attr :id, :string
 
-  attr :class, :string, default: nil
+  # attr :class, :string, default: nil
 
-  defp score_card(assigns) do
+  defp score_card(%{team: team, match: match} = assigns) do
+    {sets, score, team_name} =
+      case team do
+        "a" ->
+          {match.a_sets, match.a_score, match.options.a_name}
+
+        "b" ->
+          {match.b_sets, match.b_score, match.options.b_name}
+      end
+
+    assigns = assign(assigns, sets: sets, score: score, team_name: team_name)
+
     ~H"""
-    <div class={[
-      "w-full h-full md:aspect-square text-center outline text-white flex flex-col justify-center gap-4",
-      @class
-    ]}>
+    <.dynamic_tag
+      name={if @scorer?, do: "a", else: "div"}
+      phx-click={@scorer? && "score"}
+      phx-value-team={@team}
+      role={@scorer? && "button"}
+      class={[
+        "block select-none w-full h-full md:aspect-square text-center outline text-white flex flex-col justify-center gap-4",
+        "bg-" <> @team
+      ]}
+    >
       <span class="text-[1.25em]">
         <%= @sets %>
       </span>
@@ -143,24 +171,16 @@ defmodule VolleyKitWeb.ScratchMatchLive do
       <span class="text-[1em]">
         <%= @team_name %>
       </span>
-    </div>
-    """
-  end
-
-  attr :scorer?, :boolean
-  attr :team, :string, values: ~w(a b)
-
-  slot :inner_block, required: true
-
-  defp wrapper(assigns) do
-    ~H"""
-    <%= if @scorer? do %>
-      <button phx-click="score" phx-value-team={@team} class="unset-all">
-        <%= render_slot(@inner_block) %>
-      </button>
-    <% else %>
-      <%= render_slot(@inner_block) %>
-    <% end %>
+      <div :if={@scorer?} class="flex flex-row justify-center gap-2">
+        <.button
+          colors="hover:backdrop-brightness-90 backdrop-brightness-95"
+          phx-click="retract"
+          phx-value-team={@team}
+        >
+          <.icon name="hero-minus-mini" />
+        </.button>
+      </div>
+    </.dynamic_tag>
     """
   end
 

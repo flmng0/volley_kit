@@ -1,6 +1,37 @@
 <.flash_group flash={@flash} />
 
-<main class="flex flex-col items-center gap-12 py-8">
-  <.live_component module={ScratchMatchForm} user_id={@user_id} id="scratch-match-create-form" />
-  <.live_component module={ScratchMatchList} user_id={@user_id} id="scratch-match" />
-</main>
+<div class="py-8">
+  <header class="max-w-xl bg-white flex flex-col mx-auto px-6 py-5 gap-4 mb-8">
+    <hgroup>
+      <h1 class="text-4xl font-serif font-semibold tracking-wider">
+        Volley Kit
+      </h1>
+      <p class="text-gray-700 tracking-wide">
+        Volleyball scoring web-app, with live syncronized scores between spectators.
+      </p>
+    </hgroup>
+
+    <h2 class="text-xl font-serif font-semibold tracking-wider mt-3">
+      Why?
+    </h2>
+    <p class="text-gray-700 tracking-wide">
+      I think I have a severe case of not-invented-here syndrome.
+    </p>
+    <p class="text-gray-700 tracking-wide">
+      Volleyball is my favourite sport, and if I'm waiting for my turn I don't want to have to get up 20+ times to see the score.
+    </p>
+
+    <p class="text-gray-700 tracking-wide">
+      Of course, there are many apps on the web store that do the same thing, but a lot of those have ads, and aren't as accessible as the web. So I decided I could just roll my own.
+    </p>
+
+    <div class="mt-5 py-4 px-4 bg-emerald-100 text-center rounded-md italic">
+      To get started, start a match with the form below.
+    </div>
+  </header>
+
+  <main class="flex flex-col items-center gap-12">
+    <.live_component module={ScratchMatchForm} user_id={@user_id} id="scratch-match-create-form" />
+    <.live_component module={ScratchMatchList} user_id={@user_id} id="scratch-match" />
+  </main>
+</div>

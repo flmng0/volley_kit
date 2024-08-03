@@ -53,6 +53,10 @@ defmodule VolleyKit.Manager do
     |> Repo.update()
   end
 
+  def as_score_action("add"), do: :add
+  def as_score_action("retract"), do: :retract
+  def as_score_action("reset"), do: :reset
+
   defp topic(%ScratchMatch{id: id}), do: "scratch_match:#{id}"
 
   @doc """
@@ -92,6 +96,9 @@ defmodule VolleyKit.Manager do
 
         :retract ->
           -1
+
+        :reset ->
+          -current
       end
 
     update_map = %{atom => max(0, current + delta)}

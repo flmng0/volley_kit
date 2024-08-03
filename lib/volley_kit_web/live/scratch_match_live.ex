@@ -78,22 +78,19 @@ defmodule VolleyKitWeb.ScratchMatchLive do
     {:noreply, assign(socket, set_finishing?: false, winner: winner)}
   end
 
-  def handle_event("score", %{"team" => team}, socket) do
-    %{match: match} = socket.assigns
+  def handle_event("score", %{"team" => team, "action" => action}, socket) do
+    %{match: match, scorer?: scorer?} = socket.assigns
+
+    # Assert that the user is an assigned scorer
+    true = scorer?
 
     if Manager.would_complete_set?(match, team) do
       {:noreply, assign(socket, set_finishing?: true)}
     else
-      {:ok, match} = Manager.score_scratch_match(match, team)
+      action = Manager.as_score_action(action)
+      {:ok, match} = Manager.score_scratch_match(match, team, action)
       {:noreply, assign(socket, match: match)}
     end
-  end
-
-  def handle_event("retract", %{"team" => team}, socket) do
-    %{match: match} = socket.assigns
-
-    {:ok, match} = Manager.score_scratch_match(match, team, :retract)
-    {:noreply, assign(socket, match: match)}
   end
 
   def handle_event("put_copy_flash", _params, socket) do
@@ -132,12 +129,6 @@ defmodule VolleyKitWeb.ScratchMatchLive do
   attr :scorer?, :boolean
   attr :team, :string, values: ~w(a b)
   attr :match, ScratchMatch
-  # attr :team_name, :string
-  # attr :score, :integer
-  # attr :sets, :integer
-  # attr :id, :string
-
-  # attr :class, :string, default: nil
 
   defp score_card(%{team: team, match: match} = assigns) do
     {sets, score, team_name} =
@@ -156,6 +147,7 @@ defmodule VolleyKitWeb.ScratchMatchLive do
       name={if @scorer?, do: "a", else: "div"}
       phx-click={@scorer? && "score"}
       phx-value-team={@team}
+      phx-value-action="add"
       role={@scorer? && "button"}
       class={[
         "block select-none w-full h-full md:aspect-square text-center outline text-white flex flex-col justify-center gap-4",
@@ -174,8 +166,19 @@ defmodule VolleyKitWeb.ScratchMatchLive do
       <div :if={@scorer?} class="flex flex-row justify-center gap-2">
         <.button
           colors="hover:backdrop-brightness-90 backdrop-brightness-95"
-          phx-click="retract"
+          phx-click="score"
           phx-value-team={@team}
+          phx-value-action="reset"
+          data-confirm={"Reset #{@team_name} score to 0?"}
+        >
+          <.icon name="hero-backspace-mini" />
+        </.button>
+
+        <.button
+          colors="hover:backdrop-brightness-90 backdrop-brightness-95"
+          phx-click="score"
+          phx-value-team={@team}
+          phx-value-action="retract"
         >
           <.icon name="hero-minus-mini" />
         </.button>

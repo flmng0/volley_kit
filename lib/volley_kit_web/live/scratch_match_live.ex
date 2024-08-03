@@ -49,6 +49,7 @@ defmodule VolleyKitWeb.ScratchMatchLive do
     token = Manager.sign_scratch_match_token(match)
 
     socket
+    |> assign(page_title: "#{match.options.a_name} vs. #{match.options.b_name}")
     |> assign(match: match, owner?: owner?, scorer?: scorer?)
     |> assign(view_code: Manager.scratch_match_view_code(match))
     |> assign(set_finishing?: false)

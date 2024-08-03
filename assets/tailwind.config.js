@@ -19,16 +19,16 @@ module.exports = {
         a: "rgb(185 28 28)",
         b: "rgb(29 78 216)",
       },
-    },
-    fontSize: {
-      score: [
-        "max(6.5cm, 10rem)",
-        {
-          lineHeight: "1.01em",
-          letterSpacing: "-0.03em",
-          fontWeight: "700",
-        },
-      ],
+      fontSize: {
+        score: [
+          "max(6.5cm, 10rem)",
+          {
+            lineHeight: "1.01em",
+            letterSpacing: "-0.03em",
+            fontWeight: "700",
+          },
+        ],
+      },
     },
   },
   plugins: [

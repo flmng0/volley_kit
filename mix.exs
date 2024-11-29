@@ -59,7 +59,7 @@ defmodule Volley.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
-      {:pow, "~> 1.0.38"}
+      {:doggo, "~> 0.10.1"}
     ]
   end
 

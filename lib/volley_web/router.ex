@@ -1,6 +1,5 @@
 defmodule VolleyWeb.Router do
   use VolleyWeb, :router
-  use Pow.Phoenix.Router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -15,16 +14,12 @@ defmodule VolleyWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/" do
-    pipe_through :browser
+  live_session :default, on_mount: VolleyWeb.ClearFlash do
+    scope "/", VolleyWeb do
+      pipe_through :browser
 
-    pow_routes()
-  end
-
-  scope "/", VolleyWeb do
-    pipe_through :browser
-
-    get "/", PageController, :home
+      live "/", HomeLive
+    end
   end
 
   # Other scopes may use custom stacks.

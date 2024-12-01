@@ -7,7 +7,7 @@ defmodule Volley.Repo.Migrations.CreateEvents do
       add :type, :integer
 
       add :match_id, references(:matches)
-      add :team_id, references(:teams)
+      add :team, :integer
     end
 
     create index(:events, [:match_id])

@@ -13,7 +13,7 @@
 alias Volley.Repo
 
 if Application.compile_env!(:volley, :dev_routes) do
-  {:ok, match} = Volley.create_match("test a", "test b")
+  {:ok, match} = Volley.create_match()
 
   {:ok, match} = Volley.score_match(match, :a)
   {:ok, match} = Volley.score_match(match, :a)

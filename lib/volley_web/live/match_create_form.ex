@@ -1,4 +1,4 @@
-defmodule VolleyWeb.MatchForm do
+defmodule VolleyWeb.MatchCreateForm do
   use VolleyWeb, :live_component
 
   @impl true

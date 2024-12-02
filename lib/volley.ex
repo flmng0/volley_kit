@@ -87,14 +87,32 @@ defmodule Volley do
   """
   def get_match(id), do: Repo.get(Match, id)
 
+  @doc """
+  Listen to event messages for a given match.
+  """
+  def subscribe_events(%Match{} = match) do
+    Phoenix.PubSub.subscribe(Volley.PubSub, "events:#{match.id}")
+  end
+
+  @doc """
+  Stop listening to event messages for a given match.
+  """
+  def unsubscribe_events(%Match{} = match) do
+    Phoenix.PubSub.unsubscribe(Volley.PubSub, "events:#{match.id}")
+  end
+
   # Helper to push new events of a given type to the `events` table.
   defp push_event(type, %Match{} = match, team) when is_team?(team) do
-    %Event{
+    event = %Event{
       type: type,
-      team: team
+      team: team,
+      match: match
     }
+
+    Phoenix.PubSub.broadcast(Volley.PubSub, "events:#{match.id}", event)
+
+    event
     |> change()
-    |> put_assoc(:match, match)
     |> Repo.insert()
   end
 
@@ -105,13 +123,13 @@ defmodule Volley do
   See `Volley.set_complete?/2`.
   """
   def score_match(%Match{} = match, team) when is_team?(team) do
-    with {:ok, _} <- push_event(:score, match, team) do
-      summary_atom = pick_team(team, :team_a_summary, :team_b_summary)
-      summary = Map.get(match, summary_atom)
+    summary_atom = pick_team(team, :team_a_summary, :team_b_summary)
+    summary = Map.get(match, summary_atom)
 
-      match
-      |> change(%{summary_atom => %{score: summary.score + 1}})
-      |> Repo.update()
+    match = change(match, %{summary_atom => %{score: summary.score + 1}})
+
+    with {:ok, match} <- Repo.update(match) do
+      push_event(:score, match, team)
     end
   end
 
@@ -119,7 +137,7 @@ defmodule Volley do
   Get boolean indicating if the set is complete.
 
   i.e. one team's score is higher than the current set limit, and there's
-  advantage of at least two between (deuce)
+  advantage of at least two between (deuce).
   """
   def set_complete?(%Match{} = match) do
     %Match{

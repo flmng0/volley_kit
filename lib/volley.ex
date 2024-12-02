@@ -24,8 +24,10 @@ defmodule Volley do
   This can be used for error-correction, and potentially 
   useful for undo-redo in the future.
   """
-  def team_summary_from_events(%Match{} = match, team) do
-    Query.team_summary_from_events(match, team) |> Repo.one() || %{}
+  def team_summary_from_events(%Match{} = match, team) when is_team?(team) do
+    # May need to revisit this style of implementation since it queries
+    # once for each team.
+    Query.team_summary_from_events(match, team) |> Repo.one()
   end
 
   # Don't want to use this outside of quick-fixes.
@@ -116,8 +118,8 @@ defmodule Volley do
   @doc """
   Get boolean indicating if the set is complete.
 
-  Defaults to 25 for the set limit, but can be configured by passing
-  the second parameter.
+  i.e. one team's score is higher than the current set limit, and there's
+  advantage of at least two between (deuce)
   """
   def set_complete?(%Match{} = match) do
     %Match{
@@ -142,9 +144,15 @@ defmodule Volley do
 
     {higher, lower} = {max(a_score, b_score), min(a_score, b_score)}
 
-    higher >= set_limit && higher > lower + 2
+    higher >= set_limit && higher >= lower + 2
   end
 
+  @doc """
+  Transition to the next set.
+
+  This function does not check whether it the set is complete first, it
+  expects that it has already been checked via `set_complete?/1`.
+  """
   def finish_set(%Match{} = match) do
     a_score = match.team_a_summary.score
     b_score = match.team_b_summary.score

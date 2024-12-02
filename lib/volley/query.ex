@@ -13,13 +13,16 @@ defmodule Volley.Query do
     # }
     stats = [score: :score, sets: :set_win]
 
-    query = from e in Event, where: e.match_id == ^match_id, select: %{}
+    query =
+      from e in Event,
+        where: e.match_id == ^match_id and e.team == ^team,
+        select: %{}
 
     for {key, type} <- stats, reduce: query do
       query ->
         from e in query,
           select_merge: %{
-            ^key => count(e.id) |> filter(e.team == ^team and e.type == ^type) |> coalesce(0)
+            ^key => count(e.id) |> filter(e.type == ^type) |> coalesce(0)
           }
     end
   end

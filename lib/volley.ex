@@ -8,6 +8,7 @@ defmodule Volley do
   """
 
   alias Volley.Repo
+  alias Volley.Query
   alias Volley.Schema.{Event, Match, MatchOptions}
 
   import Ecto.Changeset
@@ -16,6 +17,27 @@ defmodule Volley do
 
   defp pick_team(:a, when_a, _when_b), do: when_a
   defp pick_team(:b, _when_a, when_b), do: when_b
+
+  @doc """
+  Summarize a match from the events table. 
+
+  This can be used for error-correction, and potentially 
+  useful for undo-redo in the future.
+  """
+  def team_summary_from_events(%Match{} = match, team) do
+    Query.team_summary_from_events(match, team) |> Repo.one() || %{}
+  end
+
+  # Don't want to use this outside of quick-fixes.
+  @doc false
+  def fix_match_with_events(%Match{} = match) do
+    team_a_summary = team_summary_from_events(match, :a)
+    team_b_summary = team_summary_from_events(match, :b)
+
+    match
+    |> change(%{team_a_summary: team_a_summary, team_b_summary: team_b_summary})
+    |> Repo.update()
+  end
 
   @doc """
   Start a new match with the given team names.
@@ -58,6 +80,8 @@ defmodule Volley do
 
   @doc """
   Get a match with the given ID.
+
+  Like `Ecto.Repo.get/2`, returns `nil` when ID not found.
   """
   def get_match(id), do: Repo.get(Match, id)
 
@@ -95,9 +119,26 @@ defmodule Volley do
   Defaults to 25 for the set limit, but can be configured by passing
   the second parameter.
   """
-  def set_complete?(%Match{} = match, set_limit \\ 25) do
-    a_score = match.team_a_summary.score
-    b_score = match.team_b_summary.score
+  def set_complete?(%Match{} = match) do
+    %Match{
+      team_a_summary: %{
+        score: a_score,
+        sets: a_sets
+      },
+      team_b_summary: %{
+        score: b_score,
+        sets: b_sets
+      },
+      options: %{
+        set_count: set_count,
+        set_point_limit: set_point_limit,
+        final_set_limit: final_set_limit
+      }
+    } = match
+
+    is_final? = a_sets + b_sets == set_count - 1
+
+    set_limit = if is_final?, do: final_set_limit, else: set_point_limit
 
     {higher, lower} = {max(a_score, b_score), min(a_score, b_score)}
 

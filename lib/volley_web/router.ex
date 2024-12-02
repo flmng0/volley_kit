@@ -19,6 +19,8 @@ defmodule VolleyWeb.Router do
       pipe_through :browser
 
       live "/", HomeLive
+
+      live "/match/:id", MatchLive
     end
   end
 

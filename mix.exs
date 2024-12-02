@@ -50,6 +50,7 @@ defmodule Volley.MixProject do
        sparse: "optimized",
        app: false,
        compile: false,
+       override: true,
        depth: 1},
       {:swoosh, "~> 1.5"},
       {:finch, "~> 0.13"},
@@ -77,11 +78,7 @@ defmodule Volley.MixProject do
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["tailwind volley", "esbuild volley"],
-      "assets.deploy": [
-        "tailwind volley --minify",
-        "esbuild volley --minify",
-        "phx.digest"
-      ]
+      "assets.deploy": ["tailwind volley --minify", "esbuild volley --minify", "phx.digest"]
     ]
   end
 end

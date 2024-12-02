@@ -42,6 +42,11 @@ defmodule Volley do
       set_point_limit: 25
     }
 
+  @doc """
+  Create changeset for a `MatchOptions` struct.
+
+  Includes validations.
+  """
   def change_match_options(%MatchOptions{} = options, attrs \\ %{}) do
     options
     |> cast(attrs, [:team_a_name, :team_b_name, :set_count, :set_point_limit, :final_set_limit])
@@ -52,11 +57,9 @@ defmodule Volley do
   end
 
   @doc """
-  Get a match with the given ID, and preload associations.
+  Get a match with the given ID.
   """
-  def get_match!(id) do
-    Repo.get!(Match, id)
-  end
+  def get_match(id), do: Repo.get(Match, id)
 
   # Helper to push new events of a given type to the `events` table.
   defp push_event(type, %Match{} = match, team) when is_team?(team) do

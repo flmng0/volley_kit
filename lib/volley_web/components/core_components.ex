@@ -14,7 +14,16 @@ defmodule VolleyWeb.CoreComponents do
 
   Icons are provided by [heroicons](https://heroicons.com). See `icon/1` for usage.
   """
+  use Doggo.Components
   use Phoenix.Component
+
+  #
+  # SECTION: Doggo Components
+  #
+
+  #
+  # SECTION: Core Components
+  #
 
   alias Phoenix.LiveView.JS
   use Gettext, backend: VolleyWeb.Gettext
@@ -202,9 +211,9 @@ defmodule VolleyWeb.CoreComponents do
   def simple_form(assigns) do
     ~H"""
     <.form :let={f} for={@for} as={@as} {@rest}>
-      <div class="mt-10 space-y-8 bg-white">
+      <div class="mt-10 space-y-8 bg-white rounded-md border border-solid border-gray-100 shadow-md p-3">
         <%= render_slot(@inner_block, f) %>
-        <div :for={action <- @actions} class="mt-2 flex items-center justify-between gap-6">
+        <div :for={action <- @actions} class="mt-2 flex items-center justify-end gap-6">
           <%= render_slot(action, f) %>
         </div>
       </div>
@@ -271,6 +280,7 @@ defmodule VolleyWeb.CoreComponents do
   attr :id, :any, default: nil
   attr :name, :any
   attr :label, :string, default: nil
+  attr :description, :string, default: nil
   attr :value, :any
 
   attr :type, :string,
@@ -310,7 +320,7 @@ defmodule VolleyWeb.CoreComponents do
 
     ~H"""
     <div>
-      <label class="flex items-center gap-4 text-sm leading-6 text-zinc-600">
+      <.label display="flex" class="items-center gap-4" description={@description}>
         <input type="hidden" name={@name} value="false" disabled={@rest[:disabled]} />
         <input
           type="checkbox"
@@ -322,7 +332,7 @@ defmodule VolleyWeb.CoreComponents do
           {@rest}
         />
         <%= @label %>
-      </label>
+      </.label>
       <.error :for={msg <- @errors}><%= msg %></.error>
     </div>
     """
@@ -331,7 +341,7 @@ defmodule VolleyWeb.CoreComponents do
   def input(%{type: "select"} = assigns) do
     ~H"""
     <div>
-      <.label for={@id}><%= @label %></.label>
+      <.label for={@id} description={@description}><%= @label %></.label>
       <select
         id={@id}
         name={@name}
@@ -350,7 +360,7 @@ defmodule VolleyWeb.CoreComponents do
   def input(%{type: "textarea"} = assigns) do
     ~H"""
     <div>
-      <.label for={@id}><%= @label %></.label>
+      <.label for={@id} description={@description}><%= @label %></.label>
       <textarea
         id={@id}
         name={@name}
@@ -370,7 +380,7 @@ defmodule VolleyWeb.CoreComponents do
   def input(assigns) do
     ~H"""
     <div>
-      <.label for={@id}><%= @label %></.label>
+      <.label for={@id} description={@description}><%= @label %></.label>
       <input
         type={@type}
         name={@name}
@@ -379,7 +389,8 @@ defmodule VolleyWeb.CoreComponents do
         class={[
           "mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6",
           @errors == [] && "border-zinc-300 focus:border-zinc-400",
-          @errors != [] && "border-rose-400 focus:border-rose-400"
+          @errors != [] && "border-rose-400 focus:border-rose-400",
+          (@value == nil || @value == "") && "bg-gray-100"
         ]}
         {@rest}
       />
@@ -392,12 +403,22 @@ defmodule VolleyWeb.CoreComponents do
   Renders a label.
   """
   attr :for, :string, default: nil
+  attr :description, :string, default: nil
+  attr :class, :string, default: ""
+  attr :display, :string, default: "block"
+  attr :font, :string, default: "font-semibold"
+
   slot :inner_block, required: true
 
   def label(assigns) do
     ~H"""
-    <label for={@for} class="block text-sm font-semibold leading-6 text-zinc-800">
+    <label for={@for} class={["text-sm leading-6 text-zinc-800", @class, @display, @font]}>
       <%= render_slot(@inner_block) %>
+
+      <%= if @description do %>
+        <br />
+        <span class="text-xs font-normal text-gray-500"><%= @description %></span>
+      <% end %>
     </label>
     """
   end

@@ -126,10 +126,11 @@ defmodule Volley do
     summary_atom = pick_team(team, :team_a_summary, :team_b_summary)
     summary = Map.get(match, summary_atom)
 
-    match = change(match, %{summary_atom => %{score: summary.score + 1}})
+    changeset = change(match, %{summary_atom => %{score: summary.score + 1}})
 
-    with {:ok, match} <- Repo.update(match) do
-      push_event(:score, match, team)
+    with {:ok, match} <- Repo.update(changeset),
+         {:ok, _event} <- push_event(:score, match, team) do
+      {:ok, match}
     end
   end
 
@@ -156,7 +157,7 @@ defmodule Volley do
       }
     } = match
 
-    is_final? = a_sets + b_sets == set_count - 1
+    is_final? = if set_count, do: a_sets + b_sets == set_count - 1
 
     set_limit = if is_final?, do: final_set_limit, else: set_point_limit
 
@@ -177,13 +178,15 @@ defmodule Volley do
 
     winner = if a_score > b_score, do: :a, else: :b
 
-    with {:ok, _} <- push_event(:set_win, match, winner) do
-      match
-      |> change(%{
+    changeset =
+      change(match, %{
         team_a_summary: %{score: 0, sets: match.team_a_summary.sets + pick_team(winner, 1, 0)},
         team_b_summary: %{score: 0, sets: match.team_b_summary.sets + pick_team(winner, 0, 1)}
       })
-      |> Repo.update()
+
+    with {:ok, match} <- Repo.update(changeset),
+         {:ok, _event} <- push_event(:set_win, match, winner) do
+      {:ok, match}
     end
   end
 end

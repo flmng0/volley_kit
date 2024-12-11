@@ -24,9 +24,9 @@ defmodule VolleyWeb.MatchLive do
   defp team_card(assigns) do
     ~H"""
     <div class="">
-      <p><%= @name %></p>
-      <p><%= @summary.score %></p>
-      <p><%= @summary.sets %></p>
+      <p>{@name}</p>
+      <p>{@summary.score}</p>
+      <p>{@summary.sets}</p>
     </div>
     """
   end

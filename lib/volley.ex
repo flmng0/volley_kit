@@ -157,7 +157,7 @@ defmodule Volley do
       }
     } = match
 
-    is_final? = if set_count, do: a_sets + b_sets == set_count - 1
+    is_final? = set_count && a_sets + b_sets == set_count - 1
 
     set_limit = if is_final?, do: final_set_limit, else: set_point_limit
 

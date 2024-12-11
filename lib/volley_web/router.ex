@@ -20,7 +20,7 @@ defmodule VolleyWeb.Router do
 
       live "/", HomeLive
 
-      live "/match/:id", MatchLive
+      live "/match/:sqid", MatchLive
     end
   end
 

@@ -3,18 +3,18 @@ defmodule VolleyWeb.MatchLive do
 
   alias Volley.Schema.{Match, TeamSummary, Event}
 
-  def mount(%{"id" => id}, _session, socket) do
-    case Volley.get_match(id) do
-      nil ->
+  def mount(%{"sqid" => sqid}, _session, socket) do
+    with {:ok, id} <- Volley.Sqids.decode(:match, sqid),
+         %Match{} = match <- Volley.get_match(id) do
+      {:ok, assign_match(socket, match)}
+    else
+      _ ->
         socket =
           socket
-          |> put_flash(:error, "Flash with that ID does not exist!")
+          |> put_flash(:error, "Match with ID \"#{sqid}\" does not exist!")
           |> push_navigate(to: ~p"/")
 
         {:ok, socket}
-
-      match ->
-        {:ok, assign_match(socket, match)}
     end
   end
 

@@ -66,15 +66,9 @@ defmodule VolleyWeb.MatchCreateForm do
   def handle_event("start", %{"match_options" => options}, socket) do
     case Volley.create_match(options) do
       {:ok, match} ->
-        socket =
-          socket
-          |> put_flash(
-            :info,
-            "Created match #{match.options.team_a_name} vs. #{match.options.team_b_name}"
-          )
-          |> push_navigate(to: ~p"/match/#{match.id}")
+        sqid = Volley.Sqids.encode!(:match, match.id)
 
-        {:noreply, socket}
+        {:noreply, push_navigate(socket, to: ~p"/match/#{sqid}")}
 
       {:error, %Ecto.Changeset{changes: %{options: changeset}}} ->
         {:noreply, assign_form(socket, changeset)}

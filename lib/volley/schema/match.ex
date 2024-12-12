@@ -9,7 +9,7 @@ defmodule Volley.Schema.Match do
 
     embeds_one :options, Schema.MatchOptions, on_replace: :update
 
-    many_to_many :users, Volley.Accounts.Users, join_through: Schema.MatchUser
+    many_to_many :users, Volley.Accounts.User, join_through: Schema.MatchUser
 
     timestamps(type: :utc_datetime)
   end

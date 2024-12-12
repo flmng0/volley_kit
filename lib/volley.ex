@@ -7,9 +7,12 @@ defmodule Volley do
   if it comes from the database, an external API or others.
   """
 
+  alias Volley.Accounts.User
   alias Volley.Repo
   alias Volley.Query
-  alias Volley.Schema.{Event, Match, MatchOptions}
+  alias Volley.Schema.{Event, Match, MatchOptions, MatchUser}
+
+  import Ecto.Query, only: [from: 2]
 
   import Ecto.Changeset
 
@@ -53,6 +56,12 @@ defmodule Volley do
     |> Repo.insert()
   end
 
+  def put_match_owner(%Match{} = match, %User{} = owner) do
+    %MatchUser{}
+    |> change(%{match_id: match.id, user_id: owner.id, level: :owner})
+    |> Repo.insert()
+  end
+
   @doc """
   Get the default options for a new match.
 
@@ -85,7 +94,28 @@ defmodule Volley do
 
   Like `Ecto.Repo.get/2`, returns `nil` when ID not found.
   """
-  def get_match(id), do: Repo.get(Match, id)
+  def get_match(id) do
+    query =
+      from m in Match,
+        preload: [:users]
+
+    Repo.get(query, id)
+  end
+
+  def get_match_owner(%Match{} = match) do
+    query =
+      from u in User,
+        join: mu in MatchUser,
+        on: mu.match_id == ^match.id and mu.level == ^:owner
+
+    Repo.one(query)
+  end
+
+  def get_user_matches(%User{} = user) do
+    user
+    |> Ecto.assoc(:matches)
+    |> Repo.all()
+  end
 
   @doc """
   Listen to event messages for a given match.

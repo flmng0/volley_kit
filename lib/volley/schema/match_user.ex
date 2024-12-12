@@ -4,6 +4,7 @@ defmodule Volley.Schema.MatchUser do
   alias Volley.Schema.Match
   alias Volley.Accounts.User
 
+  @primary_key false
   schema "match_users" do
     belongs_to :user, User
     belongs_to :match, Match

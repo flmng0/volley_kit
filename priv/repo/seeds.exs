@@ -10,8 +10,6 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-alias Volley.Repo
-
 if Application.compile_env!(:volley, :dev_routes) do
   {:ok, match} = Volley.create_match(%{team_a_name: "a", team_b_name: "b", set_point_limit: 25})
 

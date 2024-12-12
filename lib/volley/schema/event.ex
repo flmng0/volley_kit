@@ -10,5 +10,7 @@ defmodule Volley.Schema.Event do
     field :team, Ecto.Enum, values: [a: 1, b: 2]
 
     belongs_to :match, Schema.Match
+
+    timestamps(type: :utc_datetime)
   end
 end

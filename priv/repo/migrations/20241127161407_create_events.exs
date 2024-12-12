@@ -8,6 +8,8 @@ defmodule Volley.Repo.Migrations.CreateEvents do
 
       add :match_id, references(:matches)
       add :team, :integer
+
+      timestamps(type: :utc_datetime)
     end
 
     create index(:events, [:match_id])

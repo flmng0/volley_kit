@@ -9,6 +9,8 @@ defmodule Volley.Accounts.User do
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
 
+    many_to_many :matches, Volley.Schema.Match, join_through: Volley.Schema.MatchUser
+
     timestamps(type: :utc_datetime)
   end
 

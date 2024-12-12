@@ -1,18 +1,23 @@
 # Volley
 
-To start your Phoenix server:
+Relatime, synchronised, self-hostable **Volley**ball scoring toolkit.
 
-  * Run `mix setup` to install and setup dependencies
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+## Notes to Self
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+Currently Needs Work:
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+- [x] Implement syncrhonisation (PubSub) functionality
+- [x] Start testing of scoring logic
+- [ ] Implement scorer/password flow.
 
-## Learn more
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+### Scorer token association:
+
+#### Use a many_to_many association via a Schema.
+
+This allows for ownership level to be configured via the join_through schema.
+
+(Rather than have a `has_one :owner` and `has_many :scorers`)
+
+This would also enable one user to be able to score / own multiple matches.
+

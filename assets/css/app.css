@@ -108,6 +108,11 @@
 }
 
 /* This file is for your main application CSS */
+:root {
+  --color-team-a: red;
+  --color-team-b: blue;
+}
+
 .bleed-container {
   display: grid;
   grid-template-columns: 1fr min(42rem, 100%) 1fr;

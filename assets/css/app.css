@@ -108,9 +108,9 @@
 }
 
 /* This file is for your main application CSS */
-:root {
-  --color-team-a: red;
-  --color-team-b: blue;
+@theme {
+  --color-team-a: rgb(185 28 28);
+  --color-team-b: rgb(29 78 216);
 }
 
 .bleed-container {

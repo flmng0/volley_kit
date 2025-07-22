@@ -8,9 +8,11 @@ defmodule VolleyWeb.MatchComponents do
 
   def score_container(assigns) do
     ~H"""
-    <div class="grid landscape:grid-cols-2 portrait:grid-rows-2 h-screen">
-      <.score_card team={:a} score={@a_score} phx-click={@event} />
-      <.score_card team={:b} score={@b_score} phx-click={@event} />
+    <div class="size-full">
+      <div class="grid not-fullscreen:grid-cols-2 fullscreen:landscape:grid-cols-2 fullscreen:portrait:grid-rows-2 h-full">
+        <.score_card team={:a} score={@a_score} phx-click={@event} />
+        <.score_card team={:b} score={@b_score} phx-click={@event} />
+      </div>
     </div>
     """
   end
@@ -31,7 +33,10 @@ defmodule VolleyWeb.MatchComponents do
 
     ~H"""
     <button
-      class={["flex flex-col justify-center max-h-screen cursor-pointer", @class]}
+      class={[
+        "flex flex-col justify-center max-h-full cursor-pointer not-fullscreen:aspect-square",
+        @class
+      ]}
       phx-value-team={@team}
       {@rest}
     >

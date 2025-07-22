@@ -79,6 +79,30 @@ defmodule VolleyWeb.Layouts do
     """
   end
 
+  slot :inner_block, required: true
+
+  def scorer(assigns) do
+    ~H"""
+    <div
+      class="w-xl md:w-2xl lg:w-3xl max-w-screen mx-auto data-fullscreen:w-screen data-fullscreen:h-screen group"
+      id="scoringContainer"
+    >
+      {render_slot(@inner_block)}
+      <.button
+        phx-click={JS.toggle_attribute({"data-fullscreen", "true"}, to: "#scoringContainer")}
+        class="fullscreen:fixed fullscreen:w-auto w-full top-4 left-4 cursor-pointer p-2 bg-base-300"
+      >
+        <span class="fullscreen:hidden">
+          Toggle Fullscreen <.icon name="hero-arrows-pointing-out" />
+        </span>
+        <span class="not-fullscreen:hidden">
+          <.icon name="hero-arrows-pointing-in" class="size-6" />
+        </span>
+      </.button>
+    </div>
+    """
+  end
+
   @doc """
   Shows the flash group with standard titles and content.
 

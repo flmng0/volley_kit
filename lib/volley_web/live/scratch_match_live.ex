@@ -15,7 +15,9 @@ defmodule VolleyWeb.ScratchMatchLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <.score_container a_score={@a_score} b_score={@b_score} event="score" />
+    <Layouts.scorer>
+      <.score_container a_score={@a_score} b_score={@b_score} event="score" />
+    </Layouts.scorer>
     """
   end
 

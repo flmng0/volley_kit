@@ -25,11 +25,44 @@ import {LiveSocket} from "phoenix_live_view"
 import {hooks as colocatedHooks} from "phoenix-colocated/volley"
 import topbar from "../vendor/topbar"
 
+const Hooks = { }
+Hooks.FullscreenButton = {
+  fullscreen() {
+    return document.documentElement.dataset.fullscreen === "true";
+  },
+  setFullscreen(value) {
+    document.documentElement.dataset.fullscreen = value;
+  },
+  mounted() {
+    this.onClick = () => {
+      const newFullscreen = !this.fullscreen();
+      this.setFullscreen(newFullscreen);
+
+      if (newFullscreen) {
+        document.getElementById("scoringContainer").requestFullscreen({ navigationUI: "hide" });
+      } else if (document.fullscreenElement) {
+        document.exitFullscreen();
+      }
+    }
+
+    this.onFullscreenChange = () => {
+      this.setFullscreen(!!document.fullscreenElement);
+    }
+
+    document.addEventListener("fullscreenchange", this.onFullscreenChange);
+    this.el.addEventListener("click", this.onClick);
+  },
+  destroyed() {
+    this.el.removeEventListener("click", this.onClick);
+    document.removeEventListener("fullscreenchange", this.onFullscreenChange);
+  }
+}
+
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks},
+  hooks: {...Hooks, ...colocatedHooks},
 })
 
 // Show progress bar on live navigation and form submits

@@ -3,6 +3,7 @@ defmodule VolleyWeb.Layouts do
   This module holds layouts and related functionality
   used by your application.
   """
+  alias Phoenix.LiveView.ColocatedHook
   use VolleyWeb, :html
 
   # Embed all files in layouts/* within this module.
@@ -38,36 +39,7 @@ defmodule VolleyWeb.Layouts do
   def app(assigns) do
     ~H"""
     <div class="grid grid-rows-[auto_1fr] min-h-screen">
-      <header class="navbar px-4 sm:px-6 lg:px-8">
-        <div class="">
-          <a :if={!@hide_home_button} href="/" class="flex w-fit items-center gap-2">
-            <img src={~p"/images/logo.svg"} width="36" />
-            <span class="text-sm font-semibold">Volley Kit</span>
-          </a>
-        </div>
-        <ul class="menu menu-horizontal w-full relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
-          <.theme_toggle />
-          <%= if @current_scope do %>
-            <li>
-              {@current_scope.user.email}
-            </li>
-            <li>
-              <.link href={~p"/users/settings"}>Settings</.link>
-            </li>
-            <li>
-              <.link href={~p"/users/log-out"} method="delete">Log out</.link>
-            </li>
-          <% else %>
-            <li>
-              <.link href={~p"/users/register"}>Register</.link>
-            </li>
-            <li>
-              <.link href={~p"/users/log-in"}>Log in</.link>
-            </li>
-          <% end %>
-        </ul>
-      </header>
-
+      <.app_header current_scope={@current_scope} hide_home_button={@hide_home_button} />
       <main class="px-4 py-20 sm:px-6 lg:px-8">
         <div class="bleed-container gap-y-4">
           {render_slot(@inner_block)}
@@ -79,18 +51,22 @@ defmodule VolleyWeb.Layouts do
     """
   end
 
+  attr :current_scope, :map, default: nil
+  attr :flash, :map, required: true
   slot :inner_block, required: true
 
   def scorer(assigns) do
     ~H"""
+    <.app_header current_scope={@current_scope} class="fullscreen:hidden" />
     <div
-      class="w-xl md:w-2xl lg:w-3xl max-w-screen mx-auto data-fullscreen:w-screen data-fullscreen:h-screen group"
+      class="w-xl md:w-2xl lg:w-3xl max-w-screen mx-auto fullscreen:w-screen fullscreen:h-screen space-y-2"
       id="scoringContainer"
     >
       {render_slot(@inner_block)}
       <.button
-        phx-click={JS.toggle_attribute({"data-fullscreen", "true"}, to: "#scoringContainer")}
-        class="fullscreen:fixed fullscreen:w-auto w-full top-4 left-4 cursor-pointer p-2 bg-base-300"
+        id="toggle-fs-button"
+        phx-hook="FullscreenButton"
+        class="fullscreen:fixed fullscreen:w-auto w-full top-4 left-4 cursor-pointer p-2"
       >
         <span class="fullscreen:hidden">
           Toggle Fullscreen <.icon name="hero-arrows-pointing-out" />
@@ -100,6 +76,46 @@ defmodule VolleyWeb.Layouts do
         </span>
       </.button>
     </div>
+    """
+  end
+
+  attr :current_scope, :map, default: nil
+  attr :hide_home_button, :boolean, default: false
+
+  attr :class, :string, default: nil
+  attr :rest, :global
+
+  def app_header(assigns) do
+    ~H"""
+    <header class={["navbar px-4 sm:px-6 lg:px-8", @class]} {@rest}>
+      <div class="">
+        <a :if={!@hide_home_button} href="/" class="flex w-fit items-center gap-2">
+          <img src={~p"/images/logo.svg"} width="36" />
+          <span class="text-sm font-semibold">Volley Kit</span>
+        </a>
+      </div>
+      <ul class="menu menu-horizontal w-full relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
+        <.theme_toggle />
+        <%= if @current_scope do %>
+          <li>
+            {@current_scope.user.email}
+          </li>
+          <li>
+            <.link href={~p"/users/settings"}>Settings</.link>
+          </li>
+          <li>
+            <.link href={~p"/users/log-out"} method="delete">Log out</.link>
+          </li>
+        <% else %>
+          <li>
+            <.link href={~p"/users/register"}>Register</.link>
+          </li>
+          <li>
+            <.link href={~p"/users/log-in"}>Log in</.link>
+          </li>
+        <% end %>
+      </ul>
+    </header>
     """
   end
 

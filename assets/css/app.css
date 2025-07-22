@@ -102,8 +102,8 @@
 /* Use the data attribute for dark mode  */
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
-
-@custom-variant fullscreen (:is([data-fullscreen=true]&, [data-fullscreen=true] &));
+@custom-variant fullscreen (:is([data-fullscreen=true]&, [data-fullscreen=true]
+  &));
 
 /* Make LiveView wrapper divs transparent for layout */
 [data-phx-session], [data-phx-teleported-src] {
@@ -114,6 +114,7 @@
 @theme {
   --color-team-a: rgb(185 28 28);
   --color-team-b: rgb(29 78 216);
+  --color-score-content: oklch(97.807% 0.029 256.847);
 }
 
 .bleed-container {

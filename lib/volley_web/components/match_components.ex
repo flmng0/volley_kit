@@ -34,7 +34,7 @@ defmodule VolleyWeb.MatchComponents do
     ~H"""
     <button
       class={[
-        "flex flex-col justify-center max-h-full cursor-pointer not-fullscreen:aspect-square",
+        "flex flex-col justify-center max-h-full cursor-pointer not-fullscreen:aspect-square text-score-content",
         @class
       ]}
       phx-value-team={@team}

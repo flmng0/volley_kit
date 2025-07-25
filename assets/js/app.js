@@ -38,8 +38,8 @@ function requestFullscreen(element, options) {
 function exitFullscreen() {
   if (document.exitFullscreen) {
     document.exitFullscreen();
-  } else if (document.webkitExitFullscreen) {
-    document.webkitExitFullscreen();
+  } else if (document.webkitExitFullScreen) {
+    document.webkitExitFullScreen();
   }
 }
 

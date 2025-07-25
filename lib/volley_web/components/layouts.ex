@@ -3,7 +3,6 @@ defmodule VolleyWeb.Layouts do
   This module holds layouts and related functionality
   used by your application.
   """
-  alias Phoenix.LiveView.ColocatedHook
   use VolleyWeb, :html
 
   # Embed all files in layouts/* within this module.
@@ -30,16 +29,12 @@ defmodule VolleyWeb.Layouts do
 
   attr :hide_home_button, :boolean, default: false
 
-  attr :current_scope, :map,
-    default: nil,
-    doc: "the current [scope](https://hexdocs.pm/phoenix/scopes.html)"
-
   slot :inner_block, required: true
 
   def app(assigns) do
     ~H"""
     <div class="grid grid-rows-[auto_1fr] min-h-screen">
-      <.app_header current_scope={@current_scope} hide_home_button={@hide_home_button} />
+      <.app_header hide_home_button={@hide_home_button} />
       <main class="px-4 py-20 sm:px-6 lg:px-8">
         <div class="bleed-container gap-y-4">
           {render_slot(@inner_block)}
@@ -51,13 +46,12 @@ defmodule VolleyWeb.Layouts do
     """
   end
 
-  attr :current_scope, :map, default: nil
   attr :flash, :map, required: true
   slot :inner_block, required: true
 
   def scorer(assigns) do
     ~H"""
-    <.app_header current_scope={@current_scope} class="fullscreen:hidden" />
+    <.app_header class="fullscreen:hidden" />
     <div
       class="w-xl md:w-2xl lg:w-3xl max-w-screen mx-auto fullscreen:w-screen fullscreen:h-screen space-y-2"
       id="scoringContainer"
@@ -79,7 +73,6 @@ defmodule VolleyWeb.Layouts do
     """
   end
 
-  attr :current_scope, :map, default: nil
   attr :hide_home_button, :boolean, default: false
 
   attr :class, :string, default: nil
@@ -96,24 +89,6 @@ defmodule VolleyWeb.Layouts do
       </div>
       <ul class="menu menu-horizontal w-full relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
         <.theme_toggle />
-        <%= if @current_scope do %>
-          <li>
-            {@current_scope.user.email}
-          </li>
-          <li>
-            <.link href={~p"/users/settings"}>Settings</.link>
-          </li>
-          <li>
-            <.link href={~p"/users/log-out"} method="delete">Log out</.link>
-          </li>
-        <% else %>
-          <li>
-            <.link href={~p"/users/register"}>Register</.link>
-          </li>
-          <li>
-            <.link href={~p"/users/log-in"}>Log in</.link>
-          </li>
-        <% end %>
       </ul>
     </header>
     """

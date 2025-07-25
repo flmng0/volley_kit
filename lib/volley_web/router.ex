@@ -19,17 +19,11 @@ defmodule VolleyWeb.Router do
 
     get "/", PageController, :home
 
-    live_session :anonymous,
-      on_mount: [{VolleyWeb.UserAuth, :mount_current_scope}] do
-      live "/scratch", ScratchMatchLive
-    end
+    live "/scratch", ScratchMatchLive
 
-    live_session :tournament,
-      on_mount: [{VolleyWeb.UserAuth, :require_authenticated}] do
-      live "/tournament/", TournamentLive, :index
-      live "/tournament/new", TournamentLive, :new
-      live "/tournament/:id", TournamentLive, :view
-    end
+    live "/tournament/", TournamentLive, :index
+    live "/tournament/new", TournamentLive, :new
+    live "/tournament/:id", TournamentLive, :view
   end
 
   # Other scopes may use custom stacks.

@@ -44,7 +44,8 @@ config :spark,
 
 config :volley,
   ecto_repos: [Volley.Repo],
-  generators: [timestamp_type: :utc_datetime]
+  generators: [timestamp_type: :utc_datetime],
+  ash_domains: [Volley.Scoring]
 
 # Configures the endpoint
 config :volley, VolleyWeb.Endpoint,

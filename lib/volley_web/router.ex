@@ -19,6 +19,9 @@ defmodule VolleyWeb.Router do
 
     get "/", PageController, :home
 
+    get "/scratch/new", ScratchController, :new
+    get "/scratch/:id", ScratchController, :join
+
     live "/scratch", ScratchMatchLive
 
     live "/tournament/", TournamentLive, :index

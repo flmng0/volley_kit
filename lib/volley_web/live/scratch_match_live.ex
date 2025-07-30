@@ -1,31 +1,60 @@
 defmodule VolleyWeb.ScratchMatchLive do
   use VolleyWeb, :live_view
   import VolleyWeb.MatchComponents
+  alias Volley.Scoring
 
   @impl true
-  def mount(_params, _session, socket) do
-    socket =
-      socket
-      |> assign(:a_score, 0)
-      |> assign(:b_score, 0)
+  def mount(_params, session, socket) do
+    with %{"match_id" => match_id} <- session,
+         {:ok, match} <- Scoring.get_match(match_id) do
+      {:ok, assign_new_match(socket, match)}
+    else
+      nil ->
+        socket =
+          socket
+          |> put_flash(:error, "Match with saved ID no longer exists")
+          |> redirect(to: ~p"/")
 
-    {:ok, socket}
+        {:ok, socket}
+    end
   end
 
   @impl true
   def render(assigns) do
     ~H"""
     <Layouts.scorer flash={@flash}>
-      <.score_container a_score={@a_score} b_score={@b_score} event="score" />
+      <.score_container a_score={@match.a_score} b_score={@match.b_score} event="score" />
     </Layouts.scorer>
     """
   end
 
   @impl true
-  def handle_event("score", %{"team" => team}, socket) do
-    team_score = String.to_existing_atom("#{team}_score")
-    socket = assign(socket, team_score, socket.assigns[team_score] + 1)
+  def handle_info(%Phoenix.Socket.Broadcast{event: "score", payload: payload}, socket) do
+    %Ash.Notifier.Notification{
+      data: match
+    } = payload
 
-    {:noreply, socket}
+    {:noreply, assign(socket, :match, match)}
+  end
+
+  @impl true
+  def handle_event("score", %{"team" => team}, socket) do
+    match = Scoring.score!(socket.assigns.match, team)
+
+    {:noreply, assign(socket, :match, match)}
+  end
+
+  defp assign_new_match(socket, match) do
+    if old_match = socket.assigns[:match] do
+      old_match
+      |> Scoring.match_topic()
+      |> VolleyWeb.Endpoint.unsubscribe()
+    end
+
+    match
+    |> Scoring.match_topic()
+    |> VolleyWeb.Endpoint.subscribe()
+
+    assign(socket, :match, match)
   end
 end

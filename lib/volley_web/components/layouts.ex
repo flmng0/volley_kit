@@ -70,6 +70,8 @@ defmodule VolleyWeb.Layouts do
         </span>
       </.button>
     </div>
+
+    <.flash_group flash={@flash} />
     """
   end
 

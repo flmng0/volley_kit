@@ -85,8 +85,8 @@ defmodule Volley.Scoring.Match do
     module VolleyWeb.Endpoint
 
     prefix "match"
-    publish :start, "start"
 
+    publish :start, "start"
     publish :score, [:id, "score"]
   end
 

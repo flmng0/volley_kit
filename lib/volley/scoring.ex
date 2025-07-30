@@ -3,7 +3,8 @@ defmodule Volley.Scoring do
 
   resources do
     resource Volley.Scoring.Match do
-      define :start_match, args: [:a_name, :b_name], action: :start
+      define :get_match, get_by: :id, action: :read
+      define :start_match, action: :start
       define :score, args: [:team]
 
       define_calculation :winning_team,
@@ -12,4 +13,6 @@ defmodule Volley.Scoring do
 
     resource Volley.Scoring.Event
   end
+
+  def match_topic(%Volley.Scoring.Match{id: id}), do: "match:#{id}:score"
 end

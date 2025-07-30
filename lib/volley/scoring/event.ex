@@ -30,6 +30,6 @@ defmodule Volley.Scoring.Event do
   end
 
   relationships do
-    belongs_to :match, Volley.Scoring.Match, public?: true
+    belongs_to :match, Volley.Scoring.Match, public?: true, allow_nil?: false
   end
 end

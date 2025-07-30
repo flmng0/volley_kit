@@ -39,7 +39,6 @@ defmodule Volley.Scoring.MatchTest do
               |> generate()
               |> Scoring.winning_team!()
 
-            # match = generate(match(a_score: a_score, b_score: b_score))
             assert expected == winner
 
           {expected, a_score, b_score, set_limit} ->

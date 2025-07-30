@@ -104,7 +104,7 @@ defmodule Volley.Scoring.Match do
       default "Team A"
     end
 
-    attribute :a_score, :integer, default: 0
+    attribute :a_score, :integer, default: 0, constraints: [min: 0]
 
     attribute :b_name, :string do
       constraints allow_empty?: false,
@@ -114,7 +114,7 @@ defmodule Volley.Scoring.Match do
       default "Team B"
     end
 
-    attribute :b_score, :integer, default: 0
+    attribute :b_score, :integer, default: 0, constraints: [min: 0]
   end
 
   relationships do

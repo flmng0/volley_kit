@@ -21,7 +21,7 @@ defmodule VolleyWeb.HomeLive do
     <Layouts.app hide_home_button={true} flash={@flash}>
       <main class="full-bleed hero">
         <div class="hero-content flex flex-col lg:flex-row gap-y-12">
-          <div class="text-center lg:text-left px-2 sm:px-4 prose">
+          <div class="text-center lg:text-left prose">
             <hgroup>
               <h1 class="mb-0">Volley Kit</h1>
               <p class="text-base-content/50 mt-1">
@@ -93,12 +93,12 @@ defmodule VolleyWeb.HomeLive do
     <.hero_card
       title="Continue Scoring"
       subtitle="Jump back in where you last left off, or reset and start a new match."
-      actions_class="flex flex-row gap-2"
+      actions_class="flex flex-row flex-wrap justify-stretch gap-2"
     >
-      <.button href={~p"/scratch/#{@match.id}"} class="grow">
+      <.button href={~p"/scratch/#{@match.id}"} class="grow max-w-full">
         {@match.a_name} vs. {@match.b_name}
       </.button>
-      <.button phx-click="reset" variant="delete">
+      <.button phx-click="reset" variant="delete" class="flex-[1_1_0]">
         Reset <.icon name="hero-arrow-path" />
       </.button>
     </.hero_card>

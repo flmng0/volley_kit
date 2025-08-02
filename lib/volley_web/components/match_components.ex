@@ -1,24 +1,42 @@
 defmodule VolleyWeb.MatchComponents do
   use Phoenix.Component
 
-  attr :a_score, :integer, required: true
-  attr :b_score, :integer, required: true
+  attr :match, Volley.Scoring.Match
 
   attr :event, :string, required: true
+  attr :editing, :boolean, default: false
 
   def score_container(assigns) do
     ~H"""
     <div class="size-full">
-      <div class="grid not-fullscreen:grid-cols-2 fullscreen:landscape:grid-cols-2 fullscreen:portrait:grid-rows-2 h-full">
-        <.score_card team={:a} score={@a_score} phx-click={@event} />
-        <.score_card team={:b} score={@b_score} phx-click={@event} />
+      <div class={[
+        "grid rounded-md not-fullscreen:overflow-hidden h-full",
+        "not-fullscreen:grid-cols-2 fullscreen:landscape:grid-cols-2 fullscreen:portrait:grid-rows-2"
+      ]}>
+        <.score_card
+          team={:a}
+          score={@match.a_score}
+          team_name={@match.a_name}
+          editing={@editing}
+          phx-click={@event}
+        />
+        <.score_card
+          team={:b}
+          score={@match.b_score}
+          team_name={@match.b_name}
+          editing={@editing}
+          phx-click={@event}
+        />
       </div>
     </div>
     """
   end
 
-  attr :score, :integer, required: true
-  attr :team, :atom, values: [:a, :b], required: true
+  attr :team, :atom, values: [:a, :b]
+  attr :score, :integer
+  attr :team_name, :string
+
+  attr :editing, :boolean
 
   attr :rest, :global
 
@@ -34,18 +52,20 @@ defmodule VolleyWeb.MatchComponents do
     ~H"""
     <button
       class={[
-        "flex flex-col justify-center max-h-full cursor-pointer not-fullscreen:aspect-square text-score-content",
+        "flex flex-col justify-center max-h-full cursor-pointer not-fullscreen:aspect-square text-score-content py-4",
         @class
       ]}
       phx-value-team={@team}
       {@rest}
     >
+      <span class="text-xl">{@team_name}</span>
       <svg
         viewBox="0 0 24 14"
         stroke="none"
         preserveAspectRatio="true"
         width="100%"
         height="100%"
+        class="basis-score-min grow"
         fill="currentColor"
       >
         <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle">{@score}</text>

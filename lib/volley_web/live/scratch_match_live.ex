@@ -9,7 +9,7 @@ defmodule VolleyWeb.ScratchMatchLive do
          {:ok, match} <- Scoring.get_match(match_id) do
       {:ok, assign_new_match(socket, match)}
     else
-      nil ->
+      _ ->
         socket =
           socket
           |> put_flash(:error, "Match with saved ID no longer exists")
@@ -23,7 +23,7 @@ defmodule VolleyWeb.ScratchMatchLive do
   def render(assigns) do
     ~H"""
     <Layouts.scorer flash={@flash}>
-      <.score_container a_score={@match.a_score} b_score={@match.b_score} event="score" />
+      <.score_container match={@match} event="score" />
     </Layouts.scorer>
     """
   end

@@ -35,7 +35,7 @@ defmodule VolleyWeb.Layouts do
     ~H"""
     <div class="grid grid-rows-[auto_1fr] min-h-screen">
       <.app_header hide_home_button={@hide_home_button} />
-      <main class="px-4 py-20 sm:px-6 lg:px-8">
+      <main class="px-2 py-20 sm:px-6 lg:px-8">
         <div class="bleed-container gap-y-4">
           {render_slot(@inner_block)}
         </div>

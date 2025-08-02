@@ -61,8 +61,8 @@ defmodule Volley.Scoring.Match do
     defaults [:read, :destroy]
 
     create :start do
-      accept [:a_name, :b_name]
       primary? true
+      accept [:a_name, :b_name]
     end
 
     update :settings do
@@ -78,6 +78,13 @@ defmodule Volley.Scoring.Match do
 
       change {AddEvent, type: :score}
       load :events
+    end
+
+    destroy :finish do
+      primary? true
+      soft? true
+
+      change set_attribute(:finished?, true)
     end
   end
 
@@ -115,6 +122,8 @@ defmodule Volley.Scoring.Match do
     end
 
     attribute :b_score, :integer, default: 0, constraints: [min: 0]
+
+    attribute :finished?, :boolean
   end
 
   relationships do

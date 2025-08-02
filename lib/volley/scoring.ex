@@ -4,6 +4,7 @@ defmodule Volley.Scoring do
   resources do
     resource Volley.Scoring.Match do
       define :get_match, get_by: :id, action: :read
+
       define :start_match, action: :start
       define :score, args: [:team]
 

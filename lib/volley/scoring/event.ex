@@ -8,6 +8,10 @@ defmodule Volley.Scoring.Event do
   postgres do
     table "scoring_events"
     repo Volley.Repo
+
+    references do
+      reference :match, on_delete: :delete
+    end
   end
 
   actions do

@@ -1,6 +1,16 @@
 defmodule VolleyWeb.Router do
   use VolleyWeb, :router
 
+  def clear_stale_match_id(conn, _opts) do
+    with %{"match_id" => id} <- get_session(conn),
+         {:ok, _match} <- Volley.Scoring.get_match(id) do
+      conn
+    else
+      _ ->
+        delete_session(conn, "match_id")
+    end
+  end
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -8,6 +18,7 @@ defmodule VolleyWeb.Router do
     plug :put_root_layout, html: {VolleyWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :clear_stale_match_id
   end
 
   pipeline :api do
@@ -17,11 +28,10 @@ defmodule VolleyWeb.Router do
   scope "/", VolleyWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
-
     get "/scratch/new", ScratchController, :new
     get "/scratch/:id", ScratchController, :join
 
+    live "/", HomeLive
     live "/scratch", ScratchMatchLive
 
     live "/tournament/", TournamentLive, :index

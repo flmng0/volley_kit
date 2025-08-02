@@ -6,9 +6,7 @@ defmodule VolleyWeb.ScratchController do
   def new(conn, _params) do
     match = Scoring.start_match!()
 
-    conn
-    |> put_flash(:info, "Created match with id #{match.id}")
-    |> view_match(match.id)
+    view_match(conn, match.id)
   end
 
   def join(conn, %{"id" => id}) do

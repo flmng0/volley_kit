@@ -43,11 +43,11 @@ defmodule VolleyWeb.HomeLive do
             <.continue_match_card :if={@match} match={@match} />
             <.scratch_match_card :if={is_nil(@match)} />
 
-            <span class="divider">OR</span>
-
-            <.button navigate={~p"/tournament/new"}>
-              <.icon name="hero-cog-8-tooth-solid" /> Configure a Tournament
-            </.button>
+            <%!-- <span class="divider">OR</span> --%>
+            <%!----%>
+            <%!-- <.button navigate={~p"/tournament/new"}> --%>
+            <%!--   <.icon name="hero-cog-8-tooth-solid" /> Configure a Tournament --%>
+            <%!-- </.button> --%>
           </nav>
         </div>
       </main>
@@ -56,16 +56,10 @@ defmodule VolleyWeb.HomeLive do
   end
 
   @impl true
-  def handle_event("reset", _params, socket) do
+  def handle_event("delete", _params, socket) do
     Ash.destroy!(socket.assigns.match, action: :destroy)
 
-    socket =
-      socket
-      |> assign(:match, nil)
-      |> put_flash(:info, "Match successfully deleted.")
-      |> push_navigate(to: ~p"/scratch/new")
-
-    {:noreply, socket}
+    {:noreply, assign(socket, :match, nil)}
   end
 
   attr :title, :string
@@ -92,14 +86,14 @@ defmodule VolleyWeb.HomeLive do
     ~H"""
     <.hero_card
       title="Continue Scoring"
-      subtitle="Jump back in where you last left off, or reset and start a new match."
+      subtitle="Jump back in where you left off, or press Delete to start a new one."
       actions_class="flex flex-row flex-wrap justify-stretch gap-2"
     >
       <.button href={~p"/scratch/#{@match.id}"} class="grow max-w-full">
         {@match.a_name} vs. {@match.b_name}
       </.button>
-      <.button phx-click="reset" variant="delete" class="flex-[1_1_0]">
-        Reset <.icon name="hero-arrow-path" />
+      <.button phx-click="delete" variant="delete" class="flex-[1_1_0]">
+        Delete <.icon name="hero-trash" />
       </.button>
     </.hero_card>
     """

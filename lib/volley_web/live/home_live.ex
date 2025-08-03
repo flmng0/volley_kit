@@ -4,15 +4,19 @@ defmodule VolleyWeb.HomeLive do
 
   @impl true
   def mount(_params, session, socket) do
-    match =
+    socket =
       with %{"match_id" => id} <- session,
            {:ok, match} <- Scoring.get_match(id) do
-        match
+        owner? = match?(%{"owns_match_id" => ^id}, session)
+
+        socket
+        |> assign(:match, match)
+        |> assign(:owner?, owner?)
       else
-        _ -> nil
+        _ -> socket
       end
 
-    {:ok, assign(socket, :match, match)}
+    {:ok, socket}
   end
 
   @impl true
@@ -40,8 +44,11 @@ defmodule VolleyWeb.HomeLive do
           </div>
 
           <nav class="flex flex-col w-full max-w-sm shrink-0">
-            <.continue_match_card :if={@match} match={@match} />
-            <.start_match_card :if={is_nil(@match)} />
+            <%= if assigns[:match] && assigns[:owner?] do %>
+              <.continue_match_card match={@match} />
+            <% else %>
+              <.start_match_card />
+            <% end %>
 
             <%!-- <span class="divider">OR</span> --%>
             <%!----%>
@@ -57,6 +64,7 @@ defmodule VolleyWeb.HomeLive do
 
   @impl true
   def handle_event("delete", _params, socket) do
+    true = socket.assigns.owner?
     Ash.destroy!(socket.assigns.match, action: :destroy)
 
     {:noreply, assign(socket, :match, nil)}

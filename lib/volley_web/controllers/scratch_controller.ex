@@ -6,7 +6,7 @@ defmodule VolleyWeb.ScratchController do
   def new(conn, _params) do
     match = Scoring.start_match!()
 
-    view_match(conn, match.id)
+    view_match(conn, match.id, true)
   end
 
   def join(conn, %{"id" => id}) do
@@ -20,7 +20,9 @@ defmodule VolleyWeb.ScratchController do
     end
   end
 
-  defp view_match(conn, id) do
+  defp view_match(conn, id, owner \\ false) do
+    conn = if owner, do: put_session(conn, :owns_match_id, id), else: conn
+
     conn
     |> put_session(:match_id, id)
     |> put_status(:moved_permanently)

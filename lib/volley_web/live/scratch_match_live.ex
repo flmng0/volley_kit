@@ -7,7 +7,9 @@ defmodule VolleyWeb.ScratchMatchLive do
   def mount(_params, session, socket) do
     with %{"match_id" => match_id} <- session,
          {:ok, match} <- Scoring.get_match(match_id) do
-      {:ok, assign_new_match(socket, match)}
+      owner? = match?(%{"owns_match_id" => ^match_id}, session)
+
+      {:ok, assign_new_match(socket, match, owner?)}
     else
       _ ->
         socket =
@@ -23,7 +25,7 @@ defmodule VolleyWeb.ScratchMatchLive do
   def render(assigns) do
     ~H"""
     <Layouts.scorer flash={@flash}>
-      <.score_container match={@match} event="score" />
+      <.score_container match={@match} can_score={@owner?} event="score" />
     </Layouts.scorer>
     """
   end
@@ -39,12 +41,14 @@ defmodule VolleyWeb.ScratchMatchLive do
 
   @impl true
   def handle_event("score", %{"team" => team}, socket) do
+    %{owner?: true} = socket.assigns
+
     match = Scoring.score!(socket.assigns.match, team)
 
     {:noreply, assign(socket, :match, match)}
   end
 
-  defp assign_new_match(socket, match) do
+  defp assign_new_match(socket, match, owner?) do
     if old_match = socket.assigns[:match] do
       old_match
       |> Scoring.match_topic()
@@ -55,6 +59,8 @@ defmodule VolleyWeb.ScratchMatchLive do
     |> Scoring.match_topic()
     |> VolleyWeb.Endpoint.subscribe()
 
-    assign(socket, :match, match)
+    socket
+    |> assign(:match, match)
+    |> assign(:owner?, owner?)
   end
 end

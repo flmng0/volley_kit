@@ -4,6 +4,7 @@ defmodule VolleyWeb.MatchComponents do
   attr :match, Volley.Scoring.Match
 
   attr :event, :string, required: true
+  attr :can_score, :boolean, default: false
   attr :editing, :boolean, default: false
 
   def score_container(assigns) do
@@ -14,18 +15,19 @@ defmodule VolleyWeb.MatchComponents do
         "not-fullscreen:grid-cols-2 fullscreen:landscape:grid-cols-2 fullscreen:portrait:grid-rows-2"
       ]}>
         <.score_card
-          team={:a}
-          score={@match.a_score}
-          team_name={@match.a_name}
+          :for={
+            {team, score, name} <- [
+              {:a, @match.a_score, @match.a_name},
+              {:b, @match.b_score, @match.b_name}
+            ]
+          }
+          :key={team}
+          team={team}
+          score={score}
+          team_name={name}
           editing={@editing}
-          phx-click={@event}
-        />
-        <.score_card
-          team={:b}
-          score={@match.b_score}
-          team_name={@match.b_name}
-          editing={@editing}
-          phx-click={@event}
+          can_score={@can_score}
+          event={@event}
         />
       </div>
     </div>
@@ -33,31 +35,18 @@ defmodule VolleyWeb.MatchComponents do
   end
 
   attr :team, :atom, values: [:a, :b]
+  attr :event, :string
+  attr :can_score, :boolean
+
   attr :score, :integer
   attr :team_name, :string
-
   attr :editing, :boolean
 
   attr :rest, :global
 
   defp score_card(assigns) do
-    team_class =
-      case assigns[:team] do
-        :a -> "bg-team-a"
-        :b -> "bg-team-b"
-      end
-
-    assigns = assign(assigns, :class, team_class)
-
     ~H"""
-    <button
-      class={[
-        "flex flex-col justify-center max-h-full cursor-pointer not-fullscreen:aspect-square text-score-content py-4",
-        @class
-      ]}
-      phx-value-team={@team}
-      {@rest}
-    >
+    <.score_card_wrapper team={@team} can_score={@can_score} event={@event}>
       <span class="text-xl">{@team_name}</span>
       <svg
         viewBox="0 0 24 14"
@@ -65,12 +54,45 @@ defmodule VolleyWeb.MatchComponents do
         preserveAspectRatio="true"
         width="100%"
         height="100%"
-        class="basis-score-min grow"
+        class="basis-score-min grow select-none"
         fill="currentColor"
       >
         <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle">{@score}</text>
       </svg>
-    </button>
+    </.score_card_wrapper>
     """
+  end
+
+  attr :team, :atom, values: [:a, :b]
+  attr :can_score, :boolean
+  attr :event, :string
+
+  slot :inner_block, required: true
+
+  defp score_card_wrapper(assigns) do
+    team_class =
+      case assigns[:team] do
+        :a -> "bg-team-a"
+        :b -> "bg-team-b"
+      end
+
+    display_class =
+      "flex flex-col justify-center max-h-full text-center not-fullscreen:aspect-square text-score-content py-4"
+
+    assigns = assign(assigns, :class, [team_class, display_class])
+
+    if assigns[:can_score] do
+      ~H"""
+      <button class={[@class, "cursor-pointer"]} phx-click={@event} phx-value-team={@team}>
+        {render_slot(@inner_block)}
+      </button>
+      """
+    else
+      ~H"""
+      <div class={@class}>
+        {render_slot(@inner_block)}
+      </div>
+      """
+    end
   end
 end

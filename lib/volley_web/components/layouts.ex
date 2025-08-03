@@ -51,24 +51,28 @@ defmodule VolleyWeb.Layouts do
 
   def scorer(assigns) do
     ~H"""
-    <.app_header class="fullscreen:hidden" />
+    <.app_header />
     <div
-      class="w-xl md:w-2xl lg:w-3xl max-w-screen mx-auto fullscreen:w-screen fullscreen:h-screen space-y-2"
+      class={[
+        "w-xl md:w-2xl lg:w-3xl max-w-screen mx-auto space-y-2",
+        "fullscreen:fixed fullscreen:inset-0 fullscreen:isolation-isolate"
+      ]}
       id="scoringContainer"
     >
       {render_slot(@inner_block)}
-      <.button
-        id="toggle-fs-button"
-        phx-hook="FullscreenButton"
-        class="fullscreen:fixed fullscreen:w-auto w-full top-4 left-4 cursor-pointer p-2"
-      >
-        <span class="fullscreen:hidden">
-          Toggle Fullscreen <.icon name="hero-arrows-pointing-out" />
-        </span>
-        <span class="not-fullscreen:hidden">
-          <.icon name="hero-arrows-pointing-in" class="size-6" />
-        </span>
-      </.button>
+      <div class={[
+        "flex flex-col w-full",
+        "fullscreen:fixed fullscreen:w-auto top-4 left-4"
+      ]}>
+        <.button id="toggle-fs-button" phx-hook="FullscreenButton" class="cursor-pointer p-2">
+          <span class="fullscreen:hidden">
+            Toggle Fullscreen <.icon name="hero-arrows-pointing-out" />
+          </span>
+          <span class="not-fullscreen:hidden">
+            <.icon name="hero-arrows-pointing-in" class="size-6" />
+          </span>
+        </.button>
+      </div>
     </div>
 
     <.flash_group flash={@flash} />

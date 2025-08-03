@@ -90,15 +90,16 @@ defmodule VolleyWeb.CoreComponents do
   """
   attr :rest, :global, include: ~w(href navigate patch method download name value disabled)
   attr :class, :string, default: ""
-  attr :variant, :string, values: ~w(primary secondary delete)
+  attr :variant, :string, values: ~w(primary secondary neutral delete)
   slot :inner_block, required: true
 
   def button(%{rest: rest} = assigns) do
     variants = %{
       "primary" => "btn-primary",
       "secondary" => "btn-secondary",
+      "neutral" => "btn-neutral",
       "delete" => "btn-error",
-      nil => "btn-neutral"
+      nil => ""
     }
 
     assigns =
@@ -422,6 +423,65 @@ defmodule VolleyWeb.CoreComponents do
     """
   end
 
+  attr :id, :string, required: true
+  attr :class, :string, default: ""
+
+  slot :inner_block, required: true
+
+  def modal(assigns) do
+    ~H"""
+    <dialog id={@id} class="modal" onclick="event.target === this && this.close()">
+      <div class={[@class, "modal-box"]}>
+        <form method="dialog">
+          <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+            <.icon name="hero-x-mark" class="size-5 text-base-content/50" />
+          </button>
+        </form>
+
+        {render_slot(@inner_block)}
+      </div>
+    </dialog>
+    """
+  end
+
+  attr :value, :string, required: true
+  attr :id, :string, required: true
+  attr :class, :string, default: ""
+  attr :rest, :global
+
+  def copy_text(assigns) do
+    ~H"""
+    <div {@rest} id={@id} class={[@class, "join"]}>
+      <input type="text" class="input grow" readonly value={@value} />
+      <.button class="join-item" phx-click={JS.dispatch("vk:copytext", to: "##{@id} > input")}>
+        <span class="max-md:hidden">
+          Copy Link
+        </span>
+        <.icon name="hero-link" />
+      </.button>
+    </div>
+    """
+  end
+
+  attr :target, :string
+  attr :class, :string, default: ""
+  attr :id, :string, default: nil
+
+  def qr_code(assigns) do
+    class = Enum.join([assigns.class, "max-w-full aspect-square h-auto"], " ")
+
+    qr_svg =
+      assigns.target
+      |> EQRCode.encode()
+      |> EQRCode.svg(class: class, id: assigns.id)
+
+    assigns = assign(assigns, :qr_svg, qr_svg)
+
+    ~H"""
+    {Phoenix.HTML.raw(@qr_svg)}
+    """
+  end
+
   ## JS Commands
 
   def show(js \\ %JS{}, selector) do
@@ -443,6 +503,10 @@ defmodule VolleyWeb.CoreComponents do
         {"transition-all ease-in duration-200", "opacity-100 translate-y-0 sm:scale-100",
          "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"}
     )
+  end
+
+  def show_modal(js \\ %JS{}, id) do
+    JS.dispatch(js, "vk:showmodal", to: "##{id}")
   end
 
   @doc """

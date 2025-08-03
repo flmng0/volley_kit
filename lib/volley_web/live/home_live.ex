@@ -41,7 +41,7 @@ defmodule VolleyWeb.HomeLive do
 
           <nav class="flex flex-col w-full max-w-sm shrink-0">
             <.continue_match_card :if={@match} match={@match} />
-            <.scratch_match_card :if={is_nil(@match)} />
+            <.start_match_card :if={is_nil(@match)} />
 
             <%!-- <span class="divider">OR</span> --%>
             <%!----%>
@@ -89,7 +89,7 @@ defmodule VolleyWeb.HomeLive do
       subtitle="Jump back in where you left off, or press Delete to start a new one."
       actions_class="flex flex-row flex-wrap justify-stretch gap-2"
     >
-      <.button href={~p"/scratch/#{@match.id}"} class="grow max-w-full">
+      <.button href={~p"/scratch/#{@match.id}"} variant="neutral" class="grow max-w-full">
         {@match.a_name} vs. {@match.b_name}
       </.button>
       <.button phx-click="delete" variant="delete" class="flex-[1_1_0]">
@@ -99,7 +99,7 @@ defmodule VolleyWeb.HomeLive do
     """
   end
 
-  defp scratch_match_card(assigns) do
+  defp start_match_card(assigns) do
     ~H"""
     <.hero_card
       title="Start A Scratch Match!"

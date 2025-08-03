@@ -49,6 +49,8 @@ defmodule VolleyWeb.Layouts do
   attr :flash, :map, required: true
   slot :inner_block, required: true
 
+  slot :actions
+
   def scorer(assigns) do
     ~H"""
     <.app_header />
@@ -61,7 +63,7 @@ defmodule VolleyWeb.Layouts do
     >
       {render_slot(@inner_block)}
       <div class={[
-        "flex flex-col w-full",
+        "flex flex-row gap-1 w-full *:flex-1",
         "fullscreen:fixed fullscreen:w-auto top-4 left-4"
       ]}>
         <.button id="toggle-fs-button" phx-hook="FullscreenButton" class="cursor-pointer p-2">
@@ -72,6 +74,7 @@ defmodule VolleyWeb.Layouts do
             <.icon name="hero-arrows-pointing-in" class="size-6" />
           </span>
         </.button>
+        {render_slot(@actions)}
       </div>
     </div>
 

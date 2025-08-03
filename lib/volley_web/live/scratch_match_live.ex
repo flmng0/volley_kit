@@ -24,8 +24,24 @@ defmodule VolleyWeb.ScratchMatchLive do
   @impl true
   def render(assigns) do
     ~H"""
+    <.modal id="shareModal" class="flex flex-col items-center text-sm md:text-base">
+      <hgroup>
+        <h3 class="text-lg font-bold">Share Match</h3>
+        <p>Scan the QR code below, or copy the sharing link, so other users to view this match.</p>
+      </hgroup>
+
+      <.qr_code class="my-6 rounded-md shadow-xl outline outline-base-300" target={@share_link} />
+
+      <.copy_text id="shareLinkCopy" class="w-full max-w-md" value={@share_link} />
+    </.modal>
     <Layouts.scorer flash={@flash}>
       <.score_container match={@match} can_score={@owner?} event="score" />
+      <:actions>
+        <.button class="p-2" phx-click={show_modal("shareModal")}>
+          <span class="fullscreen:hidden">Share Match</span>
+          <.icon class="fullscreen:size-6 size-4" name="hero-share" />
+        </.button>
+      </:actions>
     </Layouts.scorer>
     """
   end
@@ -59,8 +75,11 @@ defmodule VolleyWeb.ScratchMatchLive do
     |> Scoring.match_topic()
     |> VolleyWeb.Endpoint.subscribe()
 
+    share_link = url(socket, ~p"/scratch/#{match.id}")
+
     socket
     |> assign(:match, match)
+    |> assign(:share_link, share_link)
     |> assign(:owner?, owner?)
   end
 end

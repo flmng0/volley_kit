@@ -24,60 +24,8 @@ import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import { hooks as colocatedHooks } from "phoenix-colocated/volley";
 import topbar from "../vendor/topbar";
-
-function requestFullscreen(element, options) {
-  if (element.requestFullscreen) {
-    element.requestFullscreen(options);
-  } else if (element.mozRequestFullScreen) {
-    element.mozRequestFullScreen(options);
-  } else if (element.webkitRequestFullScreen) {
-    element.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-  }
-}
-
-function exitFullscreen() {
-  if (document.exitFullscreen) {
-    document.exitFullscreen();
-  } else if (document.webkitExitFullScreen) {
-    document.webkitExitFullScreen();
-  }
-}
-
-const Hooks = {};
-Hooks.FullscreenButton = {
-  fullscreen() {
-    return document.documentElement.dataset.fullscreen === "true";
-  },
-  setFullscreen(value) {
-    document.documentElement.dataset.fullscreen = value;
-  },
-  mounted() {
-    this.onClick = () => {
-      const newFullscreen = !this.fullscreen();
-      this.setFullscreen(newFullscreen);
-
-      if (newFullscreen) {
-        const container = document.getElementById("scoringContainer");
-        requestFullscreen(container, {
-          navigationUI: "hide",
-        });
-      } else if (document.fullscreenElement) {
-        exitFullscreen();
-      }
-    };
-
-    this.onFullscreenChange = () => {
-      this.setFullscreen(!!document.fullscreenElement);
-    };
-
-    document.addEventListener("fullscreenchange", this.onFullscreenChange);
-    this.el.addEventListener("click", this.onClick);
-  },
-  destroyed() {
-    this.el.removeEventListener("click", this.onClick);
-    document.removeEventListener("fullscreenchange", this.onFullscreenChange);
-  },
-};
+import Hooks from "./hooks.js";
+import "./events.js";
 
 const csrfToken = document.querySelector("meta[name='csrf-token']")
   .getAttribute("content");

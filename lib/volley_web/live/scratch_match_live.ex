@@ -34,6 +34,7 @@ defmodule VolleyWeb.ScratchMatchLive do
 
       <.copy_text id="shareLinkCopy" class="w-full max-w-md" value={@share_link} />
     </.modal>
+
     <Layouts.scorer flash={@flash}>
       <.score_container match={@match} can_score={@owner?} event="score" />
       <:actions>

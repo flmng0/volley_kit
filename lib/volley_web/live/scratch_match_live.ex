@@ -79,6 +79,7 @@ defmodule VolleyWeb.ScratchMatchLive do
     share_link = url(socket, ~p"/scratch/#{match.id}")
 
     socket
+    |> assign(:page_title, "#{match.a_name} vs. #{match.b_name}")
     |> assign(:match, match)
     |> assign(:share_link, share_link)
     |> assign(:owner?, owner?)

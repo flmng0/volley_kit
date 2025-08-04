@@ -89,11 +89,12 @@ defmodule VolleyWeb.Layouts do
 
   def app_header(assigns) do
     ~H"""
-    <header class={["navbar px-4 sm:px-6 lg:px-8", @class]} {@rest}>
+    <header class={["navbar max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8", @class]} {@rest}>
       <div class="">
         <a :if={!@hide_home_button} href="/" class="flex w-fit items-center gap-2">
-          <img src={~p"/images/logo.svg"} width="36" />
-          <span class="text-sm font-semibold">Volley Kit</span>
+          <.icon name="hero-home-solid" class="size-6" />
+          <%!-- <img src={~p"/images/logo.svg"} width="36" /> --%>
+          <span class="text-sm font-semibold text-nowrap">Home</span>
         </a>
       </div>
       <ul class="menu menu-horizontal w-full relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">

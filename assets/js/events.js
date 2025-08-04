@@ -5,7 +5,7 @@ window.addEventListener("vk:showmodal", function (e) {
   if (e.target instanceof HTMLDialogElement) {
     e.target.showModal();
   } else {
-    console.warning(
+    console.warn(
       "Tried to send `vk:showmodal` event to non-dialog element!",
     );
   }

@@ -36,8 +36,13 @@ Hooks.FullscreenButton = {
         requestFullscreen(container, {
           navigationUI: "hide",
         });
+
+        screen.orientation.lock("landscape").catch(() =>
+          console.warn("Failed to lock screen orientation")
+        );
       } else if (document.fullscreenElement) {
         exitFullscreen();
+        screen.orientation.unlock();
       }
     };
 

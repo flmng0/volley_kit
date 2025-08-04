@@ -427,29 +427,31 @@ defmodule VolleyWeb.CoreComponents do
   attr :class, :string, default: ""
 
   slot :inner_block, required: true
-  slot :action 
+  slot :action
 
   def modal(assigns) do
     ~H"""
-    <dialog id={@id} class="modal" onclick="event.target === this && this.close()">
-      <div class={[@class, "modal-box"]}>
-        <form method="dialog">
-          <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-            <.icon name="hero-x-mark" class="size-5 text-base-content/50" />
-          </button>
-        </form>
-
-        {render_slot(@inner_block)}
-
-        <div class="modal-action" :if={@action != []}>
-          <form method="dialog" class="inline-block">
-            <%= for action <- @action do %>
-              {render_slot(action)}
-            <% end %>
+    <.portal id={"#{@id}Portal"} target="body">
+      <dialog id={@id} class="modal" onclick="event.target === this && this.close()">
+        <div class={[@class, "modal-box"]}>
+          <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+              <.icon name="hero-x-mark" class="size-5 text-base-content/50" />
+            </button>
           </form>
+
+          {render_slot(@inner_block)}
+
+          <div :if={@action != []} class="modal-action">
+            <form method="dialog" class="inline-block">
+              <%= for action <- @action do %>
+                {render_slot(action)}
+              <% end %>
+            </form>
+          </div>
         </div>
-      </div>
-    </dialog>
+      </dialog>
+    </.portal>
     """
   end
 

@@ -3,13 +3,16 @@ defmodule VolleyWeb.ScratchController do
 
   alias Volley.Scoring
 
-  def new(conn, params) do
-    match =
-      params
-      |> Scoring.Settings.new!()
-      |> Scoring.start_match!()
-
-    view_match(conn, match.id, true)
+  def new(conn, %{"form" => settings}) do
+    with {:ok, settings} <- Ash.create(Scoring.Settings, settings),
+         {:ok, match} <- Scoring.start_match(settings) do
+      view_match(conn, match.id, true)
+    else
+      _ ->
+        conn
+        |> put_flash(:error, "Failed to create match")
+        |> redirect(to: ~p"/")
+    end
   end
 
   def join(conn, %{"id" => id}) do

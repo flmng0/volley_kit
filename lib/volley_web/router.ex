@@ -28,7 +28,7 @@ defmodule VolleyWeb.Router do
   scope "/", VolleyWeb do
     pipe_through :browser
 
-    get "/scratch/new", ScratchController, :new
+    post "/scratch/new", ScratchController, :new
     get "/scratch/:id", ScratchController, :join
 
     live "/", HomeLive

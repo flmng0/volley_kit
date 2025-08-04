@@ -63,7 +63,7 @@ defmodule Volley.Scoring.Match do
     attribute :a_sets, :integer, default: 0, constraints: [min: 0]
     attribute :b_sets, :integer, default: 0, constraints: [min: 0]
 
-    attribute :settings, Settings, allow_nil?: false
+    attribute :settings, Settings, public?: true, allow_nil?: false
 
     attribute :finished?, :boolean
   end

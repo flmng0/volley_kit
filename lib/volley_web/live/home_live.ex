@@ -70,19 +70,32 @@ defmodule VolleyWeb.HomeLive do
     {:noreply, assign(socket, :match, nil)}
   end
 
+  @impl true
+  def handle_info({:start_match, settings}, socket) do
+    {:noreply, redirect(socket, to: ~p"/scratch/new?#{settings}")}
+  end
+
   attr :title, :string
   attr :subtitle, :string
   attr :actions_class, :string, default: ""
 
-  slot :inner_block, required: true
+  slot :inner_block
+  slot :action
 
   defp hero_card(assigns) do
     ~H"""
     <div class="p-4 space-y-6 rounded-box shadow-lg bg-base-200 border border-base-300">
       <h2 class="text-2xl font-semibold">{@title}</h2>
       <p class="text-base-content/80 text-sm">{@subtitle}</p>
-      <div class={@actions_class}>
+
+      <%= if @inner_block != [] do %>
         {render_slot(@inner_block)}
+      <% end %>
+
+      <div :if={@action != []} class={@actions_class}>
+        <%= for action <- @action do %>
+          {render_slot(action)}
+        <% end %>
       </div>
     </div>
     """
@@ -108,12 +121,16 @@ defmodule VolleyWeb.HomeLive do
       subtitle="Jump back in where you left off, or press Delete to start a new one."
       actions_class="flex flex-row flex-wrap justify-stretch gap-2"
     >
-      <.button href={~p"/scratch/#{@match.id}"} variant="neutral" class="grow max-w-full">
-        {@match.settings.a_name} vs. {@match.settings.b_name}
-      </.button>
-      <.button phx-click={show_modal("deleteConfirmation")} variant="delete" class="flex-[1_1_0]">
-        Delete <.icon name="hero-trash" />
-      </.button>
+      <:action>
+        <.button href={~p"/scratch/#{@match.id}"} variant="neutral" class="grow max-w-full">
+          {@match.settings.a_name} vs. {@match.settings.b_name}
+        </.button>
+      </:action>
+      <:action>
+        <.button phx-click={show_modal("deleteConfirmation")} variant="delete" class="flex-[1_1_0]">
+          Delete <.icon name="hero-trash" />
+        </.button>
+      </:action>
     </.hero_card>
     """
   end
@@ -125,9 +142,7 @@ defmodule VolleyWeb.HomeLive do
       subtitle="Jump straight into scoring a new volleyball match, no additional config required."
       actions_class="text-right"
     >
-      <.button href={~p"/scratch/new"} variant="primary">
-        Start <.icon name="hero-chevron-right" />
-      </.button>
+      <.live_component id="scratch-match-create-form" module={VolleyWeb.ScratchMatchCard} />
     </.hero_card>
     """
   end

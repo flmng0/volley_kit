@@ -427,6 +427,7 @@ defmodule VolleyWeb.CoreComponents do
   attr :class, :string, default: ""
 
   slot :inner_block, required: true
+  slot :action 
 
   def modal(assigns) do
     ~H"""
@@ -439,6 +440,14 @@ defmodule VolleyWeb.CoreComponents do
         </form>
 
         {render_slot(@inner_block)}
+
+        <div class="modal-action" :if={@action != []}>
+          <form method="dialog" class="inline-block">
+            <%= for action <- @action do %>
+              {render_slot(action)}
+            <% end %>
+          </form>
+        </div>
       </div>
     </dialog>
     """

@@ -22,6 +22,17 @@ defmodule VolleyWeb.HomeLive do
   @impl true
   def render(assigns) do
     ~H"""
+    <.modal :if={assigns[:match]} id="deleteConfirmation">
+      <h3 class="text-lg font-bold">Are you sure?</h3>
+      <p>Are you sure you want to delete this scratch match?</p>
+
+      <:action>
+        <.button variant="delete" phx-click="delete">Yes, delete</.button>
+      </:action>
+      <:action>
+        <.button>Cancel</.button>
+      </:action>
+    </.modal>
     <Layouts.app hide_home_button={true} flash={@flash}>
       <main class="full-bleed hero">
         <div class="hero-content flex flex-col lg:flex-row gap-y-12">
@@ -45,7 +56,7 @@ defmodule VolleyWeb.HomeLive do
 
           <nav class="flex flex-col w-full max-w-sm shrink-0">
             <%= if assigns[:match] && assigns[:owner?] do %>
-              <.continue_match_card match={@match} />
+              <.continue_match_card match={@match} delete_confirm_id="deleteConfirmation" />
             <% else %>
               <.start_match_card />
             <% end %>
@@ -89,6 +100,7 @@ defmodule VolleyWeb.HomeLive do
   end
 
   attr :match, Volley.Scoring.Match
+  attr :delete_confirm_id, :string
 
   defp continue_match_card(assigns) do
     ~H"""
@@ -100,7 +112,7 @@ defmodule VolleyWeb.HomeLive do
       <.button href={~p"/scratch/#{@match.id}"} variant="neutral" class="grow max-w-full">
         {@match.a_name} vs. {@match.b_name}
       </.button>
-      <.button phx-click="delete" variant="delete" class="flex-[1_1_0]">
+      <.button phx-click={show_modal(@delete_confirm_id)} variant="delete" class="flex-[1_1_0]">
         Delete <.icon name="hero-trash" />
       </.button>
     </.hero_card>

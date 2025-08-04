@@ -6,8 +6,11 @@ defmodule Volley.ScoringGenerator do
   def match(opts \\ []) do
     seed_generator(
       %Scoring.Match{
-        a_name: "Team A",
-        b_name: "Team B",
+        settings: %Scoring.Settings{
+          a_name: "Team A",
+          b_name: "Team B",
+          set_limit: 25
+        },
         a_score: 0,
         b_score: 0
       },

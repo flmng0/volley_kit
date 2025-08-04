@@ -3,8 +3,11 @@ defmodule VolleyWeb.ScratchController do
 
   alias Volley.Scoring
 
-  def new(conn, _params) do
-    match = Scoring.start_match!()
+  def new(conn, params) do
+    match =
+      params
+      |> Scoring.Settings.new!()
+      |> Scoring.start_match!()
 
     view_match(conn, match.id, true)
   end

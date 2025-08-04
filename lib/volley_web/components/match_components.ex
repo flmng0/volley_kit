@@ -17,8 +17,8 @@ defmodule VolleyWeb.MatchComponents do
         <.score_card
           :for={
             {team, score, name} <- [
-              {:a, @match.a_score, @match.a_name},
-              {:b, @match.b_score, @match.b_name}
+              {:a, @match.a_score, @match.settings.a_name},
+              {:b, @match.b_score, @match.settings.b_name}
             ]
           }
           :key={team}

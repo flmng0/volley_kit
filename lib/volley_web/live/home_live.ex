@@ -109,7 +109,7 @@ defmodule VolleyWeb.HomeLive do
       actions_class="flex flex-row flex-wrap justify-stretch gap-2"
     >
       <.button href={~p"/scratch/#{@match.id}"} variant="neutral" class="grow max-w-full">
-        {@match.a_name} vs. {@match.b_name}
+        {@match.settings.a_name} vs. {@match.settings.b_name}
       </.button>
       <.button phx-click={show_modal("deleteConfirmation")} variant="delete" class="flex-[1_1_0]">
         Delete <.icon name="hero-trash" />

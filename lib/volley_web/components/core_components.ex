@@ -425,6 +425,8 @@ defmodule VolleyWeb.CoreComponents do
 
   attr :id, :string, required: true
   attr :class, :string, default: ""
+  attr :allow_close, :boolean, default: true
+  attr :rest, :global
 
   slot :inner_block, required: true
   slot :action
@@ -432,9 +434,14 @@ defmodule VolleyWeb.CoreComponents do
   def modal(assigns) do
     ~H"""
     <.portal id={"#{@id}Portal"} target="body">
-      <dialog id={@id} class="modal" onclick="event.target === this && this.close()">
+      <dialog
+        id={@id}
+        {@rest}
+        class="modal"
+        onclick={@allow_close && "event.target === this && this.close()"}
+      >
         <div class={[@class, "modal-box"]}>
-          <form method="dialog">
+          <form :if={@allow_close} method="dialog">
             <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
               <.icon name="hero-x-mark" class="size-5 text-base-content/50" />
             </button>

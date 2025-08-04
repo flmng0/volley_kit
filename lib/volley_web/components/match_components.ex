@@ -16,14 +16,15 @@ defmodule VolleyWeb.MatchComponents do
       ]}>
         <.score_card
           :for={
-            {team, score, name} <- [
-              {:a, @match.a_score, @match.settings.a_name},
-              {:b, @match.b_score, @match.settings.b_name}
+            {team, score, sets, name} <- [
+              {:a, @match.a_score, @match.a_sets, @match.settings.a_name},
+              {:b, @match.b_score, @match.b_sets, @match.settings.b_name}
             ]
           }
           :key={team}
           team={team}
           score={score}
+          sets={sets}
           team_name={name}
           editing={@editing}
           can_score={@can_score}
@@ -39,6 +40,7 @@ defmodule VolleyWeb.MatchComponents do
   attr :can_score, :boolean
 
   attr :score, :integer
+  attr :sets, :integer
   attr :team_name, :string
   attr :editing, :boolean
 
@@ -59,6 +61,7 @@ defmodule VolleyWeb.MatchComponents do
       >
         <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle">{@score}</text>
       </svg>
+      <span class="text-xl">{@sets}</span>
     </.score_card_wrapper>
     """
   end

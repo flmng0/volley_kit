@@ -35,6 +35,27 @@ defmodule VolleyWeb.ScratchMatchLive do
       <.copy_text id="shareLinkCopy" class="w-full max-w-md" value={@share_link} />
     </.modal>
 
+    <.modal
+      :if={@winning_team in [:a, :b]}
+      id="setCompleteModal"
+      allow_close={false}
+      phx-mounted={show_modal("setCompleteModal")}
+    >
+      <hgroup>
+        <h3 class="text-lg font-bold">Set Complete!</h3>
+        <p>
+          {if @winning_team == :a, do: @match.settings.a_name, else: @match.settings.b_name} has won this set.
+        </p>
+      </hgroup>
+
+      <:action>
+        <.button phx-click="undo">Undo</.button>
+      </:action>
+      <:action>
+        <.button phx-click="next_set" variant="neutral">Continue To Next Set!</.button>
+      </:action>
+    </.modal>
+
     <Layouts.scorer flash={@flash}>
       <.score_container match={@match} can_score={@owner?} event="score" />
       <:actions>
@@ -57,12 +78,37 @@ defmodule VolleyWeb.ScratchMatchLive do
   end
 
   @impl true
-  def handle_event("score", %{"team" => team}, socket) do
+  def handle_event(event, params, socket) do
     %{owner?: true} = socket.assigns
 
+    {:noreply, apply_event(socket, event, params)}
+  end
+
+  def apply_event(socket, "score", %{"team" => team}) do
     match = Scoring.score!(socket.assigns.match, team)
 
-    {:noreply, assign(socket, :match, match)}
+    assign_match(socket, match)
+  end
+
+  def apply_event(socket, "undo", _params) do
+    match = Scoring.undo_event!(socket.assigns.match)
+
+    assign_match(socket, match)
+  end
+
+  def apply_event(socket, "next_set", _params) do
+    match =
+      socket.assigns.match
+      |> Ash.load!(:winning_team)
+      |> Scoring.complete_set!()
+
+    assign_match(socket, match)
+  end
+
+  defp assign_match(socket, match) do
+    winning_team = Scoring.winning_team!(match)
+
+    assign(socket, match: match, winning_team: winning_team)
   end
 
   defp assign_new_match(socket, match, owner?) do
@@ -72,16 +118,18 @@ defmodule VolleyWeb.ScratchMatchLive do
       |> VolleyWeb.Endpoint.unsubscribe()
     end
 
-    match
-    |> Scoring.match_topic()
-    |> VolleyWeb.Endpoint.subscribe()
+    unless owner? do
+      match
+      |> Scoring.match_topic()
+      |> VolleyWeb.Endpoint.subscribe()
+    end
 
     share_link = url(socket, ~p"/scratch/#{match.id}")
 
     socket
     |> assign(:page_title, "#{match.settings.a_name} vs. #{match.settings.b_name}")
-    |> assign(:match, match)
     |> assign(:share_link, share_link)
     |> assign(:owner?, owner?)
+    |> assign_match(match)
   end
 end

@@ -6,10 +6,13 @@ defmodule Volley.Scoring do
       define :get_match, get_by: :id, action: :read
 
       define :start_match, action: :start, args: [:settings]
-      define :score, args: [:team]
 
-      define_calculation :winning_team,
-        args: [:_record, {:optional, :set_limit}]
+      define :score, args: [:team]
+      define :complete_set
+
+      define :undo_event, action: :undo, args: [{:optional, :count}]
+
+      define_calculation :winning_team, args: [:_record]
     end
 
     resource Volley.Scoring.Event

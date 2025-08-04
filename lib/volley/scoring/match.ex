@@ -6,7 +6,7 @@ defmodule Volley.Scoring.Match do
 
   alias Volley.Scoring.Team
   alias Volley.Scoring.Settings
-  alias Volley.Scoring.Changes.AddEvent
+  alias Volley.Scoring.Changes
 
   postgres do
     table "scoring_matches"
@@ -31,8 +31,34 @@ defmodule Volley.Scoring.Match do
       change increment(:a_score), where: argument_equals(:team, :a)
       change increment(:b_score), where: argument_equals(:team, :b)
 
-      change {AddEvent, type: :score}
+      change {Changes.AddEvent, type: :score}
       load :events
+    end
+
+    update :complete_set do
+      require_atomic? false
+
+      load :winning_team
+
+      change increment(:a_sets), where: attribute_equals(:winning_team, :a)
+      change increment(:b_sets), where: attribute_equals(:winning_team, :b)
+
+      change set_attribute(:a_score, 0)
+      change set_attribute(:b_score, 0)
+
+      change {Changes.AddEvent, type: :set_won, team_argument_or_attribute: :winning_team}
+    end
+
+    update :undo do
+      argument :count, :integer do
+        allow_nil? false
+        constraints min: 1
+        default 1
+      end
+
+      require_atomic? false
+
+      change {Changes.UndoEvents, []}
     end
 
     destroy :finish do

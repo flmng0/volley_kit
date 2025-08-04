@@ -12,8 +12,8 @@ defmodule Volley.Scoring.Changes.AddEvent do
     end
   end
 
-  defp validate(:team_argument, opts) do
-    arg = Keyword.get(opts, :team_arguments)
+  defp validate(:team_argument_or_attribute, opts) do
+    arg = Keyword.get(opts, :team_argument_or_attributes)
 
     if is_nil(arg) or is_atom(arg) do
       :ok
@@ -25,19 +25,19 @@ defmodule Volley.Scoring.Changes.AddEvent do
   @impl true
   def init(opts) do
     with :ok <- validate(:type, opts),
-         :ok <- validate(:team_argument, opts) do
+         :ok <- validate(:team_argument_or_attribute, opts) do
       {:ok, opts}
     end
   end
 
   @impl true
   def change(changeset, opts, _ctx) do
-    team_argument = opts[:team_argument] || :team
+    team_argument_or_attribute = opts[:team_argument_or_attribute] || :team
 
     event = %{
       match_id: Ash.Changeset.get_data(changeset, :id),
       type: opts[:type],
-      team: Ash.Changeset.get_argument(changeset, team_argument)
+      team: Ash.Changeset.get_argument_or_attribute(changeset, team_argument_or_attribute)
     }
 
     Ash.Changeset.manage_relationship(changeset, :events, [event], type: :create)

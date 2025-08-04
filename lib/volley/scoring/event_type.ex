@@ -1,5 +1,5 @@
 defmodule Volley.Scoring.EventType do
-  @valid_types [:score, :substitution, :timeout]
+  @valid_types [:score, :set_won, :substitution, :timeout]
 
   use Ash.Type.NewType,
     subtype_of: :atom,

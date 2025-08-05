@@ -42,7 +42,7 @@ defmodule VolleyWeb.ScratchMatchLive do
           icon_name="hero-share"
         />
       </:action>
-      <:action>
+      <:action :if={@owner?}>
         <Layouts.scorer_action_button phx-click="undo" label="Undo" icon_name="hero-arrow-uturn-left" />
       </:action>
     </Layouts.scorer>

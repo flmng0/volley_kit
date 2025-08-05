@@ -6,7 +6,7 @@ defmodule VolleyWeb.ScratchController do
   def new(conn, %{"form" => settings}) do
     with {:ok, settings} <- Ash.create(Scoring.Settings, settings),
          {:ok, match} <- Scoring.start_match(settings) do
-      view_match(conn, match.id, true)
+      view_match(conn, match, true)
     else
       _ ->
         conn
@@ -17,7 +17,7 @@ defmodule VolleyWeb.ScratchController do
 
   def join(conn, %{"id" => id}) do
     with {:ok, match} <- Scoring.get_match(id) do
-      view_match(conn, match.id)
+      view_match(conn, match)
     else
       _ ->
         conn
@@ -26,12 +26,15 @@ defmodule VolleyWeb.ScratchController do
     end
   end
 
-  defp view_match(conn, id, owner \\ false) do
+  defp view_match(conn, %{id: id} = match, owner \\ false) do
     conn = if owner, do: put_session(conn, :owns_match_id, id), else: conn
+
+    title = "#{match.settings.a_name} vs. #{match.settings.b_name}"
 
     conn
     |> put_session(:match_id, id)
     |> put_status(:moved_permanently)
+    |> assign(:page_title, title)
     |> redirect(to: ~p"/scratch")
   end
 end

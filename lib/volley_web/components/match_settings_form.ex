@@ -1,4 +1,4 @@
-defmodule VolleyWeb.ScratchMatchCard do
+defmodule VolleyWeb.MatchSettingsForm do
   use VolleyWeb, :live_component
 
   alias Volley.Scoring

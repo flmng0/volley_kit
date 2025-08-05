@@ -3,10 +3,15 @@ defmodule Volley.Scoring.Changes.UndoEvents do
 
   @impl true
   def change(changeset, _opts, _context) do
-    match = Ash.load!(changeset.data, :events)
-
+    id = Ash.Changeset.get_data(changeset, :id)
     count = Ash.Changeset.get_argument(changeset, :count)
-    events = Enum.take(match.events, length(match.events) - count)
+
+    events =
+      Volley.Scoring.Event
+      |> Ash.Query.filter(match_id: id)
+      |> Ash.Query.sort(inserted_at: :desc)
+      |> Ash.Query.offset(count)
+      |> Ash.read!()
 
     summarized =
       for event <- events, reduce: %{a_score: 0, b_score: 0, a_sets: 0, b_sets: 0} do

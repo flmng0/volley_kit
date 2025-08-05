@@ -25,6 +25,28 @@ defmodule VolleyWeb.ScratchMatchLive do
   @impl true
   def render(assigns) do
     ~H"""
+    <Layouts.scorer flash={@flash}>
+      <.score_container
+        match={@match}
+        can_score={@owner?}
+        event="score"
+        swap={Integer.is_odd(@current_set)}
+      />
+      <:action>
+        <Layouts.toggle_fullscreen_button />
+      </:action>
+      <:action>
+        <Layouts.scorer_action_button
+          phx-click={show_modal("shareModal")}
+          label="Share Match"
+          icon_name="hero-share"
+        />
+      </:action>
+      <:action>
+        <Layouts.scorer_action_button phx-click="undo" label="Undo" icon_name="hero-arrow-uturn-left" />
+      </:action>
+    </Layouts.scorer>
+
     <.modal id="shareModal" class="flex flex-col items-center text-sm md:text-base">
       <hgroup>
         <h3 class="text-lg font-bold">Share Match</h3>
@@ -56,16 +78,6 @@ defmodule VolleyWeb.ScratchMatchLive do
         <.button phx-click="next_set" variant="neutral">Continue To Next Set!</.button>
       </:action>
     </.modal>
-
-    <Layouts.scorer flash={@flash}>
-      <.score_container match={@match} can_score={@owner?} event="score" swap={Integer.is_odd(@current_set)} />
-      <:actions>
-        <.button class="p-2" phx-click={show_modal("shareModal")}>
-          <span class="fullscreen:hidden">Share Match</span>
-          <.icon class="fullscreen:size-6 size-4" name="hero-share" />
-        </.button>
-      </:actions>
-    </Layouts.scorer>
     """
   end
 

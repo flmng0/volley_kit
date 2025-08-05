@@ -49,36 +49,64 @@ defmodule VolleyWeb.Layouts do
   attr :flash, :map, required: true
   slot :inner_block, required: true
 
-  slot :actions
+  slot :action
 
   def scorer(assigns) do
     ~H"""
-    <.app_header />
+    <.app_header class="fullscreen:hidden" />
     <div
       class={[
-        "w-xl md:w-2xl lg:w-3xl max-w-screen mx-auto space-y-2",
-        "fullscreen:fixed fullscreen:inset-0 fullscreen:isolation-isolate"
+        "max-w-xl md:max-w-2xl lg:max-w-3xl fullscreen:max-w-none mx-auto space-y-2",
+        "fullscreen:fixed fullscreen:inset-0 fullscreen:isolate"
       ]}
       id="scoringContainer"
     >
       {render_slot(@inner_block)}
       <div class={[
-        "flex flex-row gap-1 w-full *:flex-1",
+        "flex flex-row gap-1 w-full flex-wrap",
         "fullscreen:fixed fullscreen:w-auto top-4 left-4"
       ]}>
-        <.button id="toggle-fs-button" phx-hook="FullscreenButton" class="cursor-pointer p-2">
-          <span class="fullscreen:hidden">
-            Toggle Fullscreen <.icon name="hero-arrows-pointing-out" />
-          </span>
-          <span class="not-fullscreen:hidden">
-            <.icon name="hero-arrows-pointing-in" class="size-6" />
-          </span>
-        </.button>
-        {render_slot(@actions)}
+        <div :for={action <- @action} class="basis-max flex-1">
+          {render_slot(action)}
+        </div>
       </div>
     </div>
 
     <.flash_group flash={@flash} />
+    """
+  end
+
+  attr :label, :string, required: true
+  attr :icon_name, :string, required: true
+  attr :fullscreen_icon_name, :string, default: nil
+  attr :rest, :global
+
+  def scorer_action_button(assigns) do
+    ~H"""
+    <.button {@rest} class="w-full p-2">
+      <span class="fullscreen:hidden text-nowrap">{@label}</span>
+      <.icon
+        class={["size-4 fullscreen:size-6", @fullscreen_icon_name && "fullscreen:hidden"]}
+        name={@icon_name}
+      />
+      <.icon
+        :if={@fullscreen_icon_name}
+        class="size-4 fullscreen:size-6 not-fullscreen:hidden"
+        name={@fullscreen_icon_name}
+      />
+    </.button>
+    """
+  end
+
+  def toggle_fullscreen_button(assigns) do
+    ~H"""
+    <.scorer_action_button
+      id="toggle-fs-button"
+      phx-hook="FullscreenButton"
+      label="Toggle Fullscreen"
+      icon_name="hero-arrows-pointing-out"
+      fullscreen_icon_name="hero-arrows-pointing-in"
+    />
     """
   end
 

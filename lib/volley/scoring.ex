@@ -18,5 +18,5 @@ defmodule Volley.Scoring do
     resource Volley.Scoring.Event
   end
 
-  def match_topic(%Volley.Scoring.Match{id: id}), do: "match:#{id}:score"
+  def match_topic(%Volley.Scoring.Match{id: id}), do: "match:#{id}"
 end

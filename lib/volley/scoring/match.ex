@@ -75,7 +75,8 @@ defmodule Volley.Scoring.Match do
     prefix "match"
 
     publish :start, "start"
-    publish :score, [:id, "score"]
+    publish :score, [:id]
+    publish :complete_set, [:id]
   end
 
   attributes do

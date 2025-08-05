@@ -2,6 +2,7 @@ defmodule VolleyWeb.ScratchMatchLive do
   use VolleyWeb, :live_view
   import VolleyWeb.MatchComponents
   alias Volley.Scoring
+  require Integer
 
   @impl true
   def mount(_params, session, socket) do
@@ -57,7 +58,7 @@ defmodule VolleyWeb.ScratchMatchLive do
     </.modal>
 
     <Layouts.scorer flash={@flash}>
-      <.score_container match={@match} can_score={@owner?} event="score" />
+      <.score_container match={@match} can_score={@owner?} event="score" swap={Integer.is_odd(@current_set)} />
       <:actions>
         <.button class="p-2" phx-click={show_modal("shareModal")}>
           <span class="fullscreen:hidden">Share Match</span>
@@ -101,18 +102,18 @@ defmodule VolleyWeb.ScratchMatchLive do
   end
 
   def apply_event(socket, "next_set", _params) do
-    match =
-      socket.assigns.match
-      |> Ash.load!(:winning_team)
-      |> Scoring.complete_set!()
+    %{match: match, winning_team: winning_team} = socket.assigns
+
+    match = Scoring.complete_set!(match, winning_team)
 
     assign_match(socket, match)
   end
 
   defp assign_match(socket, match) do
     winning_team = Scoring.winning_team!(match)
+    current_set = Scoring.current_set!(match)
 
-    assign(socket, match: match, winning_team: winning_team)
+    assign(socket, match: match, winning_team: winning_team, current_set: current_set)
   end
 
   defp assign_new_match(socket, match, owner?) do

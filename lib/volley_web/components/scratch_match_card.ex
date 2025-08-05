@@ -20,11 +20,7 @@ defmodule VolleyWeb.ScratchMatchCard do
         <.input field={f[:a_name]} label="Team A's Name" />
         <.input field={f[:b_name]} label="Team B's Name" />
 
-        <.input field={f[:total_sets]} label="Set Count" placeholder="Leave empty for unlimited sets" />
-
         <.input field={f[:set_limit]} label="Set Limit" />
-
-        <.input field={f[:final_set_limit]} label="Final Set Limit" placeholder={f[:set_limit].value} />
 
         <div class="mt-6 flex justify-end">
           <.button type="submit" variant="primary" class="">
@@ -54,7 +50,6 @@ defmodule VolleyWeb.ScratchMatchCard do
 
   def handle_event("start", %{"form" => params}, socket) do
     form = AshPhoenix.Form.validate(socket.assigns.form, params)
-    IO.inspect(form)
 
     if form.errors == [] do
       {:noreply, assign(socket, form: form, trigger_submit: true)}

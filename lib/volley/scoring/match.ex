@@ -36,17 +36,17 @@ defmodule Volley.Scoring.Match do
     end
 
     update :complete_set do
+      argument :team, Team
+
       require_atomic? false
 
-      load :winning_team
-
-      change increment(:a_sets), where: attribute_equals(:winning_team, :a)
-      change increment(:b_sets), where: attribute_equals(:winning_team, :b)
+      change increment(:a_sets), where: argument_equals(:team, :a)
+      change increment(:b_sets), where: argument_equals(:team, :b)
 
       change set_attribute(:a_score, 0)
       change set_attribute(:b_score, 0)
 
-      change {Changes.AddEvent, type: :set_won, team_argument_or_attribute: :winning_team}
+      change {Changes.AddEvent, type: :set_won}
     end
 
     update :undo do

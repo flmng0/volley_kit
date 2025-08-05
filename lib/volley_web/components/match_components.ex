@@ -6,6 +6,7 @@ defmodule VolleyWeb.MatchComponents do
   attr :event, :string, required: true
   attr :can_score, :boolean, default: false
   attr :editing, :boolean, default: false
+  attr :swap, :boolean, default: false
 
   def score_container(assigns) do
     ~H"""
@@ -26,6 +27,7 @@ defmodule VolleyWeb.MatchComponents do
           score={score}
           sets={sets}
           team_name={name}
+          swap={@swap}
           editing={@editing}
           can_score={@can_score}
           event={@event}
@@ -43,12 +45,13 @@ defmodule VolleyWeb.MatchComponents do
   attr :sets, :integer
   attr :team_name, :string
   attr :editing, :boolean
+  attr :swap, :boolean, default: false
 
   attr :rest, :global
 
   defp score_card(assigns) do
     ~H"""
-    <.score_card_wrapper team={@team} can_score={@can_score} event={@event}>
+    <.score_card_wrapper team={@team} can_score={@can_score} event={@event} class={@swap && @team == :a && "order-last"}>
       <span class="text-xl">{@team_name}</span>
       <svg
         viewBox="0 0 24 14"
@@ -69,6 +72,7 @@ defmodule VolleyWeb.MatchComponents do
   attr :team, :atom, values: [:a, :b]
   attr :can_score, :boolean
   attr :event, :string
+  attr :class, :string, default: ""
 
   slot :inner_block, required: true
 
@@ -82,7 +86,7 @@ defmodule VolleyWeb.MatchComponents do
     display_class =
       "flex flex-col justify-center max-h-full text-center not-fullscreen:aspect-square text-score-content py-4"
 
-    assigns = assign(assigns, :class, [team_class, display_class])
+    assigns = assign(assigns, :class, [team_class, display_class, assigns[:class]])
 
     if assigns[:can_score] do
       ~H"""

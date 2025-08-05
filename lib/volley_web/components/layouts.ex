@@ -56,7 +56,7 @@ defmodule VolleyWeb.Layouts do
     ~H"""
     <.app_header class="fullscreen:hidden" />
 
-    <main class="max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto space-y-6">
+    <main class="max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto space-y-6 pb-16">
       <div
         class={[
           "fullscreen:max-w-none space-y-2",

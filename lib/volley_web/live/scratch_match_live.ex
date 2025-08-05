@@ -118,7 +118,7 @@ defmodule VolleyWeb.ScratchMatchLive do
         data: match
       } = payload
 
-      {:noreply, assign(socket, :match, match)}
+      {:noreply, assign_match(socket, match)}
     else
       {:noreply, socket}
     end

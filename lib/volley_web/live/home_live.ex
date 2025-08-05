@@ -105,17 +105,6 @@ defmodule VolleyWeb.HomeLive do
 
   defp continue_match_card(assigns) do
     ~H"""
-    <.modal id="deleteConfirmation">
-      <h3 class="text-lg font-bold">Are you sure?</h3>
-      <p>Are you sure you want to delete this scratch match?</p>
-
-      <:action>
-        <.button variant="delete" phx-click="delete">Yes, delete</.button>
-      </:action>
-      <:action>
-        <.button>Cancel</.button>
-      </:action>
-    </.modal>
     <.hero_card
       title="Continue Scoring"
       subtitle="Jump back in where you left off, or press Delete to start a new one."
@@ -132,6 +121,17 @@ defmodule VolleyWeb.HomeLive do
         </.button>
       </:action>
     </.hero_card>
+    <.modal id="deleteConfirmation">
+      <h3 class="text-lg font-bold">Are you sure?</h3>
+      <p>Are you sure you want to delete this scratch match?</p>
+
+      <:action>
+        <.button variant="delete" phx-click="delete">Yes, delete</.button>
+      </:action>
+      <:action>
+        <.button>Cancel</.button>
+      </:action>
+    </.modal>
     """
   end
 
@@ -142,10 +142,7 @@ defmodule VolleyWeb.HomeLive do
       subtitle="Jump straight into scoring a new volleyball match, no additional config required."
       actions_class="text-right"
     >
-      <.live_component
-        id="scratch-match-create-form"
-        module={VolleyWeb.MatchSettingsForm}
-      />
+      <.live_component id="scratch-match-create-form" module={VolleyWeb.MatchSettingsForm} />
     </.hero_card>
     """
   end

@@ -441,12 +441,6 @@ defmodule VolleyWeb.CoreComponents do
         onclick={@allow_close && "event.target === this && this.close()"}
       >
         <div class={[@class, "modal-box"]}>
-          <form :if={@allow_close} method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-              <.icon name="hero-x-mark" class="size-5 text-base-content/50" />
-            </button>
-          </form>
-
           {render_slot(@inner_block)}
 
           <div :if={@action != []} class="modal-action">
@@ -456,6 +450,11 @@ defmodule VolleyWeb.CoreComponents do
               <% end %>
             </form>
           </div>
+          <form :if={@allow_close} method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+              <.icon name="hero-x-mark" class="size-5 text-base-content/50" />
+            </button>
+          </form>
         </div>
       </dialog>
     </.portal>

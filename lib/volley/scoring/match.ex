@@ -20,7 +20,7 @@ defmodule Volley.Scoring.Match do
       accept [:settings]
     end
 
-    update :settings do
+    update :update_settings do
       accept [:settings]
     end
 
@@ -77,6 +77,7 @@ defmodule Volley.Scoring.Match do
     publish :start, "start"
     publish :score, [:id]
     publish :complete_set, [:id]
+    publish :update_settings, [:id]
   end
 
   attributes do

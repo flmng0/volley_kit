@@ -89,7 +89,7 @@ defmodule VolleyWeb.CoreComponents do
       <.button navigate={~p"/"}>Home</.button>
   """
   attr :rest, :global, include: ~w(href navigate patch method download name value disabled)
-  attr :class, :string, default: ""
+  attr :class, :any, default: ""
   attr :variant, :string, values: ~w(primary secondary neutral delete)
   slot :inner_block, required: true
 

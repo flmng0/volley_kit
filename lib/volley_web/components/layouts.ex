@@ -50,34 +50,42 @@ defmodule VolleyWeb.Layouts do
   slot :inner_block, required: true
 
   slot :action
+  slot :footer
 
   def scorer(assigns) do
     ~H"""
     <.app_header class="fullscreen:hidden" />
-    <div
-      class={[
-        "max-w-xl md:max-w-2xl lg:max-w-3xl fullscreen:max-w-none mx-auto space-y-2",
-        "fullscreen:fixed fullscreen:inset-0 fullscreen:isolate"
-      ]}
-      id="scoringContainer"
-    >
-      {render_slot(@inner_block)}
-      <div class={
-        [
-          "flex flex-row gap-1 w-full flex-wrap",
-          # full screen rules
-          "fullscreen:fixed fullscreen:w-auto bottom-4",
-          # full screen, and portrait
-          "fullscreen:portrait:flex-col portrait:left-4",
-          # full screen, and landscape
-          "landscape:left-1/2 fullscreen:landscape:-translate-x-1/2"
-        ]
-      }>
-        <div :for={action <- @action} class="basis-max flex-1">
-          {render_slot(action)}
+
+    <main class="max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto space-y-6">
+      <div
+        class={[
+          "fullscreen:max-w-none space-y-2",
+          "fullscreen:fixed fullscreen:inset-0 fullscreen:isolate"
+        ]}
+        id="scoringContainer"
+      >
+        {render_slot(@inner_block)}
+        <div class={
+          [
+            "flex flex-row gap-1 w-full flex-wrap",
+            # full screen rules
+            "fullscreen:fixed fullscreen:w-auto bottom-4",
+            # full screen, and portrait
+            "fullscreen:portrait:flex-col portrait:left-4",
+            # full screen, and landscape
+            "landscape:left-1/2 fullscreen:landscape:-translate-x-1/2"
+          ]
+        }>
+          <div :for={action <- @action} class="basis-max flex-1">
+            {render_slot(action)}
+          </div>
         </div>
       </div>
-    </div>
+
+      <%= for footer <- @footer do %>
+        {render_slot(footer)}
+      <% end %>
+    </main>
 
     <.flash_group flash={@flash} />
     """
@@ -86,11 +94,12 @@ defmodule VolleyWeb.Layouts do
   attr :label, :string, required: true
   attr :icon_name, :string, required: true
   attr :fullscreen_icon_name, :string, default: nil
+  attr :show_in_fullscreen?, :boolean, default: true
   attr :rest, :global
 
   def scorer_action_button(assigns) do
     ~H"""
-    <.button {@rest} class="w-full p-2">
+    <.button {@rest} class={["btn-block p-2", @show_in_fullscreen? || "fullscreen:hidden"]}>
       <span class="fullscreen:hidden text-nowrap">{@label}</span>
       <.icon
         class={["size-4 fullscreen:size-6", @fullscreen_icon_name && "fullscreen:hidden"]}

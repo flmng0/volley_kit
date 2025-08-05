@@ -10,6 +10,7 @@ defmodule Volley.Scoring do
       define :score, args: [:team]
       define :complete_set, args: [:team]
 
+      define :update_settings, args: [:settings]
       define :undo_event, action: :undo, args: [{:optional, :count}]
 
       define_calculation :winning_team, args: [:_record]

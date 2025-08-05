@@ -115,7 +115,8 @@
   --color-team-a: rgb(185 28 28);
   --color-team-b: rgb(29 78 216);
   --color-score-content: oklch(97.807% 0.029 256.847);
-  --container-score-min: 3rem;
+  --size-score-min: 3rem;
+  --container-score-min: var(--size-score-min);
 }
 
 .bleed-container {

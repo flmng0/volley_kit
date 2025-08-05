@@ -51,7 +51,12 @@ defmodule VolleyWeb.MatchComponents do
 
   defp score_card(assigns) do
     ~H"""
-    <.score_card_wrapper team={@team} can_score={@can_score} event={@event} class={@swap && @team == :a && "order-last"}>
+    <.score_card_wrapper
+      team={@team}
+      can_score={@can_score}
+      event={@event}
+      class={@swap && @team == :a && "order-last"}
+    >
       <span class="text-xl">{@team_name}</span>
       <svg
         viewBox="0 0 24 14"
@@ -59,7 +64,7 @@ defmodule VolleyWeb.MatchComponents do
         preserveAspectRatio="true"
         width="100%"
         height="100%"
-        class="basis-score-min grow select-none"
+        class="basis-score-min min-w-score-min grow select-none"
         fill="currentColor"
       >
         <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle">{@score}</text>

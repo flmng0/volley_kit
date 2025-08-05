@@ -62,10 +62,17 @@ defmodule VolleyWeb.Layouts do
       id="scoringContainer"
     >
       {render_slot(@inner_block)}
-      <div class={[
-        "flex flex-row gap-1 w-full flex-wrap",
-        "fullscreen:fixed fullscreen:w-auto top-4 left-4"
-      ]}>
+      <div class={
+        [
+          "flex flex-row gap-1 w-full flex-wrap",
+          # full screen rules
+          "fullscreen:fixed fullscreen:w-auto bottom-4",
+          # full screen, and portrait
+          "fullscreen:portrait:flex-col portrait:left-4",
+          # full screen, and landscape
+          "landscape:left-1/2 fullscreen:landscape:-translate-x-1/2"
+        ]
+      }>
         <div :for={action <- @action} class="basis-max flex-1">
           {render_slot(action)}
         </div>

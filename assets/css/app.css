@@ -94,16 +94,13 @@
 
 /* Add variants based on LiveView classes */
 @custom-variant phx-click-loading (.phx-click-loading&, .phx-click-loading &);
-@custom-variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading
-  &);
-@custom-variant phx-change-loading (.phx-change-loading&, .phx-change-loading
-  &);
+@custom-variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading &);
+@custom-variant phx-change-loading (.phx-change-loading&, .phx-change-loading &);
 
 /* Use the data attribute for dark mode  */
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
-@custom-variant fullscreen (:is([data-fullscreen=true]&, [data-fullscreen=true]
-  &));
+@custom-variant fullscreen (:is([data-fullscreen=true]&, [data-fullscreen=true] &));
 
 /* Make LiveView wrapper divs transparent for layout */
 [data-phx-session], [data-phx-teleported-src] {

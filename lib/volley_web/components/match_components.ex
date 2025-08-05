@@ -10,7 +10,7 @@ defmodule VolleyWeb.MatchComponents do
 
   def score_container(assigns) do
     ~H"""
-    <div class="size-full">
+    <div class="size-full touch-none">
       <div class={[
         "grid rounded-md not-fullscreen:overflow-hidden h-full",
         "not-fullscreen:grid-cols-2 fullscreen:landscape:grid-cols-2 fullscreen:portrait:grid-rows-2"
@@ -57,7 +57,7 @@ defmodule VolleyWeb.MatchComponents do
       event={@event}
       class={@swap && @team == :a && "order-last"}
     >
-      <span class="text-xl">{@team_name}</span>
+      <span class="w-full text-xl">{@team_name}</span>
       <svg
         viewBox="0 0 24 14"
         stroke="none"
@@ -69,7 +69,7 @@ defmodule VolleyWeb.MatchComponents do
       >
         <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle">{@score}</text>
       </svg>
-      <span class="text-xl">{@sets}</span>
+      <span class="w-full text-xl">{@sets}</span>
     </.score_card_wrapper>
     """
   end

@@ -434,12 +434,7 @@ defmodule VolleyWeb.CoreComponents do
   def modal(assigns) do
     ~H"""
     <.portal id={"#{@id}Portal"} target="body">
-      <dialog
-        id={@id}
-        {@rest}
-        class="modal"
-        onclick={@allow_close && "event.target === this && this.close()"}
-      >
+      <dialog id={@id} {@rest} class="modal" closedby={@allow_close && "auto"}>
         <div class={[@class, "modal-box"]}>
           {render_slot(@inner_block)}
 
@@ -456,6 +451,9 @@ defmodule VolleyWeb.CoreComponents do
             </button>
           </form>
         </div>
+        <form :if={@allow_close} method="dialog" class="modal-backdrop">
+          <button>close</button>
+        </form>
       </dialog>
     </.portal>
     """

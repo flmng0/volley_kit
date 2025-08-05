@@ -142,7 +142,11 @@ defmodule VolleyWeb.HomeLive do
       subtitle="Jump straight into scoring a new volleyball match, no additional config required."
       actions_class="text-right"
     >
-      <.live_component id="scratch-match-create-form" module={VolleyWeb.MatchSettingsForm} />
+      <.live_component
+        id="scratch-match-create-form"
+        module={VolleyWeb.MatchSettingsForm}
+        type={:create}
+      />
     </.hero_card>
     """
   end

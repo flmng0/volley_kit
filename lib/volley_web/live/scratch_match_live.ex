@@ -43,8 +43,38 @@ defmodule VolleyWeb.ScratchMatchLive do
         />
       </:action>
       <:action :if={@owner?}>
-        <Layouts.scorer_action_button phx-click="undo" label="Undo" icon_name="hero-arrow-uturn-left" />
+        <Layouts.scorer_action_button
+          phx-click="undo"
+          label="Undo Score"
+          icon_name="hero-arrow-uturn-left"
+        />
       </:action>
+      <:action :if={@owner?}>
+        <Layouts.scorer_action_button
+          phx-click="edit"
+          show_in_fullscreen?={false}
+          label={if @editing?, do: "Close Settings", else: "Edit Settings"}
+          icon_name={if @editing?, do: "hero-x-mark", else: "hero-adjustments-vertical"}
+        />
+      </:action>
+
+      <:footer :if={@editing?}>
+        <div class="card" phx-mounted={JS.focus_first()}>
+          <div class="card-body bg-base-200">
+            <h3 class="card-title">
+              <span class="grow">Edit Match Settings</span>
+              <.icon class="size-6" name="hero-adjustments-vertical" />
+            </h3>
+            <.live_component
+              id="settingsEditForm"
+              module={VolleyWeb.MatchSettingsForm}
+              type={:update}
+              settings={@match.settings}
+            >
+            </.live_component>
+          </div>
+        </div>
+      </:footer>
     </Layouts.scorer>
 
     <.modal id="shareModal" class="flex flex-col items-center text-sm md:text-base">
@@ -94,11 +124,26 @@ defmodule VolleyWeb.ScratchMatchLive do
     end
   end
 
+  def handle_info({:update_settings, settings}, socket) do
+    match = Scoring.update_settings!(socket.assigns.match, settings)
+
+    socket =
+      socket
+      |> assign(:editing?, false)
+      |> assign_match(match)
+
+    {:noreply, socket}
+  end
+
   @impl true
   def handle_event(event, params, socket) do
     %{owner?: true} = socket.assigns
 
     {:noreply, apply_event(socket, event, params)}
+  end
+
+  def apply_event(socket, "edit", _params) do
+    assign(socket, :editing?, not socket.assigns.editing?)
   end
 
   def apply_event(socket, "score", %{"team" => team}) do
@@ -147,6 +192,7 @@ defmodule VolleyWeb.ScratchMatchLive do
     |> assign(:page_title, "#{match.settings.a_name} vs. #{match.settings.b_name}")
     |> assign(:share_link, share_link)
     |> assign(:owner?, owner?)
+    |> assign(:editing?, false)
     |> assign_match(match)
   end
 end

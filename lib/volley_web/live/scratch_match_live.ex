@@ -61,7 +61,7 @@ defmodule VolleyWeb.ScratchMatchLive do
       </:action>
 
       <:footer :if={@editing?}>
-        <div class="card" phx-mounted={JS.focus_first()}>
+        <div class="card">
           <div class="card-body bg-base-200">
             <h3 class="card-title">
               <span class="grow">Edit Match Settings</span>

@@ -139,7 +139,7 @@ defmodule VolleyWeb.Layouts do
       </div>
       <ul class="menu menu-horizontal w-full relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
         <.theme_toggle />
-        <%= if @current_scope do %>
+        <%= if known_user?(@current_scope) do %>
           <li>
             {@current_scope.user.email}
           </li>

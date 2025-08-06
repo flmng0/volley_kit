@@ -20,6 +20,7 @@ defmodule VolleyWeb.Router do
     plug :put_root_layout, html: {VolleyWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :put_anonymous_user_id
     plug :fetch_current_scope_for_user
     plug :clear_stale_match_id
   end
@@ -31,11 +32,8 @@ defmodule VolleyWeb.Router do
   scope "/", VolleyWeb do
     pipe_through :browser
 
-    post "/scratch/new", ScratchController, :new
-    get "/scratch/:id", ScratchController, :join
-
     live "/", HomeLive
-    live "/scratch", ScratchMatchLive
+    live "/scratch/:id", ScratchMatchLive
 
     live "/tournament/", TournamentLive, :index
     live "/tournament/new", TournamentLive, :new

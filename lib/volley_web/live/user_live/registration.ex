@@ -42,7 +42,11 @@ defmodule VolleyWeb.UserLive.Registration do
   end
 
   @impl true
-  def mount(_params, _session, %{assigns: %{current_scope: %{user: user}}} = socket)
+  def mount(
+        _params,
+        _session,
+        %{assigns: %{current_scope: %{user: user, anonymous: false}}} = socket
+      )
       when not is_nil(user) do
     {:ok, redirect(socket, to: VolleyWeb.UserAuth.signed_in_path(socket))}
   end

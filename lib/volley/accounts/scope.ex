@@ -16,9 +16,9 @@ defmodule Volley.Accounts.Scope do
   growing application requirements.
   """
 
-  alias Volley.Accounts.User
+  alias Volley.Accounts.{AnonymousUser, User}
 
-  defstruct user: nil
+  defstruct user: nil, anonymous: false
 
   @doc """
   Creates a scope for the given user.
@@ -26,8 +26,15 @@ defmodule Volley.Accounts.Scope do
   Returns nil if no user is given.
   """
   def for_user(%User{} = user) do
-    %__MODULE__{user: user}
+    %__MODULE__{user: user, anonymous: false}
+  end
+
+  def for_user(%AnonymousUser{} = user) do
+    %__MODULE__{user: user, anonymous: true}
   end
 
   def for_user(nil), do: nil
+
+  def known_user?(%__MODULE__{user: %User{}}), do: true
+  def known_user?(_), do: false
 end

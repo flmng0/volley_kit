@@ -35,6 +35,7 @@ defmodule Volley.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:picosat_elixir, "~> 0.2"},
       {:bcrypt_elixir, "~> 3.0"},
       {:ash_phoenix, "~> 2.3.12"},
       {:ash_postgres, "~> 2.0"},

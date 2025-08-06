@@ -4,6 +4,7 @@ defmodule VolleyWeb.UserAuth do
   import Plug.Conn
   import Phoenix.Controller
 
+  alias Volley.Accounts.AnonymousUser
   alias Volley.Accounts
   alias Volley.Accounts.Scope
 
@@ -218,7 +219,7 @@ defmodule VolleyWeb.UserAuth do
   def on_mount(:require_authenticated, _params, session, socket) do
     socket = mount_current_scope(socket, session)
 
-    if socket.assigns.current_scope && socket.assigns.current_scope.user do
+    if Scope.known_user?(socket.assigns.current_scope) do
       {:cont, socket}
     else
       socket =
@@ -246,14 +247,19 @@ defmodule VolleyWeb.UserAuth do
   end
 
   defp mount_current_scope(socket, session) do
-    Phoenix.Component.assign_new(socket, :current_scope, fn ->
-      {user, _} =
-        if user_token = session["user_token"] do
-          Accounts.get_user_by_session_token(user_token)
-        end || {nil, nil}
+    user =
+      cond do
+        user_token = session["user_token"] ->
+          {user, _} = Accounts.get_user_by_session_token(user_token)
+          user
 
-      Scope.for_user(user)
-    end)
+        anonymous_id = session["anonymous_user_id"] ->
+          %AnonymousUser{id: anonymous_id}
+      end
+
+    scope = Scope.for_user(user)
+
+    Phoenix.Component.assign(socket, :current_scope, scope)
   end
 
   @doc "Returns the path to redirect to after log in."
@@ -276,6 +282,20 @@ defmodule VolleyWeb.UserAuth do
       |> maybe_store_return_to()
       |> redirect(to: ~p"/users/log-in")
       |> halt()
+    end
+  end
+
+  def put_anonymous_user_id(conn, _opts) do
+    cond do
+      conn.assigns[:current_scope] && conn.assigns.current_scope[:user] ->
+        conn
+
+      get_session(conn, "anonymous_user_id") ->
+        conn
+
+      true ->
+        uuid = Ecto.UUID.bingenerate() |> Ecto.UUID.load!()
+        put_session(conn, "anonymous_user_id", uuid)
     end
   end
 

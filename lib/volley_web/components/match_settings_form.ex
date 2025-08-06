@@ -17,8 +17,6 @@ defmodule VolleyWeb.MatchSettingsForm do
         phx-change="validate"
         phx-submit="submit"
         phx-target={@myself}
-        action={@type == :create && ~p"/scratch/new"}
-        phx-trigger-action={@type == :create && @trigger_submit}
       >
         <.input field={f[:a_name]} label="Team A's Name" />
         <.input field={f[:b_name]} label="Team B's Name" />
@@ -80,27 +78,13 @@ defmodule VolleyWeb.MatchSettingsForm do
   end
 
   def handle_event("submit", %{"form" => form}, socket) do
-    {:noreply, apply_submit(socket, form, socket.assigns.type)}
-  end
-
-  def apply_submit(socket, form, :create) do
-    form = AshPhoenix.Form.validate(socket.assigns.form, form)
-
-    if form.errors == [] do
-      assign(socket, form: form, trigger_submit: true)
-    else
-      assign(socket, :form, form)
-    end
-  end
-
-  def apply_submit(socket, form, :update) do
     case AshPhoenix.Form.submit(socket.assigns.form, params: form) do
       {:ok, settings} ->
-        send(self(), {:update_settings, settings})
-        socket
+        send(self(), {:submit_settings, settings})
+        {:noreply, socket}
 
       {:error, form} ->
-        assign(socket, :form, form)
+        {:noreply, assign(socket, :form, form)}
     end
   end
 end

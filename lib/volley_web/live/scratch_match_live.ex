@@ -1,24 +1,26 @@
 defmodule VolleyWeb.ScratchMatchLive do
   use VolleyWeb, :live_view
+
+  on_mount {VolleyWeb.UserAuth, :mount_current_scope}
+
   import VolleyWeb.MatchComponents
   alias Volley.Scoring
+
   require Integer
 
   @impl true
-  def mount(_params, session, socket) do
-    with %{"match_id" => match_id} <- session,
-         {:ok, match} <- Scoring.get_match(match_id) do
-      owner? = match?(%{"owns_match_id" => ^match_id}, session)
+  def mount(%{"id" => match_id}, _session, socket) do
+    if match = Scoring.get_match!(match_id, actor: socket.assigns.current_scope) do
+      scorer? = Scoring.can_score?(socket.assigns.current_scope, match, nil)
 
-      {:ok, assign_new_match(socket, match, owner?)}
+      {:ok, assign_new_match(socket, match, scorer?)}
     else
-      _ ->
-        socket =
-          socket
-          |> put_flash(:error, "Match with saved ID no longer exists")
-          |> redirect(to: ~p"/")
+      socket =
+        socket
+        |> put_flash(:error, "Match with saved ID no longer exists")
+        |> redirect(to: ~p"/")
 
-        {:ok, socket}
+      {:ok, socket}
     end
   end
 
@@ -28,7 +30,7 @@ defmodule VolleyWeb.ScratchMatchLive do
     <Layouts.scorer flash={@flash}>
       <.score_container
         match={@match}
-        can_score={@owner?}
+        can_score={@scorer?}
         event="score"
         swap={Integer.is_odd(@current_set)}
       />
@@ -42,14 +44,14 @@ defmodule VolleyWeb.ScratchMatchLive do
           icon_name="hero-share"
         />
       </:action>
-      <:action :if={@owner?}>
+      <:action :if={@scorer?}>
         <Layouts.scorer_action_button
           phx-click="undo"
           label="Undo Score"
           icon_name="hero-arrow-uturn-left"
         />
       </:action>
-      <:action :if={@owner?}>
+      <:action :if={@scorer?}>
         <Layouts.scorer_action_button
           phx-click="edit"
           show_in_fullscreen?={false}
@@ -124,8 +126,11 @@ defmodule VolleyWeb.ScratchMatchLive do
     end
   end
 
-  def handle_info({:update_settings, settings}, socket) do
-    match = Scoring.update_settings!(socket.assigns.match, settings)
+  def handle_info({:submit_settings, settings}, socket) do
+    match =
+      Scoring.update_settings!(socket.assigns.match, settings,
+        actor: socket.assigns.current_scope
+      )
 
     socket =
       socket
@@ -137,8 +142,6 @@ defmodule VolleyWeb.ScratchMatchLive do
 
   @impl true
   def handle_event(event, params, socket) do
-    %{owner?: true} = socket.assigns
-
     {:noreply, apply_event(socket, event, params)}
   end
 
@@ -147,13 +150,13 @@ defmodule VolleyWeb.ScratchMatchLive do
   end
 
   def apply_event(socket, "score", %{"team" => team}) do
-    match = Scoring.score!(socket.assigns.match, team)
+    match = Scoring.score!(socket.assigns.match, team, actor: socket.assigns.current_scope)
 
     assign_match(socket, match)
   end
 
   def apply_event(socket, "undo", _params) do
-    match = Scoring.undo_event!(socket.assigns.match)
+    match = Scoring.undo_event!(socket.assigns.match, 1, actor: socket.assigns.current_scope)
 
     assign_match(socket, match)
   end
@@ -161,26 +164,26 @@ defmodule VolleyWeb.ScratchMatchLive do
   def apply_event(socket, "next_set", _params) do
     %{match: match, winning_team: winning_team} = socket.assigns
 
-    match = Scoring.complete_set!(match, winning_team)
+    match = Scoring.complete_set!(match, winning_team, actor: socket.assigns.current_scope)
 
     assign_match(socket, match)
   end
 
   defp assign_match(socket, match) do
-    winning_team = Scoring.winning_team!(match)
-    current_set = Scoring.current_set!(match)
+    winning_team = Scoring.winning_team!(match, actor: socket.assigns.current_scope)
+    current_set = Scoring.current_set!(match, actor: socket.assigns.current_scope)
 
     assign(socket, match: match, winning_team: winning_team, current_set: current_set)
   end
 
-  defp assign_new_match(socket, match, owner?) do
+  defp assign_new_match(socket, match, scorer?) do
     if old_match = socket.assigns[:match] do
       old_match
       |> Scoring.match_topic()
       |> VolleyWeb.Endpoint.unsubscribe()
     end
 
-    unless owner? do
+    unless scorer? do
       match
       |> Scoring.match_topic()
       |> VolleyWeb.Endpoint.subscribe()
@@ -191,7 +194,7 @@ defmodule VolleyWeb.ScratchMatchLive do
     socket
     |> assign(:page_title, "#{match.settings.a_name} vs. #{match.settings.b_name}")
     |> assign(:share_link, share_link)
-    |> assign(:owner?, owner?)
+    |> assign(:scorer?, scorer?)
     |> assign(:editing?, false)
     |> assign_match(match)
   end

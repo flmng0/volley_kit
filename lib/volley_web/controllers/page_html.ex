@@ -7,4 +7,10 @@ defmodule VolleyWeb.PageHTML do
   use VolleyWeb, :html
 
   embed_templates "page_html/*"
+
+  def redirect(assigns) do
+    ~H"""
+    <p>You are being redirected...</p>
+    """
+  end
 end

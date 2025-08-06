@@ -1,6 +1,8 @@
 defmodule VolleyWeb.ScratchController do
   use VolleyWeb, :controller
 
+  plug :put_view, html: VolleyWeb.PageHTML
+
   alias Volley.Scoring
 
   def new(conn, %{"form" => settings}) do
@@ -34,7 +36,8 @@ defmodule VolleyWeb.ScratchController do
     conn
     |> put_session(:match_id, id)
     |> put_status(:moved_permanently)
+    |> put_resp_header("location", ~p"/scratch")
     |> assign(:page_title, title)
-    |> redirect(to: ~p"/scratch")
+    |> render(:redirect)
   end
 end

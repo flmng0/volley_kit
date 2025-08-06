@@ -2,7 +2,11 @@ defmodule Volley.Scoring.Match do
   use Ash.Resource,
     domain: Volley.Scoring,
     notifiers: Ash.Notifier.PubSub,
-    data_layer: AshPostgres.DataLayer
+    data_layer: AshPostgres.DataLayer,
+    authorizers: [Ash.Policy.Authorizer]
+
+  alias Volley.Accounts.User
+  alias Volley.Accounts.AnonymousUser
 
   alias Volley.Scoring.Team
   alias Volley.Scoring.Settings
@@ -18,6 +22,26 @@ defmodule Volley.Scoring.Match do
 
     create :start do
       accept [:settings]
+
+      change fn changeset, context ->
+        case context.actor.user do
+          %AnonymousUser{} = user ->
+            Ash.Changeset.change_attribute(changeset, :anonymous_owner_id, user.id)
+
+          %User{} = user ->
+            Ash.Changeset.change_attribute(changeset, :owner_id, user.id)
+        end
+      end
+    end
+
+    read :get_by_user do
+      filter expr(
+               if ^actor(:anonymous) do
+                 anonymous_owner_id == ^actor([:user, :id])
+               else
+                 owner_id == ^actor([:user, :id])
+               end
+             )
     end
 
     update :update_settings do
@@ -69,6 +93,26 @@ defmodule Volley.Scoring.Match do
     end
   end
 
+  policies do
+    policy_group action_type([:update, :destroy]) do
+      policy actor_attribute_equals(:anonymous, true) do
+        authorize_if expr(anonymous_owner_id == ^actor([:user, :id]))
+      end
+
+      policy actor_attribute_equals(:anonymous, false) do
+        authorize_if expr(owner_id == ^actor([:user, :id]))
+      end
+    end
+
+    policy action_type(:create) do
+      authorize_if actor_present()
+    end
+
+    policy action_type(:read) do
+      authorize_if always()
+    end
+  end
+
   pub_sub do
     module VolleyWeb.Endpoint
 
@@ -85,6 +129,9 @@ defmodule Volley.Scoring.Match do
 
     create_timestamp :inserted_at
     update_timestamp :updated_at
+
+    attribute :owner_id, :integer, allow_nil?: true
+    attribute :anonymous_owner_id, :string, allow_nil?: true
 
     attribute :a_score, :integer, default: 0, constraints: [min: 0]
     attribute :b_score, :integer, default: 0, constraints: [min: 0]

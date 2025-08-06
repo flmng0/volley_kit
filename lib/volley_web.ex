@@ -91,6 +91,8 @@ defmodule VolleyWeb do
       alias Phoenix.LiveView.JS
       alias VolleyWeb.Layouts
 
+      import Volley.Accounts.Scope, only: [known_user?: 1]
+
       # Routes generation with the ~p sigil
       unquote(verified_routes())
     end

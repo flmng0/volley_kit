@@ -33,14 +33,11 @@ defmodule VolleyWeb.Layouts do
 
   def app(assigns) do
     ~H"""
-    <div class="grid grid-rows-[auto_1fr] min-h-screen place-items-center">
-      <.app_header hide_home_button={@hide_home_button} />
-      <main class="px-2 sm:px-6 lg:px-8">
-        <div class="bleed-container gap-y-4">
-          {render_slot(@inner_block)}
-        </div>
-      </main>
-    </div>
+    <main class="px-2 sm:px-6 lg:px-8">
+      <div class="bleed-container gap-y-4">
+        {render_slot(@inner_block)}
+      </div>
+    </main>
 
     <.flash_group flash={@flash} />
     """
@@ -54,40 +51,38 @@ defmodule VolleyWeb.Layouts do
 
   def scorer(assigns) do
     ~H"""
-    <.app_header class="fullscreen:hidden" />
-
-    <main class="max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto space-y-6 pb-16">
-      <div
-        class={[
-          "fullscreen:max-w-none space-y-2",
-          "fullscreen:fixed fullscreen:inset-0 fullscreen:isolate"
-        ]}
-        id="scoringContainer"
-      >
-        {render_slot(@inner_block)}
-        <div class={
-          [
-            "flex flex-row gap-1 w-full flex-wrap",
-            # full screen rules
-            "fullscreen:fixed fullscreen:w-auto bottom-4",
-            # full screen, and portrait
-            "fullscreen:portrait:flex-col portrait:left-4",
-            # full screen, and landscape
-            "landscape:left-1/2 fullscreen:landscape:-translate-x-1/2"
-          ]
-        }>
-          <div :for={action <- @action} class="basis-max flex-1">
-            {render_slot(action)}
+    <Layouts.app flash={@flash}>
+      <main class="max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto space-y-6 pb-16">
+        <div
+          class={[
+            "fullscreen:max-w-none space-y-2",
+            "fullscreen:fixed fullscreen:inset-0 fullscreen:isolate"
+          ]}
+          id="scoringContainer"
+        >
+          {render_slot(@inner_block)}
+          <div class={
+            [
+              "flex flex-row gap-1 w-full flex-wrap",
+              # full screen rules
+              "fullscreen:fixed fullscreen:w-auto bottom-4",
+              # full screen, and portrait
+              "fullscreen:portrait:flex-col portrait:left-4",
+              # full screen, and landscape
+              "landscape:left-1/2 fullscreen:landscape:-translate-x-1/2"
+            ]
+          }>
+            <div :for={action <- @action} class="basis-max flex-1">
+              {render_slot(action)}
+            </div>
           </div>
         </div>
-      </div>
 
-      <%= for footer <- @footer do %>
-        {render_slot(footer)}
-      <% end %>
-    </main>
-
-    <.flash_group flash={@flash} />
+        <%= for footer <- @footer do %>
+          {render_slot(footer)}
+        <% end %>
+      </main>
+    </Layouts.app>
     """
   end
 
@@ -99,7 +94,7 @@ defmodule VolleyWeb.Layouts do
 
   def scorer_action_button(assigns) do
     ~H"""
-    <.button {@rest} class={["btn-block p-2", @show_in_fullscreen? || "fullscreen:hidden"]}>
+    <.button {@rest} class={["btn-block btn-md p-4", @show_in_fullscreen? || "fullscreen:hidden"]}>
       <span class="fullscreen:hidden text-nowrap">{@label}</span>
       <.icon
         class={["size-4 fullscreen:size-6", @fullscreen_icon_name && "fullscreen:hidden"]}
@@ -127,6 +122,7 @@ defmodule VolleyWeb.Layouts do
   end
 
   attr :hide_home_button, :boolean, default: false
+  attr :current_scope, :map, default: nil
 
   attr :class, :string, default: nil
   attr :rest, :global
@@ -143,10 +139,38 @@ defmodule VolleyWeb.Layouts do
       </div>
       <ul class="menu menu-horizontal w-full relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
         <.theme_toggle />
+        <%!-- FIXME: Temporarily disabled until mailer is setup --%>
+        <%!-- <.user_buttons current_scope={@current_scope} /> --%>
       </ul>
     </header>
     """
   end
+
+  # FIXME: Temporarily disabled until mailer is setup
+  # attr :current_scope, :map, default: nil
+  #
+  # def user_buttons(assigns) do
+  #   ~H"""
+  #   <%= if known_user?(@current_scope) do %>
+  #     <li>
+  #       {@current_scope.user.email}
+  #     </li>
+  #     <li>
+  #       <.button variant="ghost" href={~p"/users/settings"}>Settings</.button>
+  #     </li>
+  #     <li>
+  #       <.button variant="ghost" href={~p"/users/log-out"} method="delete">Log out</.button>
+  #     </li>
+  #   <% else %>
+  #     <li>
+  #       <.button variant="ghost" href={~p"/users/register"}>Register</.button>
+  #     </li>
+  #     <li>
+  #       <.button variant="ghost" href={~p"/users/log-in"}>Log in</.button>
+  #     </li>
+  #   <% end %>
+  #   """
+  # end
 
   @doc """
   Shows the flash group with standard titles and content.

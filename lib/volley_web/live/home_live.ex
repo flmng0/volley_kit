@@ -1,22 +1,20 @@
 defmodule VolleyWeb.HomeLive do
-  alias Volley.Scoring
   use VolleyWeb, :live_view
 
-  @impl true
-  def mount(_params, session, socket) do
-    socket =
-      with %{"match_id" => id} <- session,
-           {:ok, match} <- Scoring.get_match(id) do
-        owner? = match?(%{"owns_match_id" => ^id}, session)
+  on_mount {VolleyWeb.UserAuth, :mount_current_scope}
 
-        socket
-        |> assign(:match, match)
-        |> assign(:owner?, owner?)
-      else
-        _ -> socket
+  alias Volley.Scoring
+
+  @impl true
+  def mount(_params, _session, socket) do
+    match =
+      if socket.assigns.current_scope do
+        Scoring.get_match_by_user!(actor: socket.assigns.current_scope)
       end
 
-    {:ok, socket}
+    socket = assign(socket, :match, match)
+
+    {:ok, assign(socket, :hide_home_button, true)}
   end
 
   @impl true
@@ -44,7 +42,7 @@ defmodule VolleyWeb.HomeLive do
           </div>
 
           <nav class="flex flex-col w-full max-w-sm shrink-0">
-            <%= if assigns[:match] && assigns[:owner?] do %>
+            <%= if @match do %>
               <.continue_match_card match={@match} />
             <% else %>
               <.start_match_card />
@@ -64,15 +62,16 @@ defmodule VolleyWeb.HomeLive do
 
   @impl true
   def handle_event("delete", _params, socket) do
-    true = socket.assigns.owner?
-    Ash.destroy!(socket.assigns.match, action: :destroy)
+    Ash.destroy!(socket.assigns.match, action: :destroy, actor: socket.assigns.current_scope)
 
     {:noreply, assign(socket, :match, nil)}
   end
 
   @impl true
-  def handle_info({:start_match, settings}, socket) do
-    {:noreply, redirect(socket, to: ~p"/scratch/new?#{settings}")}
+  def handle_info({:submit_settings, settings}, socket) do
+    match = Scoring.start_match!(settings, actor: socket.assigns.current_scope)
+
+    {:noreply, redirect(socket, to: ~p"/scratch/#{match.id}")}
   end
 
   attr :title, :string

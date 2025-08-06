@@ -3,7 +3,9 @@ defmodule Volley.Scoring do
 
   resources do
     resource Volley.Scoring.Match do
-      define :get_match, get_by: :id, action: :read
+      define :get_match, get_by: :id, action: :read, not_found_error?: false
+
+      define :get_match_by_user, action: :get_by_user, get?: true, not_found_error?: false
 
       define :start_match, action: :start, args: [:settings]
 

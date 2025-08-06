@@ -94,7 +94,7 @@ defmodule VolleyWeb.Layouts do
 
   def scorer_action_button(assigns) do
     ~H"""
-    <.button {@rest} class={["btn-block p-2", @show_in_fullscreen? || "fullscreen:hidden"]}>
+    <.button {@rest} class={["btn-block btn-md p-4", @show_in_fullscreen? || "fullscreen:hidden"]}>
       <span class="fullscreen:hidden text-nowrap">{@label}</span>
       <.icon
         class={["size-4 fullscreen:size-6", @fullscreen_icon_name && "fullscreen:hidden"]}
@@ -139,28 +139,38 @@ defmodule VolleyWeb.Layouts do
       </div>
       <ul class="menu menu-horizontal w-full relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
         <.theme_toggle />
-        <%= if known_user?(@current_scope) do %>
-          <li>
-            {@current_scope.user.email}
-          </li>
-          <li>
-            <.button variant="ghost" href={~p"/users/settings"}>Settings</.button>
-          </li>
-          <li>
-            <.button variant="ghost" href={~p"/users/log-out"} method="delete">Log out</.button>
-          </li>
-        <% else %>
-          <li>
-            <.button variant="ghost" href={~p"/users/register"}>Register</.button>
-          </li>
-          <li>
-            <.button variant="ghost" href={~p"/users/log-in"}>Log in</.button>
-          </li>
-        <% end %>
+        <%!-- FIXME: Temporarily disabled until mailer is setup --%>
+        <%!-- <.user_buttons current_scope={@current_scope} /> --%>
       </ul>
     </header>
     """
   end
+
+  # FIXME: Temporarily disabled until mailer is setup
+  # attr :current_scope, :map, default: nil
+  #
+  # def user_buttons(assigns) do
+  #   ~H"""
+  #   <%= if known_user?(@current_scope) do %>
+  #     <li>
+  #       {@current_scope.user.email}
+  #     </li>
+  #     <li>
+  #       <.button variant="ghost" href={~p"/users/settings"}>Settings</.button>
+  #     </li>
+  #     <li>
+  #       <.button variant="ghost" href={~p"/users/log-out"} method="delete">Log out</.button>
+  #     </li>
+  #   <% else %>
+  #     <li>
+  #       <.button variant="ghost" href={~p"/users/register"}>Register</.button>
+  #     </li>
+  #     <li>
+  #       <.button variant="ghost" href={~p"/users/log-in"}>Log in</.button>
+  #     </li>
+  #   <% end %>
+  #   """
+  # end
 
   @doc """
   Shows the flash group with standard titles and content.

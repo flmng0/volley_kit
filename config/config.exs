@@ -7,6 +7,19 @@
 # General application configuration
 import Config
 
+config :volley, :scopes,
+  user: [
+    default: true,
+    module: Volley.Accounts.Scope,
+    assign_key: :current_scope,
+    access_path: [:user, :id],
+    schema_key: :user_id,
+    schema_type: :id,
+    schema_table: :users,
+    test_data_fixture: Volley.AccountsFixtures,
+    test_setup_helper: :register_and_log_in_user
+  ]
+
 config :ash,
   allow_forbidden_field_for_relationships_by_default?: true,
   include_embedded_source_by_default?: false,

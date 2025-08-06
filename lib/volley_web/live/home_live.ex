@@ -16,7 +16,7 @@ defmodule VolleyWeb.HomeLive do
         _ -> socket
       end
 
-    {:ok, socket}
+    {:ok, assign(socket, :hide_home_button, true)}
   end
 
   @impl true

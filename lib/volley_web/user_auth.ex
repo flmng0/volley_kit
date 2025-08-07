@@ -248,13 +248,16 @@ defmodule VolleyWeb.UserAuth do
 
   defp mount_current_scope(socket, session) do
     user =
-      cond do
-        user_token = session["user_token"] ->
-          {user, _} = Accounts.get_user_by_session_token(user_token)
-          user
-
-        anonymous_id = session["anonymous_user_id"] ->
-          %AnonymousUser{id: anonymous_id}
+      with %{"user_token" => user_token} <- session,
+           {user, _} <- Accounts.get_user_by_session_token(user_token) do
+        user
+      else
+        _ ->
+          if id = session["anonymous_user_id"] do
+            %AnonymousUser{id: id}
+          else
+            nil
+          end
       end
 
     scope = Scope.for_user(user)

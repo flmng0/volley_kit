@@ -3,7 +3,8 @@ defmodule Volley.Scoring.Match do
     domain: Volley.Scoring,
     notifiers: Ash.Notifier.PubSub,
     data_layer: AshPostgres.DataLayer,
-    authorizers: [Ash.Policy.Authorizer]
+    authorizers: [Ash.Policy.Authorizer],
+    extensions: [AshOban]
 
   alias Volley.Accounts.User
   alias Volley.Accounts.AnonymousUser
@@ -15,6 +16,20 @@ defmodule Volley.Scoring.Match do
   postgres do
     table "scoring_matches"
     repo Volley.Repo
+  end
+
+  oban do
+    triggers do
+      trigger :clean_old do
+        scheduler_cron "@daily"
+        worker_module_name __MODULE__.CleanOld.Worker
+        scheduler_module_name __MODULE__.CleanOld.Scheduler
+        action :destroy
+        queue :cleanup
+        read_action :read
+        where expr(is_old)
+      end
+    end
   end
 
   actions do
@@ -94,6 +109,10 @@ defmodule Volley.Scoring.Match do
   end
 
   policies do
+    bypass AshOban.Checks.AshObanInteraction do
+      authorize_if always()
+    end
+
     policy_group action_type([:update, :destroy]) do
       policy actor_attribute_equals(:anonymous, true) do
         authorize_if expr(anonymous_owner_id == ^actor([:user, :id]))
@@ -181,5 +200,7 @@ defmodule Volley.Scoring.Match do
               ) do
       load :set_limit
     end
+
+    calculate :is_old, :boolean, expr(is_nil(owner_id) and updated_at < ago(1, :day))
   end
 end

@@ -7,6 +7,15 @@
 # General application configuration
 import Config
 
+config :ash_oban, pro?: false
+
+config :volley, Oban,
+  engine: Oban.Engines.Basic,
+  notifier: Oban.Notifiers.Postgres,
+  queues: [default: 10, cleanup: 10],
+  repo: Volley.Repo,
+  plugins: [{Oban.Plugins.Cron, []}]
+
 config :volley, :scopes,
   user: [
     default: true,

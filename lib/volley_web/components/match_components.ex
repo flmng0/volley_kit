@@ -68,7 +68,13 @@ defmodule VolleyWeb.MatchComponents do
         phx-update="ignore"
         id={"score_text_#{@team}"}
       >
-        <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" class="scoreText">
+        <text
+          x="50%"
+          y="50%"
+          dominant-baseline="central"
+          text-anchor="middle"
+          class="scoreText font-score"
+        >
           {@score}
         </text>
         <text
@@ -76,7 +82,7 @@ defmodule VolleyWeb.MatchComponents do
           y="150%"
           dominant-baseline="central"
           text-anchor="middle"
-          class="scoreNextText opacity-0"
+          class="scoreNextText opacity-0 font-score"
         >
           {@score + 1}
         </text>

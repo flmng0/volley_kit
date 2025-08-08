@@ -92,6 +92,15 @@
   --noise: 0;
 }
 
+/* Fonts :) */
+@font-face {
+  font-family: "Noto Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+}
+
 /* Add variants based on LiveView classes */
 @custom-variant phx-click-loading (.phx-click-loading&, .phx-click-loading &);
 @custom-variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading &);
@@ -103,7 +112,8 @@
 @custom-variant fullscreen (:is([data-fullscreen=true]&, [data-fullscreen=true] &));
 
 /* Make LiveView wrapper divs transparent for layout */
-[data-phx-session], [data-phx-teleported-src] {
+[data-phx-session],
+[data-phx-teleported-src] {
   display: contents;
 }
 
@@ -114,6 +124,7 @@
   --color-score-content: oklch(97.807% 0.029 256.847);
   --size-score-min: 3rem;
   --container-score-min: var(--size-score-min);
+  --font-score: "Noto Sans";
 }
 
 .bleed-container {

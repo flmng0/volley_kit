@@ -142,13 +142,23 @@ defmodule VolleyWeb.ScratchMatchLive do
 
   @impl true
   def handle_event("score", %{"team" => team}, socket) do
-    match = Scoring.score!(socket.assigns.match, team, actor: socket.assigns.current_scope)
+    if socket.assigns.winning_team in [:a, :b] do
+      socket = assign_match(socket, socket.assigns.match, true)
+      {:reply, %{wait: true}, socket}
+    else
+      match = Scoring.score!(socket.assigns.match, team, actor: socket.assigns.current_scope)
+      socket = assign_match(socket, match)
 
-    socket = assign_match(socket, match)
+      wait = match.winning_team in [:a, :b]
 
-    wait = not is_nil(socket.assigns.match.winning_team)
+      score =
+        case team do
+          "a" -> socket.assigns.match.a_score
+          "b" -> socket.assigns.match.b_score
+        end
 
-    {:reply, %{wait: wait}, socket}
+      {:reply, %{wait: wait, score: score}, socket}
+    end
   end
 
   def handle_event(event, params, socket) do
@@ -162,7 +172,7 @@ defmodule VolleyWeb.ScratchMatchLive do
   def apply_event(socket, "undo", _params) do
     match = Scoring.undo_event!(socket.assigns.match, 1, actor: socket.assigns.current_scope)
 
-    assign_match(socket, match)
+    assign_match(socket, match, true)
   end
 
   def apply_event(socket, "next_set", _params) do
@@ -170,14 +180,26 @@ defmodule VolleyWeb.ScratchMatchLive do
 
     match = Scoring.complete_set!(match, winning_team, actor: socket.assigns.current_scope)
 
-    assign_match(socket, match)
+    assign_match(socket, match, true)
   end
 
-  defp assign_match(socket, match) do
+  defp assign_match(socket, match, reset? \\ false) do
     winning_team = Scoring.winning_team!(match, actor: socket.assigns.current_scope)
     current_set = Scoring.current_set!(match, actor: socket.assigns.current_scope)
 
-    assign(socket, match: match, winning_team: winning_team, current_set: current_set)
+    socket =
+      if reset? do
+        wait = not is_nil(winning_team)
+        push_event(socket, "reset_score", %{a: match.a_score, b: match.b_score, wait: wait})
+      else
+        socket
+      end
+
+    assign(socket,
+      match: match,
+      winning_team: winning_team,
+      current_set: current_set
+    )
   end
 
   defp assign_new_match(socket, match, scorer?) do

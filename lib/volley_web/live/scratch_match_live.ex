@@ -97,7 +97,7 @@ defmodule VolleyWeb.ScratchMatchLive do
       <.copy_text id="shareLinkCopy" class="w-full max-w-md" value={@share_link} />
     </.modal>
 
-    <.modal id="resetConfirmModal">
+    <.modal :if={@scorer?} id="resetConfirmModal">
       <hgroup class="prose">
         <h3>Are you sure?</h3>
         <p>
@@ -121,7 +121,7 @@ defmodule VolleyWeb.ScratchMatchLive do
     </.modal>
 
     <.modal
-      :if={@winning_team in [:a, :b]}
+      :if={@scorer? and @winning_team in [:a, :b]}
       id="setCompleteModal"
       allow_close={false}
       phx-mounted={show_modal("setCompleteModal")}

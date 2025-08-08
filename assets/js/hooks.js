@@ -48,7 +48,7 @@ Hooks.ScoreCard = {
     const text = this.el.querySelector("text.scoreText");
     const next = this.el.querySelector("text.scoreNextText");
 
-    const duration = 300;
+    const duration = 250;
     const easing = "cubic-bezier(1, 0, 0, 1)";
     let animating = false;
 
@@ -109,6 +109,7 @@ Hooks.ScoreCard = {
     };
 
     const DEBOUNCE = 350;
+
     let timeout;
     let waitingScore = null;
     let wait = false;

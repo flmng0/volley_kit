@@ -61,7 +61,6 @@ defmodule VolleyWeb.MatchComponents do
       <svg
         viewBox="0 0 24 14"
         stroke="none"
-        preserveAspectRatio="true"
         width="100%"
         height="100%"
         class="basis-score-min min-w-score-min grow select-none"
@@ -71,6 +70,15 @@ defmodule VolleyWeb.MatchComponents do
       >
         <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" class="scoreText">
           {@score}
+        </text>
+        <text
+          x="50%"
+          y="150%"
+          dominant-baseline="central"
+          text-anchor="middle"
+          class="scoreNextText opacity-0"
+        >
+          {@score + 1}
         </text>
       </svg>
       <span class="w-full text-xl">{@sets}</span>

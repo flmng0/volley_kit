@@ -5,9 +5,7 @@ window.addEventListener("vk:showmodal", function (e) {
   if (e.target instanceof HTMLDialogElement) {
     e.target.showModal();
   } else {
-    console.warn(
-      "Tried to send `vk:showmodal` event to non-dialog element!",
-    );
+    console.warn("Tried to send `vk:showmodal` event to non-dialog element!");
   }
 });
 
@@ -16,9 +14,7 @@ window.addEventListener("vk:copytext", function (e) {
 
   e.target.select();
 
-  navigator.clipboard
-    .writeText(input.value)
-    .catch(() => {
-      document.execCommand("copy");
-    });
+  navigator.clipboard.writeText(input.value).catch(() => {
+    document.execCommand("copy");
+  });
 });

@@ -1,20 +1,4 @@
-function requestFullscreen(element, options) {
-  if (element.requestFullscreen) {
-    element.requestFullscreen(options);
-  } else if (element.mozRequestFullScreen) {
-    element.mozRequestFullScreen(options);
-  } else if (element.webkitRequestFullScreen) {
-    element.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-  }
-}
-
-function exitFullscreen() {
-  if (document.exitFullscreen) {
-    document.exitFullscreen();
-  } else if (document.webkitExitFullScreen) {
-    document.webkitExitFullScreen();
-  }
-}
+import { exitFullscreen, requestFullscreen } from "./polyfill";
 
 /** @type {import("phoenix_live_view").HooksOptions} */
 const Hooks = {};
@@ -37,9 +21,9 @@ Hooks.FullscreenButton = {
           navigationUI: "hide",
         });
 
-        screen.orientation.lock("landscape").catch(() =>
-          console.warn("Failed to lock screen orientation")
-        );
+        screen.orientation
+          .lock("landscape")
+          .catch(() => console.warn("Failed to lock screen orientation"));
       } else if (document.fullscreenElement) {
         exitFullscreen();
         screen.orientation.unlock();
@@ -61,17 +45,67 @@ Hooks.FullscreenButton = {
 
 Hooks.ScoreCard = {
   mounted() {
-    const target = this.el.querySelector("text.scoreText");
+    const text = this.el.querySelector("text.scoreText");
+    const next = this.el.querySelector("text.scoreNextText");
+
+    const duration = 300;
+    const easing = "cubic-bezier(1, 0, 0, 1)";
+    let animating = false;
+
+    async function animateScore() {
+      const wrap = (anim) =>
+        new Promise((res, rej) => {
+          anim.onfinish = () => res();
+          anim.oncancel = () => rej();
+        });
+
+      /** @type {KeyframeAnimationOptions} */
+      const options = { duration, easing };
+
+      const transform = [
+        { transform: "translateY(0)" },
+        { transform: "translateY(-100%)" },
+      ];
+
+      const animations = [];
+
+      animations.push(text.animate(transform, options));
+      animations.push(next.animate(transform, options));
+
+      // linear on purpose
+      animations.push(text.animate({ opacity: [1, 0] }, duration));
+      animations.push(next.animate({ opacity: [0, 1] }, duration));
+
+      const promises = animations.map(wrap);
+
+      await Promise.all(promises);
+    }
+
+    function updateDom(value) {
+      text.innerHTML = value;
+      next.innerHTML = value + 1;
+    }
 
     const score = {
-      _value: Number(target.innerHTML.trim()),
+      _value: Number(text.innerHTML.trim()),
       set value(newScore) {
+        const animate = newScore === this._value + 1;
         this._value = Number(newScore);
-        target.innerHTML = newScore;
+
+        if (animate) {
+          animating = true;
+
+          animateScore().then(() => {
+            updateDom(this._value);
+            animating = false;
+          });
+        } else {
+          updateDom(this._value);
+        }
       },
       get value() {
         return this._value;
-      }
+      },
     };
 
     const DEBOUNCE = 350;
@@ -84,18 +118,17 @@ Hooks.ScoreCard = {
     const handleCount = (newScore) => {
       if (newScore > score.value || wait) {
         score.value = newScore;
-      }
-      else if (waitingScore == null || newScore > waitingScore) {
+      } else if (waitingScore == null || newScore > waitingScore) {
         waitingScore = newScore;
         timeout = setTimeout(() => {
           score.value = newScore;
         }, DEBOUNCE);
       }
-    }
+    };
 
     this.handleEvent("reset_score", (data) => {
       if (data.wait !== undefined) {
-        wait = data.wait
+        wait = data.wait;
       }
       if (data[team] === undefined) {
         return;
@@ -104,14 +137,14 @@ Hooks.ScoreCard = {
       waitingScore = null;
 
       score.value = data[team];
-    })
+    });
 
     this.el.addEventListener("click", () => {
-      if (!wait) {
-        score.value += 1;
-      }
+      if (wait || animating) return;
 
-      this.pushEvent("score", {team}, (reply) => {
+      score.value += 1;
+
+      this.pushEvent("score", { team }, (reply) => {
         if (reply.score !== undefined) {
           handleCount(reply.score);
         }
@@ -120,10 +153,9 @@ Hooks.ScoreCard = {
         if (reply.wait !== undefined) {
           wait = reply.wait;
         }
-      })
-    })
-  }
-}
-    
+      });
+    });
+  },
+};
 
 export default Hooks;

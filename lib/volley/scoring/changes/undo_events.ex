@@ -12,6 +12,7 @@ defmodule Volley.Scoring.Changes.UndoEvents do
       |> Ash.Query.sort(inserted_at: :desc)
       |> Ash.Query.offset(count)
       |> Ash.read!()
+      |> Enum.reverse()
 
     summarized =
       for event <- events, reduce: %{a_score: 0, b_score: 0, a_sets: 0, b_sets: 0} do

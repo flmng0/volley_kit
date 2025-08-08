@@ -141,18 +141,22 @@ defmodule VolleyWeb.ScratchMatchLive do
   end
 
   @impl true
+  def handle_event("score", %{"team" => team}, socket) do
+    match = Scoring.score!(socket.assigns.match, team, actor: socket.assigns.current_scope)
+
+    socket = assign_match(socket, match)
+
+    wait = not is_nil(socket.assigns.match.winning_team)
+
+    {:reply, %{wait: wait}, socket}
+  end
+
   def handle_event(event, params, socket) do
     {:noreply, apply_event(socket, event, params)}
   end
 
   def apply_event(socket, "edit", _params) do
     assign(socket, :editing?, not socket.assigns.editing?)
-  end
-
-  def apply_event(socket, "score", %{"team" => team}) do
-    match = Scoring.score!(socket.assigns.match, team, actor: socket.assigns.current_scope)
-
-    assign_match(socket, match)
   end
 
   def apply_event(socket, "undo", _params) do

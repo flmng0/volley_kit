@@ -1,6 +1,8 @@
 defmodule VolleyWeb.MatchComponents do
   use Phoenix.Component
 
+  import Phoenix.LiveView.ColocatedHook
+
   attr :match, Volley.Scoring.Match
 
   attr :event, :string, required: true
@@ -66,11 +68,57 @@ defmodule VolleyWeb.MatchComponents do
         height="100%"
         class="basis-score-min min-w-score-min grow select-none"
         fill="currentColor"
+        phx-update="ignore"
+        id={"score_text_#{@team}"}
       >
-        <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle">{@score}</text>
+        <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" class="scoreText">{@score}</text>
       </svg>
       <span class="w-full text-xl">{@sets}</span>
     </.score_card_wrapper>
+
+    <script :type={ColocatedHook} name="ScoreCard">
+      export default {
+        mounted() {
+            let value = 0;
+            let timeout;
+            let wait = false;
+      
+            const target = this.el.querySelector("text.scoreText");
+
+            const handleCount = (score) => {
+              timeout && clearTimeout(timeout);
+              if (score > value || wait) {
+                value = score;
+                target.innerText = value;
+              }
+              else {
+                timeout = setTimeout(() => {
+                  value = score;
+                  target.innerText = value;
+                });
+              }
+            }
+
+            this.el.addEventListener("click", () => {
+              if (!wait) {
+                value += 1;
+                target.innerText = value;
+              }
+      
+              this.pushEvent("inc", null, (reply) => {
+                if (reply.score !== undefined) {
+                  handleCount(reply.score)
+                }
+                timeout && clearTimeout(timeout);
+
+                if (reply.wait !== undefined) {
+                  wait = reply.wait;
+                }
+              })
+            })
+          }
+      }
+    </script>
     """
   end
 
@@ -95,7 +143,7 @@ defmodule VolleyWeb.MatchComponents do
 
     if assigns[:can_score] do
       ~H"""
-      <button class={[@class, "cursor-pointer"]} phx-click={@event} phx-value-team={@team}>
+      <button class={[@class, "cursor-pointer"]} phx-hook=".ScoreCard" id={"score_button_#{@team}"} data-team={@team}>
         {render_slot(@inner_block)}
       </button>
       """

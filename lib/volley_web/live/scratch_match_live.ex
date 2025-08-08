@@ -53,6 +53,13 @@ defmodule VolleyWeb.ScratchMatchLive do
       </:action>
       <:action :if={@scorer?}>
         <Layouts.scorer_action_button
+          phx-click="reset"
+          label="Reset Scores to 0"
+          icon_name="hero-stop-solid"
+        />
+      </:action>
+      <:action :if={@scorer?}>
+        <Layouts.scorer_action_button
           phx-click="edit"
           show_in_fullscreen?={false}
           label={if @editing?, do: "Close Settings", else: "Edit Settings"}
@@ -171,6 +178,12 @@ defmodule VolleyWeb.ScratchMatchLive do
 
   def apply_event(socket, "undo", _params) do
     match = Scoring.undo_event!(socket.assigns.match, 1, actor: socket.assigns.current_scope)
+
+    assign_match(socket, match, true)
+  end
+
+  def apply_event(socket, "reset", _params) do
+    match = Scoring.reset_scores!(socket.assigns.match, actor: socket.assigns.current_scope)
 
     assign_match(socket, match, true)
   end

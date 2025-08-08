@@ -63,6 +63,15 @@ defmodule Volley.Scoring.Match do
       accept [:settings]
     end
 
+    update :reset_scores do
+      require_atomic? false
+
+      change set_attribute(:a_score, 0)
+      change set_attribute(:b_score, 0)
+
+      change {Changes.ClearSetEvents, []}
+    end
+
     update :score do
       argument :team, Team
       require_atomic? false

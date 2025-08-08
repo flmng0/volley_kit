@@ -65,7 +65,7 @@ defmodule VolleyWeb.MatchComponents do
         height="100%"
         class="basis-score-min min-w-score-min grow select-none"
         fill="currentColor"
-        phx-update="ignore"
+        phx-update={@can_score && "ignore"}
         id={"score_text_#{@team}"}
       >
         <text
@@ -78,6 +78,7 @@ defmodule VolleyWeb.MatchComponents do
           {@score}
         </text>
         <text
+          :if={@can_score}
           x="50%"
           y="150%"
           dominant-baseline="central"

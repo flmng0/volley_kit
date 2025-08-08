@@ -3,18 +3,23 @@ defmodule Volley.Scoring.Changes.ClearSetEvents do
 
   @impl true
   def change(changeset, _opts, _context) do
-    id = Ash.Changeset.get_data(changeset, :id)
+    clear_sets? = Ash.Changeset.get_argument(changeset, :clear_sets?)
 
     events =
-      Volley.Scoring.Event
-      |> Ash.Query.filter(match_id: id)
-      |> Ash.Query.sort(inserted_at: :desc)
-      |> Ash.read!()
-      |> Enum.drop_while(fn event ->
-        event.type != :set_won
-      end)
+      if clear_sets? do
+        []
+      else
+        id = Ash.Changeset.get_data(changeset, :id)
 
-    changeset
-    |> Ash.Changeset.manage_relationship(:events, events, on_missing: :destroy)
+        Volley.Scoring.Event
+        |> Ash.Query.filter(match_id: id)
+        |> Ash.Query.sort(inserted_at: :desc)
+        |> Ash.read!()
+        |> Enum.drop_while(fn event ->
+          event.type != :set_won
+        end)
+      end
+
+    Ash.Changeset.manage_relationship(changeset, :events, events, on_missing: :destroy)
   end
 end

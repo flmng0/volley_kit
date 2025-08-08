@@ -53,8 +53,8 @@ defmodule VolleyWeb.ScratchMatchLive do
       </:action>
       <:action :if={@scorer?}>
         <Layouts.scorer_action_button
-          phx-click="reset"
-          label="Reset Scores to 0"
+          phx-click={show_modal("resetConfirmModal")}
+          label="Open Reset Menu"
           icon_name="hero-stop-solid"
         />
       </:action>
@@ -87,14 +87,37 @@ defmodule VolleyWeb.ScratchMatchLive do
     </Layouts.scorer>
 
     <.modal id="shareModal" class="flex flex-col items-center text-sm md:text-base">
-      <hgroup>
-        <h3 class="text-lg font-bold">Share Match</h3>
+      <hgroup class="prose">
+        <h3>Share Match</h3>
         <p>Scan the QR code below, or copy the sharing link, so other users to view this match.</p>
       </hgroup>
 
       <.qr_code class="my-6 rounded-md shadow-xl outline outline-base-300" target={@share_link} />
 
       <.copy_text id="shareLinkCopy" class="w-full max-w-md" value={@share_link} />
+    </.modal>
+
+    <.modal id="resetConfirmModal">
+      <hgroup class="prose">
+        <h3>Are you sure?</h3>
+        <p>
+          Ressetting scores will clear the history for the current set. You can also reset the set counts as well, but this will clear all history.
+        </p>
+      </hgroup>
+
+      <:action>
+        <.button variant="delete" phx-click="reset" phx-value-clear_sets={true}>
+          Also Reset Sets
+        </.button>
+      </:action>
+      <:action>
+        <.button variant="primary" phx-click="reset" phx-value-clear_sets={false}>
+          Only Reset Scores
+        </.button>
+      </:action>
+      <:action>
+        <.button>Cancel</.button>
+      </:action>
     </.modal>
 
     <.modal
@@ -182,8 +205,13 @@ defmodule VolleyWeb.ScratchMatchLive do
     assign_match(socket, match, true)
   end
 
-  def apply_event(socket, "reset", _params) do
-    match = Scoring.reset_scores!(socket.assigns.match, actor: socket.assigns.current_scope)
+  def apply_event(socket, "reset", params) do
+    clear_sets? = Map.has_key?(params, "clear_sets")
+
+    match =
+      Scoring.reset_scores!(socket.assigns.match, clear_sets?,
+        actor: socket.assigns.current_scope
+      )
 
     assign_match(socket, match, true)
   end

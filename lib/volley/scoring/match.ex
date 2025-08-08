@@ -64,10 +64,15 @@ defmodule Volley.Scoring.Match do
     end
 
     update :reset_scores do
+      argument :clear_sets?, :boolean, default: false
+
       require_atomic? false
 
       change set_attribute(:a_score, 0)
       change set_attribute(:b_score, 0)
+
+      change set_attribute(:a_sets, 0), where: argument_equals(:clear_sets?, true)
+      change set_attribute(:b_sets, 0), where: argument_equals(:clear_sets?, true)
 
       change {Changes.ClearSetEvents, []}
     end

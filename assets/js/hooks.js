@@ -59,4 +59,71 @@ Hooks.FullscreenButton = {
   },
 };
 
+Hooks.ScoreCard = {
+  mounted() {
+    const target = this.el.querySelector("text.scoreText");
+
+    const score = {
+      _value: Number(target.innerHTML.trim()),
+      set value(newScore) {
+        this._value = Number(newScore);
+        target.innerHTML = newScore;
+      },
+      get value() {
+        return this._value;
+      }
+    };
+
+    const DEBOUNCE = 350;
+    let timeout;
+    let waitingScore = null;
+    let wait = false;
+
+    const team = this.el.dataset.team;
+
+    const handleCount = (newScore) => {
+      if (newScore > score.value || wait) {
+        score.value = newScore;
+      }
+      else if (waitingScore == null || newScore > waitingScore) {
+        waitingScore = newScore;
+        timeout = setTimeout(() => {
+          score.value = newScore;
+        }, DEBOUNCE);
+      }
+    }
+
+    this.handleEvent("reset_score", (data) => {
+      if (data.wait !== undefined) {
+        wait = data.wait
+      }
+      if (data[team] === undefined) {
+        return;
+      }
+      timeout && clearTimeout();
+      waitingScore = null;
+
+      score.value = data[team];
+    })
+
+    this.el.addEventListener("click", () => {
+      if (!wait) {
+        score.value += 1;
+      }
+
+      this.pushEvent("score", {team}, (reply) => {
+        if (reply.score !== undefined) {
+          handleCount(reply.score);
+        }
+        timeout && clearTimeout(timeout);
+
+        if (reply.wait !== undefined) {
+          wait = reply.wait;
+        }
+      })
+    })
+  }
+}
+    
+
 export default Hooks;

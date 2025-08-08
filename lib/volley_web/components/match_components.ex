@@ -66,8 +66,12 @@ defmodule VolleyWeb.MatchComponents do
         height="100%"
         class="basis-score-min min-w-score-min grow select-none"
         fill="currentColor"
+        phx-update="ignore"
+        id={"score_text_#{@team}"}
       >
-        <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle">{@score}</text>
+        <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" class="scoreText">
+          {@score}
+        </text>
       </svg>
       <span class="w-full text-xl">{@sets}</span>
     </.score_card_wrapper>
@@ -95,7 +99,12 @@ defmodule VolleyWeb.MatchComponents do
 
     if assigns[:can_score] do
       ~H"""
-      <button class={[@class, "cursor-pointer"]} phx-click={@event} phx-value-team={@team}>
+      <button
+        class={[@class, "cursor-pointer"]}
+        phx-hook="ScoreCard"
+        id={"score_button_#{@team}"}
+        data-team={@team}
+      >
         {render_slot(@inner_block)}
       </button>
       """

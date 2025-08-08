@@ -71,7 +71,10 @@ defmodule Volley.Scoring.Match do
       change increment(:b_score), where: argument_equals(:team, :b)
 
       change {Changes.AddEvent, type: :score}
+
       load :events
+      load :current_set
+      load :winning_team
     end
 
     update :complete_set do
@@ -197,9 +200,8 @@ defmodule Volley.Scoring.Match do
                   b_score >= set_limit && b_score >= a_score + 2 -> :b
                   true -> nil
                 end
-              ) do
-      load :set_limit
-    end
+              ),
+              load: :set_limit
 
     calculate :is_old, :boolean, expr(is_nil(owner_id) and updated_at < ago(1, :day))
   end

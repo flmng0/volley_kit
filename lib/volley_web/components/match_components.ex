@@ -58,36 +58,12 @@ defmodule VolleyWeb.MatchComponents do
       class={@swap && @team == :a && "order-last"}
     >
       <span class="w-full text-xl">{@team_name}</span>
-      <svg
-        viewBox="0 0 24 14"
-        stroke="none"
-        width="100%"
-        height="100%"
-        class="basis-score-min min-w-score-min grow select-none"
-        fill="currentColor"
+      <score-card
+        id={"score_card_#{@team}"}
         phx-update={@can_score && "ignore"}
-        id={"score_text_#{@team}"}
-      >
-        <text
-          x="50%"
-          y="50%"
-          dominant-baseline="central"
-          text-anchor="middle"
-          class="scoreText font-score"
-        >
-          {@score}
-        </text>
-        <text
-          :if={@can_score}
-          x="50%"
-          y="150%"
-          dominant-baseline="central"
-          text-anchor="middle"
-          class="scoreNextText opacity-0 font-score"
-        >
-          {@score + 1}
-        </text>
-      </svg>
+        class="basis-score-min min-w-score-min grow select-none"
+        score={@score}
+      />
       <span class="w-full text-xl">{@sets}</span>
     </.score_card_wrapper>
     """

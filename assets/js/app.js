@@ -25,9 +25,11 @@ import { LiveSocket } from "phoenix_live_view";
 import { hooks as colocatedHooks } from "phoenix-colocated/volley";
 import topbar from "../vendor/topbar";
 import Hooks from "./hooks.js";
+import "./elements";
 import "./events.js";
 
-const csrfToken = document.querySelector("meta[name='csrf-token']")
+const csrfToken = document
+  .querySelector("meta[name='csrf-token']")
   .getAttribute("content");
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
@@ -68,19 +70,23 @@ if (process.env.NODE_ENV === "development") {
       //   * click with "c" key pressed to open at caller location
       //   * click with "d" key pressed to open at function component definition location
       let keyDown;
-      window.addEventListener("keydown", (e) => keyDown = e.key);
-      window.addEventListener("keyup", (e) => keyDown = null);
-      window.addEventListener("click", (e) => {
-        if (keyDown === "c") {
-          e.preventDefault();
-          e.stopImmediatePropagation();
-          reloader.openEditorAtCaller(e.target);
-        } else if (keyDown === "d") {
-          e.preventDefault();
-          e.stopImmediatePropagation();
-          reloader.openEditorAtDef(e.target);
-        }
-      }, true);
+      window.addEventListener("keydown", (e) => (keyDown = e.key));
+      window.addEventListener("keyup", (e) => (keyDown = null));
+      window.addEventListener(
+        "click",
+        (e) => {
+          if (keyDown === "c") {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            reloader.openEditorAtCaller(e.target);
+          } else if (keyDown === "d") {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            reloader.openEditorAtDef(e.target);
+          }
+        },
+        true,
+      );
 
       window.liveReloader = reloader;
     },

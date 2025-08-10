@@ -3,8 +3,9 @@ const Hooks = {};
 
 Hooks.ScoreCard = {
   mounted() {
-    /** @type {import("./scoreCard.js").default} */
+    /** @type {import("./elements").ScoreCard} */
     const scoreElem = this.el.querySelector("score-card");
+
     const team = this.el.dataset.team;
     const debounceMs = 350;
 

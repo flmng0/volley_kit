@@ -90,7 +90,7 @@ defmodule VolleyWeb.CoreComponents do
   """
   attr :rest, :global, include: ~w(href navigate patch method download name value disabled)
   attr :class, :any, default: ""
-  attr :variant, :string, values: ~w(primary secondary neutral delete ghost)
+  attr :variant, :string, values: ~w(primary secondary neutral delete ghost scorer-action)
   slot :inner_block, required: true
 
   def button(%{rest: rest} = assigns) do
@@ -100,6 +100,7 @@ defmodule VolleyWeb.CoreComponents do
       "neutral" => "btn-neutral",
       "delete" => "btn-error",
       "ghost" => "btn-ghost",
+      "scorer-action" => "btn-block btn-md p-4",
       nil => ""
     }
 
@@ -523,6 +524,10 @@ defmodule VolleyWeb.CoreComponents do
 
   def show_modal(js \\ %JS{}, id) do
     JS.dispatch(js, "vk:showmodal", to: "##{id}")
+  end
+
+  def toggle_fullscreen(js \\ %JS{}, target) do
+    JS.dispatch(js, "vk:toggleFullscreen", to: target)
   end
 
   @doc """

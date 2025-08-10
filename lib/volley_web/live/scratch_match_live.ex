@@ -35,36 +35,29 @@ defmodule VolleyWeb.ScratchMatchLive do
         swap={Integer.is_odd(@current_set)}
       />
       <:action>
-        <Layouts.toggle_fullscreen_button />
-      </:action>
-      <:action>
-        <Layouts.scorer_action_button
-          phx-click={show_modal("shareModal")}
-          label="Share Match"
-          icon_name="hero-share"
-        />
+        <.button variant="scorer-action" phx-click={show_modal("shareModal")}>
+          <.icon name="hero-share" /> Share Match
+        </.button>
       </:action>
       <:action :if={@scorer?}>
-        <Layouts.scorer_action_button
-          phx-click="undo"
-          label="Undo Score"
-          icon_name="hero-arrow-uturn-left"
-        />
+        <.button variant="scorer-action" phx-click="undo">
+          <.icon name="hero-arrow-uturn-left" /> Undo Score
+        </.button>
       </:action>
       <:action :if={@scorer?}>
-        <Layouts.scorer_action_button
-          phx-click={show_modal("resetConfirmModal")}
-          label="Open Reset Menu"
-          icon_name="hero-stop-solid"
-        />
+        <.button variant="scorer-action" phx-click={show_modal("resetConfirmModal")}>
+          <.icon name="hero-stop-solid" /> Open Reset Menu
+        </.button>
       </:action>
-      <:action :if={@scorer?}>
-        <Layouts.scorer_action_button
-          phx-click="edit"
-          show_in_fullscreen?={false}
-          label={if @editing?, do: "Close Settings", else: "Edit Settings"}
-          icon_name={if @editing?, do: "hero-x-mark", else: "hero-adjustments-vertical"}
-        />
+      <:action :if={@scorer?} show_in_fullscreen?={false}>
+        <.button variant="scorer-action" phx-click="edit">
+          <.icon name={if @editing?, do: "hero-x-mark", else: "hero-adjustments-vertical"} />
+          <%= if @editing? do %>
+            Close Settings
+          <% else %>
+            Edit Settings
+          <% end %>
+        </.button>
       </:action>
 
       <:footer :if={@editing?}>

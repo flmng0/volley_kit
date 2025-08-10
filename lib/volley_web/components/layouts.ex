@@ -44,9 +44,13 @@ defmodule VolleyWeb.Layouts do
   end
 
   attr :flash, :map, required: true
+
   slot :inner_block, required: true
 
-  slot :action
+  slot :action do
+    attr :show_in_fullscreen?, :boolean
+  end
+
   slot :footer
 
   def scorer(assigns) do
@@ -61,20 +65,37 @@ defmodule VolleyWeb.Layouts do
           id="scoringContainer"
         >
           {render_slot(@inner_block)}
-          <div class={
-            [
-              "flex flex-row gap-1 w-full flex-wrap",
-              # full screen rules
-              "fullscreen:fixed fullscreen:w-auto bottom-4",
-              # full screen, and portrait
-              "fullscreen:portrait:flex-col portrait:left-4",
-              # full screen, and landscape
-              "landscape:left-1/2 fullscreen:landscape:-translate-x-1/2"
-            ]
-          }>
-            <div :for={action <- @action} class="basis-max flex-1">
-              {render_slot(action)}
-            </div>
+          <div class={[
+            "hidden fullscreen:flex",
+            "fixed w-auto bottom-4 gap-2",
+            "landscape:left-1/2 landscape:-translate-x-1/2",
+            "portrait:left-4 portrait:flex-col-reverse"
+          ]}>
+            <.button class="aspect-square h-auto" phx-click={toggle_fullscreen("#scoringContainer")}>
+              <.icon name="hero-arrows-pointing-in" />
+            </.button>
+            <details class="dropdown dropdown-top">
+              <summary class="btn p-4 aspect-square h-auto">
+                <.icon name="hero-ellipsis-horizontal" />
+              </summary>
+
+              <ul class="menu dropdown-content bg-base-300 rounded-box w-56 gap-1">
+                <li :for={action <- @action} :if={Map.get(action, :show_in_fullscreen?, true)}>
+                  {render_slot(action)}
+                </li>
+              </ul>
+            </details>
+          </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-1 w-full flex-wrap">
+          <div class="text-nowrap basis-max flex-1">
+            <.button variant="scorer-action" phx-click={toggle_fullscreen("#scoringContainer")}>
+              <.icon name="hero-arrows-pointing-out" /> Toggle Fullscreen
+            </.button>
+          </div>
+          <div :for={action <- @action} class="text-nowrap basis-max flex-1" ,>
+            {render_slot(action)}
           </div>
         </div>
 
@@ -83,41 +104,6 @@ defmodule VolleyWeb.Layouts do
         <% end %>
       </main>
     </Layouts.app>
-    """
-  end
-
-  attr :label, :string, required: true
-  attr :icon_name, :string, required: true
-  attr :fullscreen_icon_name, :string, default: nil
-  attr :show_in_fullscreen?, :boolean, default: true
-  attr :rest, :global
-
-  def scorer_action_button(assigns) do
-    ~H"""
-    <.button {@rest} class={["btn-block btn-md p-4", @show_in_fullscreen? || "fullscreen:hidden"]}>
-      <span class="fullscreen:hidden text-nowrap">{@label}</span>
-      <.icon
-        class={["size-4 fullscreen:size-6", @fullscreen_icon_name && "fullscreen:hidden"]}
-        name={@icon_name}
-      />
-      <.icon
-        :if={@fullscreen_icon_name}
-        class="size-4 fullscreen:size-6 not-fullscreen:hidden"
-        name={@fullscreen_icon_name}
-      />
-    </.button>
-    """
-  end
-
-  def toggle_fullscreen_button(assigns) do
-    ~H"""
-    <.scorer_action_button
-      id="toggle-fs-button"
-      phx-hook="FullscreenButton"
-      label="Toggle Fullscreen"
-      icon_name="hero-arrows-pointing-out"
-      fullscreen_icon_name="hero-arrows-pointing-in"
-    />
     """
   end
 

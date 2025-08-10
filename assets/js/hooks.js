@@ -6,11 +6,26 @@ Hooks.ScoreCard = {
     const text = this.el.querySelector("text.scoreText");
     const next = this.el.querySelector("text.scoreNextText");
 
-    const duration = 250;
-    const easing = "cubic-bezier(1, 0, 0, 1)";
-    let animating = false;
+    const team = this.el.dataset.team;
+    const debounceMs = 350;
 
+    // State stating whether we're currently animating
+    let animating = false;
+    // Timeout tracking debounce
+    let timeout;
+    // Current score we're debouncing on
+    let waitingScore = null;
+    // Whether the next click should optimistic update (wait == false),
+    // or should wait for the server to respond (wait == true).
+    let wait = false;
+
+    // Returns a promise that resolves once the score is finished animating
     async function animateScore() {
+      animating = true;
+
+      const duration = 250;
+      const easing = "cubic-bezier(1, 0, 0, 1)";
+
       const wrap = (anim) =>
         new Promise((res, rej) => {
           anim.onfinish = () => res();
@@ -37,6 +52,8 @@ Hooks.ScoreCard = {
       const promises = animations.map(wrap);
 
       await Promise.all(promises);
+
+      animating = false;
     }
 
     function updateDom(value) {
@@ -44,19 +61,15 @@ Hooks.ScoreCard = {
       next.innerHTML = value + 1;
     }
 
+    // Proxy object to handle side-effects of updating the score
     const score = {
       _value: Number(text.innerHTML.trim()),
       set value(newScore) {
         const animate = newScore === this._value + 1;
-        this._value = Number(newScore);
+        this._value = newScore;
 
         if (animate) {
-          animating = true;
-
-          animateScore().then(() => {
-            updateDom(this._value);
-            animating = false;
-          });
+          animateScore().then(() => updateDom(this._value));
         } else {
           updateDom(this._value);
         }
@@ -66,14 +79,6 @@ Hooks.ScoreCard = {
       },
     };
 
-    const DEBOUNCE = 350;
-
-    let timeout;
-    let waitingScore = null;
-    let wait = false;
-
-    const team = this.el.dataset.team;
-
     const handleCount = (newScore) => {
       if (newScore > score.value || wait) {
         score.value = newScore;
@@ -81,10 +86,14 @@ Hooks.ScoreCard = {
         waitingScore = newScore;
         timeout = setTimeout(() => {
           score.value = newScore;
-        }, DEBOUNCE);
+        }, debounceMs);
       }
     };
 
+    // This is called on reset, undo, etc.
+    //
+    // Can be sent from the server at any time to sync the state of the
+    // client.
     this.handleEvent("reset_score", (data) => {
       if (data.wait !== undefined) {
         wait = data.wait;
@@ -92,7 +101,7 @@ Hooks.ScoreCard = {
       if (data[team] === undefined) {
         return;
       }
-      timeout && clearTimeout();
+      timeout && clearTimeout(timeout);
       waitingScore = null;
 
       score.value = data[team];
@@ -104,8 +113,8 @@ Hooks.ScoreCard = {
       score.value += 1;
 
       this.pushEvent("score", { team }, (reply) => {
-        if (reply.score !== undefined) {
-          handleCount(reply.score);
+        if (reply.score !== undefined && !isNaN(Number(reply.score))) {
+          handleCount(Number(reply.score));
         }
         timeout && clearTimeout(timeout);
 

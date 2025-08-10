@@ -94,7 +94,7 @@ defmodule VolleyWeb.Layouts do
           </div>
         </div>
 
-        <div class="flex flex-col md:flex-row gap-1 w-full flex-wrap">
+        <div class="flex flex-col sm:flex-row gap-1 w-full flex-wrap">
           <div class="text-nowrap basis-max flex-1">
             <.button variant="scorer-action" phx-click={toggle_fullscreen("#scoringContainer")}>
               <.icon name="hero-arrows-pointing-out" /> Toggle Fullscreen

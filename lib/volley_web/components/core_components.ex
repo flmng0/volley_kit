@@ -441,7 +441,10 @@ defmodule VolleyWeb.CoreComponents do
           {render_slot(@inner_block)}
 
           <div :if={@action != []} class="modal-action">
-            <form method="dialog" class="inline-block">
+            <form
+              method="dialog"
+              class="flex flex-col w-full sm:flex-row sm:justify-end flex-wrap gap-2"
+            >
               <%= for action <- @action do %>
                 {render_slot(action)}
               <% end %>

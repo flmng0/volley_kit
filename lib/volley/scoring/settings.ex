@@ -8,13 +8,13 @@ defmodule Volley.Scoring.Settings do
       description: "First team name",
       public?: true,
       allow_nil?: false,
-      constraints: [allow_empty?: false, min_length: 3]
+      constraints: [allow_empty?: false, min_length: 3, max_length: 30]
 
     attribute :b_name, :string,
       default: "Team B",
       public?: true,
       allow_nil?: false,
-      constraints: [allow_empty?: false, min_length: 3]
+      constraints: [allow_empty?: false, min_length: 3, max_length: 30]
 
     attribute :set_limit, :integer, default: 25, public?: true, allow_nil?: false
 

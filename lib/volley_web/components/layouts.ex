@@ -71,15 +71,21 @@ defmodule VolleyWeb.Layouts do
             "landscape:left-1/2 landscape:-translate-x-1/2",
             "portrait:left-4 portrait:flex-col-reverse"
           ]}>
-            <.button class="aspect-square h-auto" phx-click={toggle_fullscreen("#scoringContainer")}>
-              <.icon name="hero-arrows-pointing-in" />
+            <.button
+              class="aspect-square h-auto p-2"
+              phx-click={toggle_fullscreen("#scoringContainer")}
+            >
+              <.icon name="hero-arrows-pointing-in" class="size-5" />
             </.button>
             <details class="dropdown dropdown-top">
-              <summary class="btn p-4 aspect-square h-auto">
-                <.icon name="hero-ellipsis-horizontal" />
+              <summary class="btn p-2 aspect-square h-auto">
+                <.icon name="hero-ellipsis-horizontal" class="size-5" />
               </summary>
 
-              <ul class="menu dropdown-content bg-base-300 rounded-box w-56 gap-1">
+              <ul
+                class="menu dropdown-content bg-base-300 rounded-box w-56 gap-1"
+                onclick="scoringContainer.querySelector('.dropdown').open = false"
+              >
                 <li :for={action <- @action} :if={Map.get(action, :show_in_fullscreen?, true)}>
                   {render_slot(action)}
                 </li>
@@ -94,7 +100,7 @@ defmodule VolleyWeb.Layouts do
               <.icon name="hero-arrows-pointing-out" /> Toggle Fullscreen
             </.button>
           </div>
-          <div :for={action <- @action} class="text-nowrap basis-max flex-1" ,>
+          <div :for={action <- @action} class="text-nowrap basis-max flex-1">
             {render_slot(action)}
           </div>
         </div>

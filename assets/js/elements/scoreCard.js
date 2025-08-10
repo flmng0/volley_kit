@@ -14,6 +14,7 @@ export class ScoreCard extends HTMLElement {
       "http://www.w3.org/2000/svg",
       "svg",
     );
+    rootSvg.setAttribute("class", this.getAttribute("class"));
     rootSvg.setAttribute("viewBox", "0 0 24 16");
     rootSvg.setAttribute("stroke", "none");
     rootSvg.setAttribute("fill", "currentColor");
@@ -30,9 +31,13 @@ export class ScoreCard extends HTMLElement {
     const next = text.cloneNode();
     next.setAttribute("y", "150%");
     next.textContent = this.score + 1;
+    next.style.opacity = 0;
 
     const style = document.createElement("style");
-    style.textContent = `svg {width: 100%; height: 100%}`;
+    style.textContent = `
+      @import '/assets/css/app.css';
+      :host { display: contents; }
+    `;
 
     shadow.appendChild(style);
     shadow.appendChild(rootSvg);

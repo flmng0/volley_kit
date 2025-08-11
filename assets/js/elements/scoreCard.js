@@ -1,3 +1,5 @@
+import { svg, render } from "lit-html";
+
 export class ScoreCard extends HTMLElement {
   static observedAttributes = ["score"];
 
@@ -8,30 +10,16 @@ export class ScoreCard extends HTMLElement {
   connectedCallback() {
     this.score = Number(this.getAttribute("score"));
 
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    this.reducedMotion = query.matches;
+    query.addEventListener("change", () => {
+      this.reducedMotion = query.matches;
+      if (this.reducedMotion) {
+        this.animating = false;
+      }
+    });
+
     const shadow = this.attachShadow({ mode: "open" });
-
-    const rootSvg = document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      "svg",
-    );
-    rootSvg.setAttribute("class", this.getAttribute("class"));
-    rootSvg.setAttribute("viewBox", "0 0 24 16");
-    rootSvg.setAttribute("stroke", "none");
-    rootSvg.setAttribute("fill", "currentColor");
-    rootSvg.setAttribute("width", "100%");
-    rootSvg.setAttribute("height", "100%");
-
-    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    text.setAttribute("x", "50%");
-    text.setAttribute("y", "50%");
-    text.setAttribute("dominant-baseline", "central");
-    text.setAttribute("text-anchor", "middle");
-    text.textContent = this.score;
-
-    const next = text.cloneNode();
-    next.setAttribute("y", "150%");
-    next.textContent = this.score + 1;
-    next.style.opacity = 0;
 
     const style = document.createElement("style");
     style.textContent = `
@@ -39,13 +27,25 @@ export class ScoreCard extends HTMLElement {
       :host { display: contents; }
     `;
 
-    shadow.appendChild(style);
-    shadow.appendChild(rootSvg);
-    rootSvg.appendChild(text);
-    rootSvg.appendChild(next);
+    const root = svg`
+      <svg 
+        class="${this.getAttribute("class")}"
+        viewBox="0 0 24 16"
+        stroke="none"
+        fill="currentColor"
+        width="100%"
+        height="100%"
+      >
+        <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" class="currentText">${this.score}</text>
+        <text x="50%" y="150%" dominant-baseline="central" text-anchor="middle" class="nextText opacity-0">${this.score + 1}</text>
+      </svg>
+    `;
 
-    this.currentText = text;
-    this.nextText = next;
+    shadow.appendChild(style);
+    render(root, shadow);
+
+    this.currentText = shadow.querySelector(".currentText");
+    this.nextText = shadow.querySelector(".nextText");
   }
 
   async runAnimation() {
@@ -66,10 +66,7 @@ export class ScoreCard extends HTMLElement {
     /** @type {KeyframeAnimationOptions} */
     const options = { duration, easing };
 
-    const transform = [
-      { transform: "translateY(0)" },
-      { transform: "translateY(-100%)" },
-    ];
+    const transform = [{ transform: "translateY(0)" }, { transform: "translateY(-100%)" }];
 
     const animations = [];
 
@@ -92,22 +89,18 @@ export class ScoreCard extends HTMLElement {
   }
 
   async attributeChangedCallback(name, oldValue, newValue) {
-    if (
-      name !== "score" ||
-      this.currentText === undefined ||
-      this.nextText === undefined
-    ) {
+    if (name !== "score" || this.currentText === undefined || this.nextText === undefined) {
       return;
     }
 
     this.score = Number(newValue);
 
-    if (Number(newValue) === Number(oldValue) + 1) {
+    if (!this.reducedMotion && Number(newValue) === Number(oldValue) + 1) {
       await this.runAnimation();
     }
 
-    this.currentText.innerHTML = this.score;
-    this.nextText.innerHTML = this.score + 1;
+    this.currentText.textContent = this.score;
+    this.nextText.textContent = this.score + 1;
   }
 }
 

@@ -87,12 +87,14 @@ defmodule Volley.MixProject do
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ash.setup --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["tailwind volley", "esbuild volley"],
+      "assets.build": ["assets.js", "tailwind volley", "esbuild volley"],
       "assets.deploy": [
+        "assets.js",
         "tailwind volley --minify",
         "esbuild volley --minify",
         "phx.digest"
-      ]
+      ],
+      "assets.js": ["cmd --cd assets npm clean-install"]
     ]
   end
 end

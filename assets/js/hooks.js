@@ -43,7 +43,7 @@ Hooks.ScoreCard = {
       timeout && clearTimeout(timeout);
       waitingScore = null;
 
-      scoreElem.setAttribute("score", data.score);
+      scoreElem.setAttribute("score", data[team]);
     });
 
     this.el.addEventListener("click", () => {

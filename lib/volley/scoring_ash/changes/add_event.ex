@@ -1,8 +1,8 @@
-defmodule Volley.Scoring.Changes.AddEvent do
+defmodule Volley.ScoringAsh.Changes.AddEvent do
   use Ash.Resource.Change
 
   defp validate(:type, opts) do
-    types = Volley.Scoring.EventType.types()
+    types = Volley.ScoringAsh.EventType.types()
     type = Keyword.get(opts, :type)
 
     cond do

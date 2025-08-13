@@ -11,11 +11,7 @@ defmodule Volley.Application do
       VolleyWeb.Telemetry,
       Volley.Repo,
       {DNSCluster, query: Application.get_env(:volley, :dns_cluster_query) || :ignore},
-      {Oban,
-       AshOban.config(
-         Application.fetch_env!(:volley, :ash_domains),
-         Application.fetch_env!(:volley, Oban)
-       )},
+      # TODO: re-add oban{Oban, }
       {Phoenix.PubSub, name: Volley.PubSub},
       # Start a worker by calling: Volley.Worker.start_link(arg)
       # {Volley.Worker, arg},

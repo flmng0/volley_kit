@@ -1,4 +1,4 @@
-defmodule Volley.Scoring.Changes.UndoEvents do
+defmodule Volley.ScoringAsh.Changes.UndoEvents do
   use Ash.Resource.Change
 
   @impl true
@@ -7,7 +7,7 @@ defmodule Volley.Scoring.Changes.UndoEvents do
     count = Ash.Changeset.get_argument(changeset, :count)
 
     events =
-      Volley.Scoring.Event
+      Volley.ScoringAsh.Event
       |> Ash.Query.filter(match_id: id)
       |> Ash.Query.sort(inserted_at: :desc)
       |> Ash.Query.offset(count)

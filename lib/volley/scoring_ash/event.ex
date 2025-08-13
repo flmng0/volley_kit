@@ -1,4 +1,4 @@
-defmodule Volley.Scoring.Event do
+defmodule Volley.ScoringAsh.Event do
   use Ash.Resource,
     domain: Volley.Scoring,
     data_layer: AshPostgres.DataLayer

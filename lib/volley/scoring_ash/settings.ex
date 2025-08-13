@@ -1,4 +1,4 @@
-defmodule Volley.Scoring.Settings do
+defmodule Volley.ScoringAsh.Settings do
   use Ash.Resource,
     data_layer: :embedded
 

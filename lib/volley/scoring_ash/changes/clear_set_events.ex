@@ -1,4 +1,4 @@
-defmodule Volley.Scoring.Changes.ClearSetEvents do
+defmodule Volley.ScoringAsh.Changes.ClearSetEvents do
   use Ash.Resource.Change
 
   @impl true
@@ -11,7 +11,7 @@ defmodule Volley.Scoring.Changes.ClearSetEvents do
       else
         id = Ash.Changeset.get_data(changeset, :id)
 
-        Volley.Scoring.Event
+        Volley.ScoringAsh.Event
         |> Ash.Query.filter(match_id: id)
         |> Ash.Query.sort(inserted_at: :desc)
         |> Ash.read!()

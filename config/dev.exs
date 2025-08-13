@@ -1,7 +1,4 @@
 import Config
-config :ash, policies: [show_policy_breakdowns?: true]
-config :ash_oban, debug_all_triggers?: true
-# config :ash, :pub_sub, debug?: true
 
 # Configure your database
 config :volley, Volley.Repo,

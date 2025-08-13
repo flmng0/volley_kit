@@ -1,6 +1,6 @@
-defmodule Volley.Scoring.Match do
+defmodule Volley.ScoringAsh.Match do
   use Ash.Resource,
-    domain: Volley.Scoring,
+    domain: Volley.ScoringAsh,
     notifiers: Ash.Notifier.PubSub,
     data_layer: AshPostgres.DataLayer,
     authorizers: [Ash.Policy.Authorizer],
@@ -9,9 +9,9 @@ defmodule Volley.Scoring.Match do
   alias Volley.Accounts.User
   alias Volley.Accounts.AnonymousUser
 
-  alias Volley.Scoring.Team
-  alias Volley.Scoring.Settings
-  alias Volley.Scoring.Changes
+  alias Volley.ScoringAsh.Team
+  alias Volley.ScoringAsh.Settings
+  alias Volley.ScoringAsh.Changes
 
   postgres do
     table "scoring_matches"
@@ -180,7 +180,7 @@ defmodule Volley.Scoring.Match do
   end
 
   relationships do
-    has_many :events, Volley.Scoring.Event
+    has_many :events, Volley.ScoringAsh.Event
   end
 
   calculations do

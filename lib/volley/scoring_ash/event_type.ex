@@ -1,4 +1,4 @@
-defmodule Volley.Scoring.EventType do
+defmodule Volley.ScoringAsh.EventType do
   @valid_types [:score, :set_won, :substitution, :timeout]
 
   use Ash.Type.NewType,

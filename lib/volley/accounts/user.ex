@@ -1,5 +1,5 @@
 defmodule Volley.Accounts.User do
-  use Ecto.Schema
+  use Volley.Schema
   import Ecto.Changeset
 
   schema "users" do

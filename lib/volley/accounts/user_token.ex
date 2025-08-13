@@ -1,5 +1,5 @@
 defmodule Volley.Accounts.UserToken do
-  use Ecto.Schema
+  use Volley.Schema
   import Ecto.Query
   alias Volley.Accounts.UserToken
 

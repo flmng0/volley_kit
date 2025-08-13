@@ -1,7 +1,7 @@
 defmodule Volley.Accounts.AnonymousUser do
-  use Volley.Schema
+  use Ecto.Schema
 
-  @primary_key {:id, :id, autogenerate: false}
+  @primary_key {:id, Ecto.UUID, autogenerate: false}
 
   embedded_schema do
   end

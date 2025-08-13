@@ -7,9 +7,7 @@
 # General application configuration
 import Config
 
-config :volley, Volley.Repo,
-  migration_primary_keys: [name: :id, type: :binary_id],
-  migration_timestamps: [type: :utc_datetime]
+config :volley, Volley.Repo, migration_timestamps: [type: :utc_datetime]
 
 config :volley, Oban,
   engine: Oban.Engines.Basic,

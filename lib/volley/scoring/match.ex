@@ -1,10 +1,12 @@
 defmodule Volley.Scoring.Match do
-  use Volley.Schema
+  use Ecto.Schema
   import Ecto.Changeset
 
   @team_name_length min: 3, max: 30
 
   schema "matches" do
+    field :public_id, Ecto.UUID, autogenerate: true
+
     field :a_score, :integer, default: 0
     field :b_score, :integer, default: 0
 
@@ -22,7 +24,7 @@ defmodule Volley.Scoring.Match do
     end
 
     belongs_to :owner, Volley.Accounts.User
-    belongs_to :anonymous_owner, Volley.Accounts.AnonymousUser
+    field :anonymous_owner_id, Ecto.UUID
 
     has_many :events, Volley.Scoring.Event
 
@@ -41,7 +43,8 @@ defmodule Volley.Scoring.Match do
 
   def start_changeset(match, params \\ %{}) do
     match
-    |> cast(params, [])
+    |> cast(params, [:anonymous_owner_id])
+    |> cast_assoc(:owner)
     |> cast_embed(:settings, required: true, with: &settings_changeset/2)
   end
 end

@@ -1,7 +1,5 @@
 defmodule Volley.Scoring.Event do
-  use Volley.Schema
-
-  @primary_key {:id, :id, autogenerate: true}
+  use Ecto.Schema
 
   schema "events" do
     field :type, Ecto.Enum, values: [:score, :set_won]

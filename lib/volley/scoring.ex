@@ -1,11 +1,14 @@
 defmodule Volley.Scoring do
-  alias Volley.Scoring.Query
   alias Volley.Accounts.AnonymousUser
   alias Volley.Accounts.User
   alias Volley.Accounts.Scope
 
+  alias Volley.Scoring.MatchSnapshot
+  alias Volley.Scoring.Query
+  alias Volley.Scoring.Match
+  alias Volley.Scoring.Event
+
   alias Volley.Repo
-  alias Volley.Scoring.{Match, Event}
 
   alias Ecto.Changeset
   import Ecto.Query, only: [from: 2]
@@ -18,8 +21,13 @@ defmodule Volley.Scoring do
     Phoenix.PubSub.unsubscribe(Volley.PubSub, "match:#{match.public_id}")
   end
 
-  def broadcast(%Match{} = match, message) do
-    Phoenix.PubSub.broadcast(Volley.PubSub, "match:#{match.public_id}", message)
+  defp maybe_broadcast({:ok, %Match{} = match}) do
+    Phoenix.PubSub.broadcast(Volley.PubSub, "match:#{match.public_id}", {:match_update, match})
+    {:ok, match}
+  end
+
+  defp maybe_broadcast(result) do
+    result
   end
 
   def start_match(%Scope{} = scope, settings \\ %{}) do
@@ -66,6 +74,7 @@ defmodule Volley.Scoring do
     match
     |> Match.update_settings_changeset(%{"settings" => settings})
     |> Repo.update()
+    |> maybe_broadcast()
   end
 
   def score_match(scope, match, team) when is_binary(team) do
@@ -87,6 +96,7 @@ defmodule Volley.Scoring do
         |> Repo.update()
       end
     end)
+    |> maybe_broadcast()
   end
 
   defp put_increment(%Changeset{} = changeset, key, delta \\ 1) do
@@ -111,43 +121,56 @@ defmodule Volley.Scoring do
         |> Repo.update()
       end
     end)
+    |> maybe_broadcast()
+  end
+
+  defp reset_match_with_events(%Match{} = match) do
+    query = match |> Query.score_timeline() |> Ecto.Query.limit(1)
+
+    snapshot =
+      case Repo.one(query) do
+        %{snapshot: snapshot} -> snapshot
+        nil -> %MatchSnapshot{a_score: 0, b_score: 0, a_sets: 0, b_sets: 0}
+      end
+
+    changes = Map.take(snapshot, [:a_score, :b_score, :a_sets, :b_sets])
+
+    match
+    |> Changeset.change(changes)
+    |> Repo.update()
+    |> maybe_broadcast()
   end
 
   def undo_match_event(%Scope{} = scope, %Match{} = match) do
     true = can_score_match?(scope, match)
 
-    with event when not is_nil(event) <- Query.latest_event(match) |> Repo.one(),
-         {:ok, _} <- Repo.delete(event) do
-      if snapshot = Query.score_timeline(match) |> Ecto.Query.limit(1) |> Repo.one() do
-        changes = Map.take(snapshot, [:a_score, :b_score, :a_sets, :b_sets])
-
-        match
-        |> Changeset.change(changes)
-        |> Repo.update()
-      else
-        reset_match_scores(scope, match, true)
+    if event = match |> Query.latest_event() |> Repo.one() do
+      with {:ok, _} <- Repo.delete(event) do
+        reset_match_with_events(match)
       end
     else
-      nil ->
-        {:ok, match}
+      {:ok, match}
     end
   end
 
-  defp reset_match_sets(%Changeset{} = changeset, true) do
-    Changeset.change(changeset, %{a_sets: 0, b_sets: 0})
-  end
-
-  defp reset_match_sets(%Changeset{} = changeset, false) do
-    changeset
-  end
-
-  def reset_match_scores(%Scope{} = scope, %Match{} = match, reset_sets? \\ false) do
+  def reset_match_scores(%Scope{} = scope, %Match{id: match_id} = match, reset_sets? \\ false) do
     true = can_score_match?(scope, match)
 
-    match
-    |> Changeset.change(%{a_score: 0, b_score: 0})
-    |> reset_match_sets(reset_sets?)
-    |> Repo.update()
+    set = Match.current_set(match)
+
+    query =
+      if reset_sets? do
+        from e in Event, where: e.match_id == ^match_id
+      else
+        from e in Event,
+          join: se in subquery(Query.events_with_set()),
+          on: e.id == se.id,
+          where: e.match_id == ^match_id and se.set == ^set and e.type != :set_won
+      end
+
+    Repo.delete_all(query)
+
+    reset_match_with_events(match)
   end
 
   def delete_match(%Scope{} = scope, %Match{} = match) do

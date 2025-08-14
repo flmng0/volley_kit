@@ -26,7 +26,7 @@ defmodule Volley.Scoring.Match do
     belongs_to :owner, Volley.Accounts.User
     field :anonymous_owner_id, Ecto.UUID
 
-    has_many :events, Volley.Scoring.Event
+    has_many :events, Volley.Scoring.Event, on_replace: :delete
 
     timestamps()
   end

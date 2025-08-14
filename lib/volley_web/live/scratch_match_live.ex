@@ -138,12 +138,8 @@ defmodule VolleyWeb.ScratchMatchLive do
   end
 
   @impl true
-  def handle_info(%Phoenix.Socket.Broadcast{topic: "match:" <> id, payload: payload}, socket) do
-    if id == socket.assigns.match.id do
-      %{
-        data: match
-      } = payload
-
+  def handle_info({:match_update, %Match{} = match}, socket) do
+    if match.id == socket.assigns.match.id do
       {:noreply, assign_match(socket, match)}
     else
       {:noreply, socket}

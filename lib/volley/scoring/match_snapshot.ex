@@ -4,7 +4,6 @@ defmodule Volley.Scoring.MatchSnapshot do
   @primary_key false
 
   embedded_schema do
-    field :event_id, :integer
     field :a_score, :integer
     field :b_score, :integer
 

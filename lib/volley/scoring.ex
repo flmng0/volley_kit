@@ -110,12 +110,7 @@ defmodule Volley.Scoring do
 
     with event when not is_nil(event) <- Query.latest_event(match) |> Repo.one(),
          {:ok, _} <- Repo.delete(event) do
-      query =
-        from s in Query.score_timeline(match),
-          order_by: [desc: s.event_id],
-          limit: 1
-
-      if snapshot = Repo.one(query) do
+      if snapshot = Query.score_timeline(match) |> Ecto.Query.limit(1) |> Repo.one() do
         changes = Map.take(snapshot, [:a_score, :b_score, :a_sets, :b_sets])
 
         match
@@ -124,6 +119,9 @@ defmodule Volley.Scoring do
       else
         reset_match_scores(scope, match, true)
       end
+    else
+      nil ->
+        {:ok, match}
     end
   end
 

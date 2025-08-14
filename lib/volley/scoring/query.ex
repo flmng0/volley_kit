@@ -8,17 +8,19 @@ defmodule Volley.Scoring.Query do
   def latest_event(%Match{id: match_id}) do
     from e in Event,
       order_by: [desc: :id],
-      where: e.id == ^match_id,
+      where: e.match_id == ^match_id,
       limit: 1
   end
 
-  def score_timeline(%Match{id: match_id}) do
-    with_set =
-      from e in Event,
-        select: %{e | current_set: count() |> filter(e.type == :set_won) |> over(order_by: e.id)},
-        where: e.match_id == ^match_id
+  def events_with_set(%Match{id: match_id}) do
+    from e in Event,
+      select: map(e, [:id, :type, :team]),
+      select_merge: %{current_set: count() |> filter(e.type == :set_won) |> over(order_by: e.id)},
+      where: e.match_id == ^match_id
+  end
 
-    from e in subquery(with_set),
+  def score_timeline(%Match{} = match) do
+    from e in subquery(events_with_set(match)),
       select: %MatchSnapshot{
         current_set: e.current_set,
         event_id: e.id,
@@ -30,6 +32,7 @@ defmodule Volley.Scoring.Query do
       windows: [
         sets: [order_by: e.current_set],
         score: [partition_by: e.current_set, order_by: e.id]
-      ]
+      ],
+      order_by: [desc: e.id]
   end
 end

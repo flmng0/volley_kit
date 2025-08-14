@@ -41,50 +41,35 @@ defmodule VolleyWeb.MatchSettingsForm do
 
   @impl true
   def update(%{type: type} = assigns, socket) do
-    if socket.assigns[:settings] do
-      {:ok, socket}
-    else
-      socket =
-        socket
-        |> assign(id: assigns.id, type: type)
-        |> apply_update(assigns, type)
+    changeset =
+      %Scoring.Match.Settings{}
+      |> Scoring.Match.settings_changeset()
 
-      {:ok, socket}
-    end
-  end
-
-  def apply_update(socket, _assigns, :create) do
-    form =
-      Scoring.Settings
-      |> AshPhoenix.Form.for_create(:create)
-      |> to_form()
-
-    assign(socket, form: form, trigger_submit: false)
-  end
-
-  def apply_update(socket, assigns, :update) do
-    form =
-      assigns.settings
-      |> AshPhoenix.Form.for_update(:update)
-      |> to_form()
-
-    assign(socket, form: form)
+    {:ok, assign(socket, id: assigns.id, type: type) |> assign_form(changeset)}
   end
 
   @impl true
-  def handle_event("validate", %{"form" => params}, socket) do
-    form = AshPhoenix.Form.validate(socket.assigns.form, params)
-    {:noreply, assign(socket, :form, form)}
+  def handle_event("validate", %{"settings" => params}, socket) do
+    changeset =
+      %Scoring.Match.Settings{}
+      |> Scoring.Match.settings_changeset(params)
+      |> Map.put(:action, :validate)
+
+    {:noreply, assign_form(socket, changeset)}
   end
 
-  def handle_event("submit", %{"form" => form}, socket) do
-    case AshPhoenix.Form.submit(socket.assigns.form, params: form) do
-      {:ok, settings} ->
-        send(self(), {:submit_settings, settings})
+  def handle_event("submit", %{"settings" => params}, socket) do
+    case Scoring.Match.settings_changeset(%Scoring.Match.Settings{}, params) do
+      %Ecto.Changeset{valid?: true} ->
+        send(self(), {:submit_settings, params})
         {:noreply, socket}
 
-      {:error, form} ->
-        {:noreply, assign(socket, :form, form)}
+      changeset ->
+        {:noreply, assign_form(socket, changeset)}
     end
+  end
+
+  defp assign_form(socket, %Ecto.Changeset{} = changeset) do
+    assign(socket, :form, to_form(changeset))
   end
 end

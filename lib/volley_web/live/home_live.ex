@@ -9,7 +9,7 @@ defmodule VolleyWeb.HomeLive do
   def mount(_params, _session, socket) do
     match =
       if socket.assigns.current_scope do
-        Scoring.get_match_by_user!(actor: socket.assigns.current_scope)
+        Scoring.get_match(socket.assigns.current_scope)
       end
 
     socket = assign(socket, :match, match)
@@ -62,16 +62,16 @@ defmodule VolleyWeb.HomeLive do
 
   @impl true
   def handle_event("delete", _params, socket) do
-    Ash.destroy!(socket.assigns.match, action: :destroy, actor: socket.assigns.current_scope)
+    {:ok, _} = Scoring.delete_match(socket.assigns.current_scope, socket.assigns.match)
 
     {:noreply, assign(socket, :match, nil)}
   end
 
   @impl true
   def handle_info({:submit_settings, settings}, socket) do
-    match = Scoring.start_match!(settings, actor: socket.assigns.current_scope)
+    {:ok, match} = Scoring.start_match(socket.assigns.current_scope, settings)
 
-    {:noreply, redirect(socket, to: ~p"/scratch/#{match.id}")}
+    {:noreply, redirect(socket, to: ~p"/scratch/#{match.public_id}")}
   end
 
   attr :title, :string
@@ -110,7 +110,7 @@ defmodule VolleyWeb.HomeLive do
       actions_class="flex flex-row flex-wrap justify-stretch gap-2"
     >
       <:action>
-        <.button href={~p"/scratch/#{@match.id}"} variant="neutral" class="grow max-w-full">
+        <.button href={~p"/scratch/#{@match.public_id}"} variant="neutral" class="grow max-w-full">
           {@match.settings.a_name} vs. {@match.settings.b_name}
         </.button>
       </:action>

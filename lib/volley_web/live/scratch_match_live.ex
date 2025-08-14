@@ -5,13 +5,14 @@ defmodule VolleyWeb.ScratchMatchLive do
 
   import VolleyWeb.MatchComponents
   alias Volley.Scoring
+  alias Volley.Scoring.Match
 
   require Integer
 
   @impl true
   def mount(%{"id" => match_id}, _session, socket) do
-    if match = Scoring.get_match!(match_id, actor: socket.assigns.current_scope) do
-      scorer? = Scoring.can_score?(socket.assigns.current_scope, match, nil)
+    if match = Scoring.get_match_by_public_id(socket.assigns.current_scope, match_id) do
+      scorer? = Scoring.can_score_match?(socket.assigns.current_scope, match)
 
       {:ok, assign_new_match(socket, match, scorer?)}
     else
@@ -139,7 +140,7 @@ defmodule VolleyWeb.ScratchMatchLive do
   @impl true
   def handle_info(%Phoenix.Socket.Broadcast{topic: "match:" <> id, payload: payload}, socket) do
     if id == socket.assigns.match.id do
-      %Ash.Notifier.Notification{
+      %{
         data: match
       } = payload
 
@@ -169,10 +170,10 @@ defmodule VolleyWeb.ScratchMatchLive do
       socket = assign_match(socket, socket.assigns.match, true)
       {:reply, %{wait: true}, socket}
     else
-      match = Scoring.score!(socket.assigns.match, team, actor: socket.assigns.current_scope)
+      {:ok, match} = Scoring.score_match(socket.assigns.current_scope, socket.assigns.match, team)
       socket = assign_match(socket, match)
 
-      wait = match.winning_team in [:a, :b]
+      wait = Match.winning_team(match) != nil
 
       score =
         case team do
@@ -201,10 +202,8 @@ defmodule VolleyWeb.ScratchMatchLive do
   def apply_event(socket, "reset", params) do
     clear_sets? = Map.has_key?(params, "clear_sets")
 
-    match =
-      Scoring.reset_scores!(socket.assigns.match, clear_sets?,
-        actor: socket.assigns.current_scope
-      )
+    {:ok, match} =
+      Scoring.reset_match_scores(socket.assigns.current_scope, socket.assigns.match, clear_sets?)
 
     assign_match(socket, match, true)
   end
@@ -212,14 +211,14 @@ defmodule VolleyWeb.ScratchMatchLive do
   def apply_event(socket, "next_set", _params) do
     %{match: match, winning_team: winning_team} = socket.assigns
 
-    match = Scoring.complete_set!(match, winning_team, actor: socket.assigns.current_scope)
+    {:ok, match} = Scoring.complete_set(socket.assigns.current_scope, match, winning_team)
 
     assign_match(socket, match, true)
   end
 
   defp assign_match(socket, match, reset? \\ false) do
-    winning_team = Scoring.winning_team!(match, actor: socket.assigns.current_scope)
-    current_set = Scoring.current_set!(match, actor: socket.assigns.current_scope)
+    winning_team = Match.winning_team(match)
+    current_set = Match.current_set(match)
 
     socket =
       if reset? do
@@ -236,20 +235,16 @@ defmodule VolleyWeb.ScratchMatchLive do
     )
   end
 
-  defp assign_new_match(socket, match, scorer?) do
+  defp assign_new_match(socket, %Match{} = match, scorer?) do
     if old_match = socket.assigns[:match] do
-      old_match
-      |> Scoring.match_topic()
-      |> VolleyWeb.Endpoint.unsubscribe()
+      Scoring.unsubscribe(old_match)
     end
 
     unless scorer? do
-      match
-      |> Scoring.match_topic()
-      |> VolleyWeb.Endpoint.subscribe()
+      Scoring.subscribe(match)
     end
 
-    share_link = url(socket, ~p"/scratch/#{match.id}")
+    share_link = url(socket, ~p"/scratch/#{match.public_id}")
 
     socket
     |> assign(:page_title, "#{match.settings.a_name} vs. #{match.settings.b_name}")

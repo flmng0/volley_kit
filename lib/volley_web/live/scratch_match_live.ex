@@ -194,7 +194,7 @@ defmodule VolleyWeb.ScratchMatchLive do
   end
 
   def apply_event(socket, "undo", _params) do
-    match = Scoring.undo_event!(socket.assigns.match, 1, actor: socket.assigns.current_scope)
+    {:ok, match} = Scoring.undo_match_event(socket.assigns.current_scope, socket.assigns.match)
 
     assign_match(socket, match, true)
   end

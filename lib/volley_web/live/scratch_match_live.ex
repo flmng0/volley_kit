@@ -151,10 +151,8 @@ defmodule VolleyWeb.ScratchMatchLive do
   end
 
   def handle_info({:submit_settings, settings}, socket) do
-    match =
-      Scoring.update_settings!(socket.assigns.match, settings,
-        actor: socket.assigns.current_scope
-      )
+    {:ok, match} =
+      Scoring.update_match_settings(socket.assigns.current_scope, socket.assigns.match, settings)
 
     socket =
       socket

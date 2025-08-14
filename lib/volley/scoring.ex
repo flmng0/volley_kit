@@ -60,6 +60,14 @@ defmodule Volley.Scoring do
     Repo.get_by(Match, public_id: public_id)
   end
 
+  def update_match_settings(%Scope{} = scope, %Match{} = match, settings) do
+    true = is_match_owner?(scope.user, match)
+
+    match
+    |> Match.update_settings_changeset(%{"settings" => settings})
+    |> Repo.update()
+  end
+
   def score_match(scope, match, team) when is_binary(team) do
     score_match(scope, match, String.to_existing_atom(team))
   end

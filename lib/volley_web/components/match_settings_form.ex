@@ -41,17 +41,19 @@ defmodule VolleyWeb.MatchSettingsForm do
 
   @impl true
   def update(%{type: type} = assigns, socket) do
-    changeset =
-      %Scoring.Match.Settings{}
-      |> Scoring.Match.settings_changeset()
+    settings = assigns[:settings] || %Scoring.Match.Settings{}
 
-    {:ok, assign(socket, id: assigns.id, type: type) |> assign_form(changeset)}
+    changeset =
+      Scoring.Match.settings_changeset(settings)
+
+    {:ok,
+     assign(socket, id: assigns.id, type: type, settings: settings) |> assign_form(changeset)}
   end
 
   @impl true
   def handle_event("validate", %{"settings" => params}, socket) do
     changeset =
-      %Scoring.Match.Settings{}
+      socket.assigns.settings
       |> Scoring.Match.settings_changeset(params)
       |> Map.put(:action, :validate)
 

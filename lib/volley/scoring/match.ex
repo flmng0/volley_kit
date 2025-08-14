@@ -13,7 +13,7 @@ defmodule Volley.Scoring.Match do
     field :a_sets, :integer, default: 0
     field :b_sets, :integer, default: 0
 
-    embeds_one :settings, Settings do
+    embeds_one :settings, Settings, on_replace: :update, primary_key: false do
       field :a_name, :string, default: "Team A"
       field :b_name, :string, default: "Team B"
 
@@ -45,6 +45,12 @@ defmodule Volley.Scoring.Match do
     match
     |> cast(params, [:anonymous_owner_id])
     |> cast_assoc(:owner)
+    |> cast_embed(:settings, required: true, with: &settings_changeset/2)
+  end
+
+  def update_settings_changeset(match, params \\ %{}) do
+    match
+    |> cast(params, [])
     |> cast_embed(:settings, required: true, with: &settings_changeset/2)
   end
 

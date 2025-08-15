@@ -13,27 +13,47 @@ defmodule Volley.Scoring do
   alias Ecto.Changeset
   import Ecto.Query, only: [from: 2]
 
+  @moduledoc """
+  Context related to scoring. The main responsibility of this context is to 
+  coordinate events on a match when necessary.
+
+  For example, `Volley.Scoring.score_match/3` will increment the necessary 
+  score, but will also create a new `Volley.Scoring.Event` with type `:score`
+  for the match.
+  """
+
+  @doc """
+  Subscribes to a given resource, and determines the correct topic.
+
+  This module dispatches reource update events with the format:
+
+    {:update, resource}
+  """
   def subscribe(%Match{} = match) do
     Phoenix.PubSub.subscribe(Volley.PubSub, "match:#{match.public_id}")
   end
 
+  @doc "Unsubscribe to updates for a given resource."
   def unsubscribe(%Match{} = match) do
     Phoenix.PubSub.unsubscribe(Volley.PubSub, "match:#{match.public_id}")
   end
 
+  # Broadcast an {:update, resource} message.
   defp broadcast(%Match{} = match) do
     Phoenix.PubSub.broadcast(Volley.PubSub, "match:#{match.public_id}", {:update, match})
   end
 
-  defp maybe_broadcast({:ok, item}) do
-    broadcast(item)
-    {:ok, item}
+  # Used in piping for only broadcasting successful `Repo.update`s
+  defp maybe_broadcast({:ok, resource}) do
+    broadcast(resource)
+    {:ok, resource}
   end
 
   defp maybe_broadcast(result) do
     result
   end
 
+  @doc "Start a new match, and associate it with the given scope."
   def start_match(%Scope{} = scope, settings \\ %{}) do
     associate_owner =
       if scope.anonymous do
@@ -48,18 +68,25 @@ defmodule Volley.Scoring do
     |> Repo.insert()
   end
 
+  # Helper to check if a given Scope owns a given Match.
+  defp is_match_owner?(%Scope{} = scope, %Match{} = match), do: is_match_owner?(scope.user, match)
+
   defp is_match_owner?(%AnonymousUser{} = user, %Match{} = match),
     do: match.anonymous_owner_id == user.id
 
   defp is_match_owner?(%User{} = user, %Match{} = match), do: match.owner_id == user.id
   defp is_match_owner?(_, %Match{} = _), do: false
 
+  # Factory to generate a new Event for a given match
   defp event(%Match{} = match, type, team) do
     %Event{match_id: match.id, type: type, team: team}
   end
 
+  @doc """
+  Does the given scope have permissions to score the given match?
+  """
   def can_score_match?(%Scope{} = scope, %Match{} = match) do
-    is_match_owner?(scope.user, match)
+    is_match_owner?(scope, match)
   end
 
   def get_match(%Scope{} = scope) do
@@ -72,8 +99,16 @@ defmodule Volley.Scoring do
     Repo.get_by(Match, public_id: public_id)
   end
 
+  @doc """
+  Update a match's settings.
+
+  Will reset the state of the given match if the `:set_limit` is changed.
+
+  This is due to a change of `:set_limit` invalidating previous `:set_won`
+  events.
+  """
   def update_match_settings(%Scope{} = scope, %Match{} = match, settings) do
-    true = is_match_owner?(scope.user, match)
+    true = is_match_owner?(scope, match)
 
     changeset = Match.update_settings_changeset(match, %{"settings" => settings})
 
@@ -94,7 +129,8 @@ defmodule Volley.Scoring do
     end)
   end
 
-  def score_match(scope, match, team) when is_binary(team) do
+  @doc "Score a match, if allowed"
+  def score_match(%Scope{} = scope, %Match{} = match, team) when is_binary(team) do
     score_match(scope, match, String.to_existing_atom(team))
   end
 
@@ -116,6 +152,7 @@ defmodule Volley.Scoring do
     |> maybe_broadcast()
   end
 
+  # Changeset helper to put an increment on a field with `key` by a given `delta`
   defp put_increment(%Changeset{} = changeset, key, delta \\ 1) do
     value = Changeset.fetch_field!(changeset, key)
     Changeset.put_change(changeset, key, value + delta)
@@ -141,6 +178,8 @@ defmodule Volley.Scoring do
     |> maybe_broadcast()
   end
 
+  # Helper to reconstruct a match from it's associated events. This is used to 
+  # support undo functionality, and can be used to fix broken match states.
   defp reset_match_with_events(%Match{} = match) do
     query = match |> Query.score_timeline() |> Ecto.Query.limit(1)
 
@@ -158,6 +197,7 @@ defmodule Volley.Scoring do
     |> maybe_broadcast()
   end
 
+  @doc "Undo the scoring event on a match"
   def undo_match_event(%Scope{} = scope, %Match{} = match) do
     true = can_score_match?(scope, match)
 
@@ -172,6 +212,14 @@ defmodule Volley.Scoring do
     end
   end
 
+  @doc """
+  Reset the scores for a match.
+
+  When `reset_sets?` is not provided, it will wipe the events for the current
+  set and only set scores to 0.
+
+  If `reset_sets?` is true, then it will wipe all events.
+  """
   def reset_match_scores(%Scope{} = scope, %Match{} = match, reset_sets? \\ false) do
     true = can_score_match?(scope, match)
 
@@ -196,8 +244,9 @@ defmodule Volley.Scoring do
     end)
   end
 
+  @doc "Delete a match, if allowed"
   def delete_match(%Scope{} = scope, %Match{} = match) do
-    true = is_match_owner?(scope.user, match)
+    true = is_match_owner?(scope, match)
 
     Repo.delete(match)
   end

@@ -14,7 +14,12 @@ config :volley, Oban,
   notifier: Oban.Notifiers.Postgres,
   queues: [default: 10, cleanup: 10],
   repo: Volley.Repo,
-  plugins: [{Oban.Plugins.Cron, []}]
+  plugins: [
+    {Oban.Plugins.Cron,
+     crontab: [
+       {"* * * * *", Volley.Workers.CleanupWorker, args: %{before: [1, "day"]}}
+     ]}
+  ]
 
 config :volley, :scopes,
   user: [

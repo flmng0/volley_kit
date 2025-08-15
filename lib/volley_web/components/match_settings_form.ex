@@ -1,10 +1,10 @@
 defmodule VolleyWeb.MatchSettingsForm do
   use VolleyWeb, :live_component
 
-  alias Volley.Scoring
+  alias Volley.Scoring.Match
 
   attr :type, :atom, values: [:create, :update]
-  attr :settings, :map, default: nil
+  attr :settings, Match.Settings, default: nil
 
   @impl true
   def render(assigns) do
@@ -23,12 +23,19 @@ defmodule VolleyWeb.MatchSettingsForm do
 
         <.input field={f[:set_limit]} label="Set Limit" />
 
-        <div class="mt-6 flex justify-end">
+        <div class="mt-6 flex justify-end items-center gap-4">
           <%= if @type == :create do %>
             <.button type="submit" variant="primary" class="btn-block">
               Start Match <.icon name="hero-flag" class="size-4 ml-2" />
             </.button>
           <% else %>
+            <div
+              :if={to_string(@form[:set_limit].value) != to_string(@settings.set_limit)}
+              class="alert alert-warning grow py-2"
+            >
+              <.icon name="hero-exclamation-triangle" />
+              <span>Warning: changing set limit will reset scores and sets as well!</span>
+            </div>
             <.button type="submit" variant="primary">
               Save <.icon name="hero-beaker-solid" />
             </.button>
@@ -41,10 +48,9 @@ defmodule VolleyWeb.MatchSettingsForm do
 
   @impl true
   def update(%{type: type} = assigns, socket) do
-    settings = assigns[:settings] || %Scoring.Match.Settings{}
+    settings = assigns[:settings] || %Match.Settings{}
 
-    changeset =
-      Scoring.Match.settings_changeset(settings)
+    changeset = Match.settings_changeset(settings)
 
     {:ok,
      assign(socket, id: assigns.id, type: type, settings: settings) |> assign_form(changeset)}
@@ -54,14 +60,14 @@ defmodule VolleyWeb.MatchSettingsForm do
   def handle_event("validate", %{"settings" => params}, socket) do
     changeset =
       socket.assigns.settings
-      |> Scoring.Match.settings_changeset(params)
+      |> Match.settings_changeset(params)
       |> Map.put(:action, :validate)
 
     {:noreply, assign_form(socket, changeset)}
   end
 
   def handle_event("submit", %{"settings" => params}, socket) do
-    case Scoring.Match.settings_changeset(%Scoring.Match.Settings{}, params) do
+    case Match.settings_changeset(%Match.Settings{}, params) do
       %Ecto.Changeset{valid?: true} ->
         send(self(), {:submit_settings, params})
         {:noreply, socket}

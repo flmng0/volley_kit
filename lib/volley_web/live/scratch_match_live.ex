@@ -138,7 +138,7 @@ defmodule VolleyWeb.ScratchMatchLive do
   end
 
   @impl true
-  def handle_info({:match_update, %Match{} = match}, socket) do
+  def handle_info({:update, %Match{} = match}, socket) do
     if match.id == socket.assigns.match.id do
       {:noreply, assign_match(socket, match)}
     else
@@ -153,7 +153,7 @@ defmodule VolleyWeb.ScratchMatchLive do
     socket =
       socket
       |> assign(:editing?, false)
-      |> assign_match(match)
+      |> assign_match(match, true)
 
     {:noreply, socket}
   end

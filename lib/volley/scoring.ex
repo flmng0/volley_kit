@@ -21,9 +21,13 @@ defmodule Volley.Scoring do
     Phoenix.PubSub.unsubscribe(Volley.PubSub, "match:#{match.public_id}")
   end
 
-  defp maybe_broadcast({:ok, %Match{} = match}) do
-    Phoenix.PubSub.broadcast(Volley.PubSub, "match:#{match.public_id}", {:match_update, match})
-    {:ok, match}
+  defp broadcast(%Match{} = match) do
+    Phoenix.PubSub.broadcast(Volley.PubSub, "match:#{match.public_id}", {:update, match})
+  end
+
+  defp maybe_broadcast({:ok, item}) do
+    broadcast(item)
+    {:ok, item}
   end
 
   defp maybe_broadcast(result) do
@@ -71,10 +75,23 @@ defmodule Volley.Scoring do
   def update_match_settings(%Scope{} = scope, %Match{} = match, settings) do
     true = is_match_owner?(scope.user, match)
 
-    match
-    |> Match.update_settings_changeset(%{"settings" => settings})
-    |> Repo.update()
-    |> maybe_broadcast()
+    changeset = Match.update_settings_changeset(match, %{"settings" => settings})
+
+    set_limit_changed? =
+      changeset
+      |> Changeset.fetch_change!(:settings)
+      |> Changeset.changed?(:set_limit)
+
+    Repo.transact(fn ->
+      with {:ok, match} <- Repo.update(changeset) do
+        if set_limit_changed? do
+          reset_match_scores(scope, match, true)
+        else
+          broadcast(match)
+          {:ok, match}
+        end
+      end
+    end)
   end
 
   def score_match(scope, match, team) when is_binary(team) do
@@ -170,11 +187,13 @@ defmodule Volley.Scoring do
           where: se.set == ^set and e.type != :set_won
       end
 
-    query
-    |> Ecto.Query.exclude(:order_by)
-    |> Repo.delete_all()
+    Repo.transact(fn ->
+      query
+      |> Ecto.Query.exclude(:order_by)
+      |> Repo.delete_all()
 
-    reset_match_with_events(match)
+      reset_match_with_events(match)
+    end)
   end
 
   def delete_match(%Scope{} = scope, %Match{} = match) do

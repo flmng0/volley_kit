@@ -9,7 +9,7 @@ defmodule Volley.Repo.Migrations.CreateUsersAuthTables do
       add :hashed_password, :string
       add :confirmed_at, :utc_datetime
 
-      timestamps(type: :utc_datetime)
+      timestamps()
     end
 
     create unique_index(:users, [:email])
@@ -21,7 +21,7 @@ defmodule Volley.Repo.Migrations.CreateUsersAuthTables do
       add :sent_to, :string
       add :authenticated_at, :utc_datetime
 
-      timestamps(type: :utc_datetime, updated_at: false)
+      timestamps(updated_at: false)
     end
 
     create index(:users_tokens, [:user_id])

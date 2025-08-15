@@ -1,10 +1,10 @@
 defmodule VolleyWeb.MatchSettingsForm do
   use VolleyWeb, :live_component
 
-  alias Volley.Scoring
+  alias Volley.Scoring.Match
 
   attr :type, :atom, values: [:create, :update]
-  attr :settings, :map, default: nil
+  attr :settings, Match.Settings, default: nil
 
   @impl true
   def render(assigns) do
@@ -23,12 +23,19 @@ defmodule VolleyWeb.MatchSettingsForm do
 
         <.input field={f[:set_limit]} label="Set Limit" />
 
-        <div class="mt-6 flex justify-end">
+        <div class="mt-6 flex justify-end items-center gap-4">
           <%= if @type == :create do %>
             <.button type="submit" variant="primary" class="btn-block">
               Start Match <.icon name="hero-flag" class="size-4 ml-2" />
             </.button>
           <% else %>
+            <div
+              :if={to_string(@form[:set_limit].value) != to_string(@settings.set_limit)}
+              class="alert alert-warning grow py-2"
+            >
+              <.icon name="hero-exclamation-triangle" />
+              <span>Warning: changing set limit will reset scores and sets as well!</span>
+            </div>
             <.button type="submit" variant="primary">
               Save <.icon name="hero-beaker-solid" />
             </.button>
@@ -41,50 +48,36 @@ defmodule VolleyWeb.MatchSettingsForm do
 
   @impl true
   def update(%{type: type} = assigns, socket) do
-    if socket.assigns[:settings] do
-      {:ok, socket}
-    else
-      socket =
-        socket
-        |> assign(id: assigns.id, type: type)
-        |> apply_update(assigns, type)
+    settings = assigns[:settings] || %Match.Settings{}
 
-      {:ok, socket}
-    end
-  end
+    changeset = Match.settings_changeset(settings)
 
-  def apply_update(socket, _assigns, :create) do
-    form =
-      Scoring.Settings
-      |> AshPhoenix.Form.for_create(:create)
-      |> to_form()
-
-    assign(socket, form: form, trigger_submit: false)
-  end
-
-  def apply_update(socket, assigns, :update) do
-    form =
-      assigns.settings
-      |> AshPhoenix.Form.for_update(:update)
-      |> to_form()
-
-    assign(socket, form: form)
+    {:ok,
+     assign(socket, id: assigns.id, type: type, settings: settings) |> assign_form(changeset)}
   end
 
   @impl true
-  def handle_event("validate", %{"form" => params}, socket) do
-    form = AshPhoenix.Form.validate(socket.assigns.form, params)
-    {:noreply, assign(socket, :form, form)}
+  def handle_event("validate", %{"settings" => params}, socket) do
+    changeset =
+      socket.assigns.settings
+      |> Match.settings_changeset(params)
+      |> Map.put(:action, :validate)
+
+    {:noreply, assign_form(socket, changeset)}
   end
 
-  def handle_event("submit", %{"form" => form}, socket) do
-    case AshPhoenix.Form.submit(socket.assigns.form, params: form) do
-      {:ok, settings} ->
-        send(self(), {:submit_settings, settings})
+  def handle_event("submit", %{"settings" => params}, socket) do
+    case Match.settings_changeset(%Match.Settings{}, params) do
+      %Ecto.Changeset{valid?: true} ->
+        send(self(), {:submit_settings, params})
         {:noreply, socket}
 
-      {:error, form} ->
-        {:noreply, assign(socket, :form, form)}
+      changeset ->
+        {:noreply, assign_form(socket, changeset)}
     end
+  end
+
+  defp assign_form(socket, %Ecto.Changeset{} = changeset) do
+    assign(socket, :form, to_form(changeset))
   end
 end

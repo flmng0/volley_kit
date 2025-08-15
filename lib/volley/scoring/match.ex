@@ -1,222 +1,75 @@
 defmodule Volley.Scoring.Match do
-  use Ash.Resource,
-    domain: Volley.Scoring,
-    notifiers: Ash.Notifier.PubSub,
-    data_layer: AshPostgres.DataLayer,
-    authorizers: [Ash.Policy.Authorizer],
-    extensions: [AshOban]
+  use Ecto.Schema
+  import Ecto.Changeset
 
-  alias Volley.Accounts.User
-  alias Volley.Accounts.AnonymousUser
+  @team_name_length min: 3, max: 30
 
-  alias Volley.Scoring.Team
-  alias Volley.Scoring.Settings
-  alias Volley.Scoring.Changes
+  schema "matches" do
+    field :public_id, Ecto.UUID, autogenerate: true
 
-  postgres do
-    table "scoring_matches"
-    repo Volley.Repo
+    field :a_score, :integer, default: 0
+    field :b_score, :integer, default: 0
+
+    field :a_sets, :integer, default: 0
+    field :b_sets, :integer, default: 0
+
+    embeds_one :settings, Settings, on_replace: :update, primary_key: false do
+      field :a_name, :string, default: "Team A"
+      field :b_name, :string, default: "Team B"
+
+      field :set_limit, :integer, default: 25
+
+      field :total_sets, :integer
+      field :final_set_limit, :integer
+    end
+
+    belongs_to :owner, Volley.Accounts.User
+    field :anonymous_owner_id, Ecto.UUID
+
+    has_many :events, Volley.Scoring.Event, on_replace: :delete
+
+    timestamps()
   end
 
-  oban do
-    triggers do
-      trigger :clean_old do
-        scheduler_cron "@daily"
-        worker_module_name __MODULE__.CleanOld.Worker
-        scheduler_module_name __MODULE__.CleanOld.Scheduler
-        action :destroy
-        queue :cleanup
-        read_action :read
-        where expr(is_old)
-      end
-    end
+  def settings_changeset(settings, params \\ %{}) do
+    settings
+    |> cast(params, [:a_name, :b_name, :set_limit, :total_sets, :final_set_limit])
+    |> validate_required([:a_name, :b_name, :set_limit])
+    |> validate_length(:a_name, @team_name_length)
+    |> validate_length(:b_name, @team_name_length)
+    |> validate_number(:set_limit, greater_than: 1)
+    |> validate_number(:final_set_limit, greater_than: 1)
   end
 
-  actions do
-    defaults [:read, :destroy]
+  def start_changeset(match, params \\ %{}) do
+    match
+    |> cast(params, [:anonymous_owner_id])
+    |> cast_assoc(:owner)
+    |> cast_embed(:settings, required: true, with: &settings_changeset/2)
+  end
 
-    create :start do
-      accept [:settings]
+  def update_settings_changeset(match, params \\ %{}) do
+    match
+    |> cast(params, [])
+    |> cast_embed(:settings, required: true, with: &settings_changeset/2)
+  end
 
-      change fn changeset, context ->
-        case context.actor.user do
-          %AnonymousUser{} = user ->
-            Ash.Changeset.change_attribute(changeset, :anonymous_owner_id, user.id)
+  def winning_team(%__MODULE__{} = match), do: winning_team(match, match.settings.set_limit)
 
-          %User{} = user ->
-            Ash.Changeset.change_attribute(changeset, :owner_id, user.id)
-        end
-      end
-    end
+  def winning_team(%__MODULE__{} = match, set_limit) do
+    cond do
+      match.a_score >= set_limit and match.a_score >= match.b_score + 2 ->
+        :a
 
-    read :get_by_user do
-      filter expr(
-               if ^actor(:anonymous) do
-                 anonymous_owner_id == ^actor([:user, :id])
-               else
-                 owner_id == ^actor([:user, :id])
-               end
-             )
-    end
+      match.b_score >= set_limit and match.b_score >= match.a_score + 2 ->
+        :b
 
-    update :update_settings do
-      accept [:settings]
-    end
-
-    update :reset_scores do
-      argument :clear_sets?, :boolean, default: false
-
-      require_atomic? false
-
-      change set_attribute(:a_score, 0)
-      change set_attribute(:b_score, 0)
-
-      change set_attribute(:a_sets, 0), where: argument_equals(:clear_sets?, true)
-      change set_attribute(:b_sets, 0), where: argument_equals(:clear_sets?, true)
-
-      change {Changes.ClearSetEvents, []}
-    end
-
-    update :score do
-      argument :team, Team
-      require_atomic? false
-
-      change increment(:a_score), where: argument_equals(:team, :a)
-      change increment(:b_score), where: argument_equals(:team, :b)
-
-      change {Changes.AddEvent, type: :score}
-
-      load :events
-      load :current_set
-      load :winning_team
-    end
-
-    update :complete_set do
-      argument :team, Team
-
-      require_atomic? false
-
-      change increment(:a_sets), where: argument_equals(:team, :a)
-      change increment(:b_sets), where: argument_equals(:team, :b)
-
-      change set_attribute(:a_score, 0)
-      change set_attribute(:b_score, 0)
-
-      change {Changes.AddEvent, type: :set_won}
-    end
-
-    update :undo do
-      argument :count, :integer do
-        allow_nil? false
-        constraints min: 1
-        default 1
-      end
-
-      require_atomic? false
-
-      change {Changes.UndoEvents, []}
-    end
-
-    destroy :finish do
-      primary? true
-      soft? true
-
-      change set_attribute(:finished?, true)
+      true ->
+        nil
     end
   end
 
-  policies do
-    bypass AshOban.Checks.AshObanInteraction do
-      authorize_if always()
-    end
-
-    policy_group action_type([:update, :destroy]) do
-      policy actor_attribute_equals(:anonymous, true) do
-        authorize_if expr(anonymous_owner_id == ^actor([:user, :id]))
-      end
-
-      policy actor_attribute_equals(:anonymous, false) do
-        authorize_if expr(owner_id == ^actor([:user, :id]))
-      end
-    end
-
-    policy action_type(:create) do
-      authorize_if actor_present()
-    end
-
-    policy action_type(:read) do
-      authorize_if always()
-    end
-  end
-
-  pub_sub do
-    module VolleyWeb.Endpoint
-
-    prefix "match"
-
-    publish :start, "start"
-    publish :score, [:id]
-    publish :complete_set, [:id]
-    publish :update_settings, [:id]
-  end
-
-  attributes do
-    uuid_primary_key :id
-
-    create_timestamp :inserted_at
-    update_timestamp :updated_at
-
-    attribute :owner_id, :integer, allow_nil?: true
-    attribute :anonymous_owner_id, :string, allow_nil?: true
-
-    attribute :a_score, :integer, default: 0, constraints: [min: 0]
-    attribute :b_score, :integer, default: 0, constraints: [min: 0]
-    attribute :a_sets, :integer, default: 0, constraints: [min: 0]
-    attribute :b_sets, :integer, default: 0, constraints: [min: 0]
-
-    attribute :settings, Settings, public?: true, allow_nil?: false
-
-    attribute :finished?, :boolean
-  end
-
-  relationships do
-    has_many :events, Volley.Scoring.Event
-  end
-
-  calculations do
-    # zero-indexed current set
-    calculate :current_set, :integer, expr(a_sets + b_sets)
-
-    # the current set limit, accounting for if final set
-    calculate :set_limit,
-              :integer,
-              expr(
-                cond do
-                  is_nil(settings[:total_sets]) or is_nil(settings[:final_set_limit]) ->
-                    settings[:set_limit]
-
-                  current_set + 1 < settings[:total_sets] ->
-                    settings[:set_limit]
-
-                  true ->
-                    settings[:final_set_limit]
-                end
-              ) do
-      load :current_set
-    end
-
-    # get the current winning team, if any
-    calculate :winning_team,
-              Team,
-              expr(
-                cond do
-                  a_score >= set_limit && a_score >= b_score + 2 -> :a
-                  b_score >= set_limit && b_score >= a_score + 2 -> :b
-                  true -> nil
-                end
-              ),
-              load: :set_limit
-
-    calculate :is_old, :boolean, expr(is_nil(owner_id) and updated_at < ago(1, :day))
+  def current_set(%__MODULE__{} = match) do
+    match.a_sets + match.b_sets
   end
 end

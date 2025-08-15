@@ -5,23 +5,25 @@ defmodule Volley.Scoring.Query do
   alias Volley.Scoring.Event
   alias Volley.Scoring.Match
 
-  def latest_event(%Match{id: match_id}) do
+  def match_events(%Match{id: match_id}) do
     from e in Event,
       order_by: [desc: :id],
-      where: e.match_id == ^match_id,
-      limit: 1
+      where: e.match_id == ^match_id
   end
 
   def events_with_set() do
     from e in Event,
       select: %{
         id: e.id,
-        set: count() |> filter(e.type == :set_won) |> over(order_by: e.id)
+        set:
+          count(e.id)
+          |> filter(e.type == :set_won)
+          |> over(partition_by: e.match_id, order_by: e.id)
       }
   end
 
   def score_timeline(%Match{} = match) do
-    from e in Event,
+    from e in match_events(match),
       join: se in subquery(events_with_set()),
       as: :events_with_set,
       on: e.id == se.id,

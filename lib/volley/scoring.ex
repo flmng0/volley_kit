@@ -144,7 +144,9 @@ defmodule Volley.Scoring do
   def undo_match_event(%Scope{} = scope, %Match{} = match) do
     true = can_score_match?(scope, match)
 
-    if event = match |> Query.latest_event() |> Repo.one() do
+    query = match |> Query.match_events() |> Ecto.Query.limit(1)
+
+    if event = Repo.one(query) do
       with {:ok, _} <- Repo.delete(event) do
         reset_match_with_events(match)
       end
@@ -153,22 +155,24 @@ defmodule Volley.Scoring do
     end
   end
 
-  def reset_match_scores(%Scope{} = scope, %Match{id: match_id} = match, reset_sets? \\ false) do
+  def reset_match_scores(%Scope{} = scope, %Match{} = match, reset_sets? \\ false) do
     true = can_score_match?(scope, match)
 
     set = Match.current_set(match)
 
     query =
       if reset_sets? do
-        from e in Event, where: e.match_id == ^match_id
+        Query.match_events(match)
       else
-        from e in Event,
+        from e in Query.match_events(match),
           join: se in subquery(Query.events_with_set()),
           on: e.id == se.id,
-          where: e.match_id == ^match_id and se.set == ^set and e.type != :set_won
+          where: se.set == ^set and e.type != :set_won
       end
 
-    Repo.delete_all(query)
+    query
+    |> Ecto.Query.exclude(:order_by)
+    |> Repo.delete_all()
 
     reset_match_with_events(match)
   end

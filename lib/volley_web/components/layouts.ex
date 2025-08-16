@@ -59,7 +59,7 @@ defmodule VolleyWeb.Layouts do
       <main class="max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto space-y-6 pb-16">
         <div
           class={[
-            "fullscreen:max-w-none space-y-2",
+            "fullscreen:max-w-none space-y-2 fullscreen:z-40",
             "fullscreen:fixed fullscreen:inset-0 fullscreen:isolate"
           ]}
           id="scoringContainer"

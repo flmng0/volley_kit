@@ -131,7 +131,7 @@ defmodule VolleyWeb.Layouts do
       </div>
       <ul class="menu menu-horizontal w-full relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
         <.theme_toggle />
-        <.user_buttons current_scope={@current_scope} />
+        <%!-- <.user_buttons current_scope={@current_scope} /> --%>
       </ul>
     </header>
     """

@@ -9,7 +9,7 @@ defmodule Volley.Accounts.UserNotifier do
     email =
       new()
       |> to(recipient)
-      |> from({"Volley", "contact@example.com"})
+      |> from({"Volley Kit", "noreply+volley-kit@tmthy.dev"})
       |> subject(subject)
       |> text_body(body)
 

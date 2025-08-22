@@ -116,4 +116,8 @@ if config_env() == :prod do
   #     config :swoosh, :api_client, Swoosh.ApiClient.Req
   #
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
+
+  config :volley, Volley.Mailer,
+    adapter: Swoosh.Adapters.SMTP2GO,
+    api_key: System.get_env("SMTP2GO_API_KEY")
 end

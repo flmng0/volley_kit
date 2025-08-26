@@ -65,6 +65,7 @@ config :volley, VolleyWeb.Endpoint,
 
 # Enable dev routes for dashboard and mailbox
 config :volley, dev_routes: true
+config :volley, skip_admin_check: true
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :default_formatter, format: "[$level] $message\n"

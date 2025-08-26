@@ -72,7 +72,9 @@ defmodule VolleyWeb.UserAuth do
       |> assign(:current_scope, Scope.for_user(user))
       |> maybe_reissue_user_session_token(user, token_inserted_at)
     else
-      nil -> assign(conn, :current_scope, Scope.for_user(nil))
+      # nil -> assign(conn, :current_scope, Scope.for_user(%AnonymousUser{id: }))
+      nil ->
+        assign(conn, :current_scope, Scope.for_user(nil))
     end
   end
 
@@ -98,6 +100,17 @@ defmodule VolleyWeb.UserAuth do
       create_or_extend_session(conn, user, %{})
     else
       conn
+    end
+  end
+
+  def fetch_current_scope_for_anonymous_user(conn, _opts) do
+    if Accounts.known_user?(conn.assigns.current_scope) do
+      conn
+    else
+      id = get_session(conn, "anonymous_user_id")
+      scope = %AnonymousUser{id: id} |> Scope.for_user()
+
+      assign(conn, :current_scope, scope)
     end
   end
 
@@ -219,7 +232,7 @@ defmodule VolleyWeb.UserAuth do
   def on_mount(:require_authenticated, _params, session, socket) do
     socket = mount_current_scope(socket, session)
 
-    if Scope.known_user?(socket.assigns.current_scope) do
+    if Accounts.known_user?(socket.assigns.current_scope.user) do
       {:cont, socket}
     else
       socket =
@@ -231,10 +244,20 @@ defmodule VolleyWeb.UserAuth do
     end
   end
 
+  def on_mount(:require_admin_user, _params, session, socket) do
+    socket = mount_current_scope(socket, session)
+
+    if socket.assigns.current_scope && Accounts.admin_user?(socket.assigns.current_scope.user) do
+      {:cont, socket}
+    else
+      {:halt, Phoenix.LiveView.redirect(socket, to: ~p"/")}
+    end
+  end
+
   def on_mount(:require_sudo_mode, _params, session, socket) do
     socket = mount_current_scope(socket, session)
 
-    if Accounts.sudo_mode?(socket.assigns.current_scope.user, -10) do
+    if socket.assigns.current_scope && Accounts.sudo_mode?(socket.assigns.current_scope.user, -10) do
       {:cont, socket}
     else
       socket =
@@ -277,13 +300,23 @@ defmodule VolleyWeb.UserAuth do
   Plug for routes that require the user to be authenticated.
   """
   def require_authenticated_user(conn, _opts) do
-    if conn.assigns.current_scope && conn.assigns.current_scope.user do
+    if conn.assigns.current_scope && Accounts.known_user?(conn.assigns.current_scope.user) do
       conn
     else
       conn
       |> put_flash(:error, "You must log in to access this page.")
       |> maybe_store_return_to()
       |> redirect(to: ~p"/users/log-in")
+      |> halt()
+    end
+  end
+
+  def require_admin_user(conn, _opts) do
+    if dbg(conn.assigns.current_scope) && Accounts.admin_user?(conn.assigns.current_scope.user) do
+      conn
+    else
+      conn
+      |> redirect(to: ~p"/")
       |> halt()
     end
   end

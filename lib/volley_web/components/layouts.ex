@@ -4,6 +4,7 @@ defmodule VolleyWeb.Layouts do
   used by your application.
   """
   use VolleyWeb, :html
+  alias Volley.Accounts
 
   # Embed all files in layouts/* within this module.
   # The default root.html.heex file contains the HTML
@@ -138,10 +139,10 @@ defmodule VolleyWeb.Layouts do
   end
 
   attr :current_scope, :map, default: nil
-  
+
   def user_buttons(assigns) do
     ~H"""
-    <%= if known_user?(@current_scope) do %>
+    <%= if Accounts.known_user?(@current_scope) do %>
       <li>
         {@current_scope.user.email}
       </li>

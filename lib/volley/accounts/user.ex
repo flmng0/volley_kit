@@ -8,6 +8,7 @@ defmodule Volley.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime
     field :authenticated_at, :utc_datetime, virtual: true
+    field :admin?, :boolean, source: :is_admin
 
     timestamps(type: :utc_datetime)
   end

@@ -35,6 +35,7 @@ defmodule Volley.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:ecto_psql_extras, "~> 0.6"},
       {:oban, "~> 2.0"},
       {:bcrypt_elixir, "~> 3.0"},
       {:phoenix, "~> 1.8.0-rc.4", override: true},

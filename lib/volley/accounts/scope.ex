@@ -34,7 +34,4 @@ defmodule Volley.Accounts.Scope do
   end
 
   def for_user(nil), do: nil
-
-  def known_user?(%__MODULE__{user: %User{}}), do: true
-  def known_user?(_), do: false
 end

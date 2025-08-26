@@ -6,7 +6,7 @@ defmodule Volley.Accounts do
   import Ecto.Query, warn: false
   alias Volley.Repo
 
-  alias Volley.Accounts.{User, UserToken, UserNotifier}
+  alias Volley.Accounts.{User, UserToken, UserNotifier, Scope}
 
   ## Database getters
 
@@ -78,6 +78,18 @@ defmodule Volley.Accounts do
     %User{}
     |> User.email_changeset(attrs)
     |> Repo.insert()
+  end
+
+  def known_user?(%Scope{user: user}), do: known_user?(user)
+  def known_user?(%User{}), do: true
+  def known_user?(_), do: false
+
+  if Application.compile_env(:volley, :skip_admin_check) do
+    def admin_user?(_), do: true
+  else
+    def admin_user?(%Scope{user: user}), do: admin_user?(user)
+    def admin_user?(%User{admin?: admin?}), do: admin?
+    def admin_user?(_), do: false
   end
 
   ## Settings

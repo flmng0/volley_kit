@@ -12,7 +12,7 @@ defmodule VolleyWeb.UserLive.Login do
           <.header>
             <p>Log in</p>
             <:subtitle>
-              <%= if known_user?(@current_scope) do %>
+              <%= if Accounts.known_user?(@current_scope) do %>
                 You need to reauthenticate to perform sensitive actions on your account.
               <% else %>
                 Don't have an account? <.link
@@ -43,7 +43,7 @@ defmodule VolleyWeb.UserLive.Login do
           phx-submit="submit_magic"
         >
           <.input
-            readonly={known_user?(@current_scope)}
+            readonly={Accounts.known_user?(@current_scope)}
             field={f[:email]}
             type="email"
             label="Email"
@@ -67,7 +67,7 @@ defmodule VolleyWeb.UserLive.Login do
           phx-trigger-action={@trigger_submit}
         >
           <.input
-            readonly={known_user?(@current_scope)}
+            readonly={Accounts.known_user?(@current_scope)}
             field={f[:email]}
             type="email"
             label="Email"

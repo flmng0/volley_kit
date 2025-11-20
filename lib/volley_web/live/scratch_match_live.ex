@@ -1,8 +1,6 @@
 defmodule VolleyWeb.ScratchMatchLive do
   use VolleyWeb, :live_view
 
-  on_mount {VolleyWeb.UserAuth, :mount_current_scope}
-
   import VolleyWeb.MatchComponents
   alias Volley.Scoring
   alias Volley.Scoring.Match
@@ -206,7 +204,9 @@ defmodule VolleyWeb.ScratchMatchLive do
     {:ok, match} =
       Scoring.reset_match_scores(socket.assigns.current_scope, socket.assigns.match, clear_sets?)
 
-    assign_match(socket, match, true)
+    socket
+    |> assign_match(match, true)
+    |> push_patch(to: ~p"/scratch/#{match}")
   end
 
   def apply_event(socket, "next_set", _params) do

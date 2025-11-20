@@ -2,6 +2,8 @@ defmodule Volley.Scoring.Match do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Phoenix.Param, key: :public_id}
+
   @team_name_length min: 3, max: 30
 
   schema "matches" do

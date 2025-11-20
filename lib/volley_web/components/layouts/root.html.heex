@@ -35,13 +35,6 @@
     </script>
   </head>
   <body class="px-2 grid grid-rows-[auto_1fr] min-h-screen place-items-center">
-    <.app_header
-      hide_home_button={assigns[:hide_home_button]}
-      current_scope={assigns[:current_scope]}
-    />
-
-    <div class="w-full">
-      {@inner_content}
-    </div>
+    {@inner_content}
   </body>
 </html>

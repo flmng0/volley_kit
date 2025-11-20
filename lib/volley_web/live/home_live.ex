@@ -14,13 +14,13 @@ defmodule VolleyWeb.HomeLive do
 
     socket = assign(socket, :match, match)
 
-    {:ok, assign(socket, :hide_home_button, true)}
+    {:ok, socket}
   end
 
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app hide_home_button={true} flash={@flash}>
+    <Layouts.app flash={@flash} hide_home_button={true}>
       <main class="full-bleed hero">
         <div class="hero-content flex flex-col lg:flex-row gap-y-12">
           <div class="text-center lg:text-left prose">
@@ -71,7 +71,7 @@ defmodule VolleyWeb.HomeLive do
   def handle_info({:submit_settings, settings}, socket) do
     {:ok, match} = Scoring.start_match(socket.assigns.current_scope, settings)
 
-    {:noreply, redirect(socket, to: ~p"/scratch/#{match.public_id}")}
+    {:noreply, push_navigate(socket, to: ~p"/scratch/#{match}")}
   end
 
   attr :title, :string
@@ -110,7 +110,7 @@ defmodule VolleyWeb.HomeLive do
       actions_class="flex flex-row flex-wrap justify-stretch gap-2"
     >
       <:action>
-        <.button href={~p"/scratch/#{@match.public_id}"} variant="neutral" class="grow max-w-full">
+        <.button navigate={~p"/scratch/#{@match}"} variant="neutral" class="grow max-w-full">
           {@match.settings.a_name} vs. {@match.settings.b_name}
         </.button>
       </:action>

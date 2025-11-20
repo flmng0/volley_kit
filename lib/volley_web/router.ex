@@ -22,12 +22,24 @@ defmodule VolleyWeb.Router do
   scope "/", VolleyWeb do
     pipe_through :browser
 
-    live "/", HomeLive
-    live "/scratch/:id", ScratchMatchLive
+    live_session :mount_user,
+      on_mount: [{VolleyWeb.UserAuth, :mount_current_scope}] do
+      live "/", HomeLive
+      live "/scratch/:id", ScratchMatchLive
+      live "/scratch/:id/share", ScratchMatchLive, :share
+      live "/scratch/:id/reset", ScratchMatchLive, :reset
+    end
+  end
 
-    live "/tournament/", TournamentLive, :index
-    live "/tournament/new", TournamentLive, :new
-    live "/tournament/:id", TournamentLive, :view
+  scope "/", VolleyWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :tournament,
+      on_mount: [{VolleyWeb.UserAuth, :require_authenticated}] do
+      live "/tournament/", TournamentLive, :index
+      live "/tournament/new", TournamentLive, :new
+      live "/tournament/:id", TournamentLive, :view
+    end
   end
 
   import Phoenix.LiveDashboard.Router

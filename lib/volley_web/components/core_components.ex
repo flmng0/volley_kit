@@ -427,8 +427,9 @@ defmodule VolleyWeb.CoreComponents do
 
   attr :id, :string, required: true
   attr :class, :string, default: ""
+  attr :close, JS, default: nil
   attr :allow_close, :boolean, default: true
-  attr :rest, :global
+  attr :rest, :global, include: ~w(open)
 
   slot :inner_block, required: true
   slot :action
@@ -450,15 +451,19 @@ defmodule VolleyWeb.CoreComponents do
               <% end %>
             </form>
           </div>
-          <form :if={@allow_close} method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+          <div :if={@close}>
+            <.button
+              class="btn-sm btn-circle btn-ghost absolute right-2 top-2"
+              phx-click={@close}
+              aria-label="close"
+            >
               <.icon name="hero-x-mark" class="size-5 text-base-content/50" />
-            </button>
-          </form>
+            </.button>
+          </div>
         </div>
-        <form :if={@allow_close} method="dialog" class="modal-backdrop">
-          <button>close</button>
-        </form>
+        <div :if={@close} class="modal-backdrop">
+          <button phx-click={@close}>close</button>
+        </div>
       </dialog>
     </.portal>
     """

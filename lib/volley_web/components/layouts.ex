@@ -29,12 +29,18 @@ defmodule VolleyWeb.Layouts do
   attr :flash, :map, required: true, doc: "the map of flash messages"
 
   attr :hide_home_button, :boolean, default: false
+  attr :current_scope, :map, default: nil
 
   slot :inner_block, required: true
 
   def app(assigns) do
     ~H"""
-    <main class="px-2 sm:px-6 lg:px-8">
+    <.app_header
+      hide_home_button={@hide_home_button}
+      current_scope={@current_scope}
+    />
+
+    <main class="w-full px-2 sm:px-6 lg:px-8">
       <div class="bleed-container gap-y-4">
         {render_slot(@inner_block)}
       </div>
@@ -45,6 +51,7 @@ defmodule VolleyWeb.Layouts do
   end
 
   attr :flash, :map, required: true
+  attr :current_scope, :map, default: nil
 
   slot :inner_block, required: true
 
@@ -56,7 +63,7 @@ defmodule VolleyWeb.Layouts do
 
   def scorer(assigns) do
     ~H"""
-    <Layouts.app flash={@flash}>
+    <Layouts.app flash={@flash} current_scope={@current_scope}>
       <main class="w-full max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto space-y-6 pb-16">
         <div
           class={[
@@ -121,15 +128,15 @@ defmodule VolleyWeb.Layouts do
     ~H"""
     <header class={["navbar max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8", @class]} {@rest}>
       <div class="">
-        <a :if={!@hide_home_button} href="/" class="flex w-fit items-center gap-2">
+        <.link :if={!@hide_home_button} navigate="/" class="flex w-fit items-center gap-2">
           <.icon name="hero-home-solid" class="size-6" />
           <%!-- <img src={~p"/images/logo.svg"} width="36" /> --%>
           <span class="text-sm font-semibold text-nowrap">Home</span>
-        </a>
+        </.link>
       </div>
       <ul class="menu menu-horizontal w-full relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
         <.theme_toggle />
-        <%!-- <.user_buttons current_scope={@current_scope} /> --%>
+        <.user_buttons current_scope={@current_scope} />
       </ul>
     </header>
     """

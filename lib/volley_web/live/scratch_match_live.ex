@@ -10,25 +10,25 @@ defmodule VolleyWeb.ScratchMatchLive do
   require Integer
 
   @impl true
-  def mount(%{"id" => match_id}, _session, socket) do
+  def handle_params(%{"id" => match_id}, _uri, socket) do
     if match = Scoring.get_match_by_public_id(socket.assigns.current_scope, match_id) do
       scorer? = Scoring.can_score_match?(socket.assigns.current_scope, match)
 
-      {:ok, assign_new_match(socket, match, scorer?)}
+      {:noreply, assign_new_match(socket, match, scorer?)}
     else
       socket =
         socket
         |> put_flash(:error, "Match with saved ID no longer exists")
         |> redirect(to: ~p"/")
 
-      {:ok, socket}
+      {:noreply, socket}
     end
   end
 
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.scorer flash={@flash}>
+    <Layouts.scorer flash={@flash} current_scope={@current_scope}>
       <.score_container
         match={@match}
         can_score={@scorer?}
@@ -36,7 +36,7 @@ defmodule VolleyWeb.ScratchMatchLive do
         swap={Integer.is_odd(@current_set)}
       />
       <:action>
-        <.button variant="scorer-action" phx-click={show_modal("shareModal")}>
+        <.button variant="scorer-action" patch={~p"/scratch/#{@match}/share"}>
           <.icon name="hero-share" /> Share
         </.button>
       </:action>
@@ -46,7 +46,7 @@ defmodule VolleyWeb.ScratchMatchLive do
         </.button>
       </:action>
       <:action :if={@scorer?}>
-        <.button variant="scorer-action" phx-click={show_modal("resetConfirmModal")}>
+        <.button variant="scorer-action" patch={~p"/scratch/#{@match}/reset"}>
           <.icon name="hero-stop-solid" /> Reset...
         </.button>
       </:action>
@@ -80,7 +80,12 @@ defmodule VolleyWeb.ScratchMatchLive do
       </:footer>
     </Layouts.scorer>
 
-    <.modal id="shareModal" class="flex flex-col items-center text-sm md:text-base">
+    <.modal
+      id="shareModal"
+      class="flex flex-col items-center text-sm md:text-base"
+      open={@live_action == :share}
+      close={JS.patch(~p"/scratch/#{@match}")}
+    >
       <hgroup class="prose">
         <h3>Share Match</h3>
         <p>Scan the QR code below, or copy the sharing link, so other users to view this match.</p>
@@ -91,7 +96,12 @@ defmodule VolleyWeb.ScratchMatchLive do
       <.copy_text id="shareLinkCopy" class="w-full max-w-md" value={@share_link} />
     </.modal>
 
-    <.modal :if={@scorer?} id="resetConfirmModal">
+    <.modal
+      :if={@scorer?}
+      id="resetConfirmModal"
+      open={@live_action == :reset}
+      close={JS.patch(~p"/scratch/#{@match}")}
+    >
       <hgroup class="prose">
         <h3>Are you sure?</h3>
         <p>
@@ -108,9 +118,6 @@ defmodule VolleyWeb.ScratchMatchLive do
         <.button variant="primary" phx-click="reset" phx-value-clear_sets={false}>
           Only Reset Scores
         </.button>
-      </:action>
-      <:action>
-        <.button>Cancel</.button>
       </:action>
     </.modal>
 
@@ -238,7 +245,7 @@ defmodule VolleyWeb.ScratchMatchLive do
       Scoring.subscribe(match)
     end
 
-    share_link = url(socket, ~p"/scratch/#{match.public_id}")
+    share_link = url(socket, ~p"/scratch/#{match}")
 
     socket
     |> assign(:page_title, "#{match.settings.a_name} vs. #{match.settings.b_name}")

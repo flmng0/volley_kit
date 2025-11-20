@@ -99,6 +99,19 @@ defmodule Volley.Scoring do
     Repo.get_by(Match, public_id: public_id)
   end
 
+  defp commit_match_settings(%Scope{} = scope, %Ecto.Changeset{} = changeset, reset?) do
+    Repo.transact(fn ->
+      with {:ok, match} <- Repo.update(changeset) do
+        if reset? do
+          reset_match_scores(scope, match, true)
+        else
+          broadcast(match)
+          {:ok, match}
+        end
+      end
+    end)
+  end
+
   @doc """
   Update a match's settings.
 
@@ -112,21 +125,13 @@ defmodule Volley.Scoring do
 
     changeset = Match.update_settings_changeset(match, %{"settings" => settings})
 
-    set_limit_changed? =
-      changeset
-      |> Changeset.fetch_change!(:settings)
-      |> Changeset.changed?(:set_limit)
+    if settings_changeset = Changeset.get_change(changeset, :settings) do
+      reset? = Changeset.changed?(settings_changeset, :set_limit)
 
-    Repo.transact(fn ->
-      with {:ok, match} <- Repo.update(changeset) do
-        if set_limit_changed? do
-          reset_match_scores(scope, match, true)
-        else
-          broadcast(match)
-          {:ok, match}
-        end
-      end
-    end)
+      commit_match_settings(scope, changeset, reset?)
+    else
+      {:ok, match}
+    end
   end
 
   @doc "Score a match, if allowed"

@@ -24,125 +24,6 @@ defmodule VolleyWeb.ScratchMatchLive do
   end
 
   @impl true
-  def render(assigns) do
-    ~H"""
-    <Layouts.scorer flash={@flash} current_scope={@current_scope}>
-      <.score_container
-        match={@match}
-        can_score={@scorer?}
-        event="score"
-        swap={Integer.is_odd(@current_set)}
-      />
-      <:action>
-        <.button variant="scorer-action" patch={~p"/scratch/#{@match}/share"}>
-          <.icon name="hero-share" /> Share
-        </.button>
-      </:action>
-      <:action :if={@scorer?}>
-        <.button variant="scorer-action" phx-click="undo">
-          <.icon name="hero-arrow-uturn-left" /> Undo
-        </.button>
-      </:action>
-      <:action :if={@scorer?}>
-        <.button variant="scorer-action" patch={~p"/scratch/#{@match}/reset"}>
-          <.icon name="hero-stop-solid" /> Reset...
-        </.button>
-      </:action>
-      <:action :if={@scorer?} show_in_fullscreen?={false}>
-        <.button variant="scorer-action" phx-click="edit">
-          <.icon name={if @editing?, do: "hero-x-mark", else: "hero-adjustments-vertical"} />
-          <%= if @editing? do %>
-            Close Settings
-          <% else %>
-            Settings
-          <% end %>
-        </.button>
-      </:action>
-
-      <:footer :if={@editing?}>
-        <div class="card">
-          <div class="card-body bg-base-200">
-            <h3 class="card-title">
-              <span class="grow">Edit Match Settings</span>
-              <.icon class="size-6" name="hero-adjustments-vertical" />
-            </h3>
-            <.live_component
-              id="settingsEditForm"
-              module={VolleyWeb.MatchSettingsForm}
-              type={:update}
-              settings={@match.settings}
-            >
-            </.live_component>
-          </div>
-        </div>
-      </:footer>
-    </Layouts.scorer>
-
-    <.modal
-      id="shareModal"
-      class="flex flex-col items-center text-sm md:text-base"
-      open={@live_action == :share}
-      close={JS.patch(~p"/scratch/#{@match}")}
-    >
-      <hgroup class="prose">
-        <h3>Share Match</h3>
-        <p>Scan the QR code below, or copy the sharing link, so other users to view this match.</p>
-      </hgroup>
-
-      <.qr_code class="my-6 rounded-md shadow-xl outline outline-base-300" target={@share_link} />
-
-      <.copy_text id="shareLinkCopy" class="w-full max-w-md" value={@share_link} />
-    </.modal>
-
-    <.modal
-      :if={@scorer?}
-      id="resetConfirmModal"
-      open={@live_action == :reset}
-      close={JS.patch(~p"/scratch/#{@match}")}
-    >
-      <hgroup class="prose">
-        <h3>Are you sure?</h3>
-        <p>
-          Ressetting scores will clear the history for the current set. You can also reset the set counts as well, but this will clear all history.
-        </p>
-      </hgroup>
-
-      <:action>
-        <.button variant="delete" phx-click="reset" phx-value-clear_sets={true}>
-          Also Reset Sets
-        </.button>
-      </:action>
-      <:action>
-        <.button variant="primary" phx-click="reset" phx-value-clear_sets={false}>
-          Only Reset Scores
-        </.button>
-      </:action>
-    </.modal>
-
-    <.modal
-      :if={@scorer? and @winning_team in [:a, :b]}
-      id="setCompleteModal"
-      allow_close={false}
-      phx-mounted={show_modal("setCompleteModal")}
-    >
-      <hgroup>
-        <h3 class="text-lg font-bold">Set Complete!</h3>
-        <p>
-          {if @winning_team == :a, do: @match.settings.a_name, else: @match.settings.b_name} has won this set.
-        </p>
-      </hgroup>
-
-      <:action>
-        <.button phx-click="undo">Undo</.button>
-      </:action>
-      <:action>
-        <.button phx-click="next_set" variant="neutral">Continue To Next Set!</.button>
-      </:action>
-    </.modal>
-    """
-  end
-
-  @impl true
   def handle_info({:update, %Match{} = match}, socket) do
     if match.id == socket.assigns.match.id do
       {:noreply, assign_match(socket, match)}
@@ -232,7 +113,8 @@ defmodule VolleyWeb.ScratchMatchLive do
     assign(socket,
       match: match,
       winning_team: winning_team,
-      current_set: current_set
+      current_set: current_set,
+      page_title: "#{match.settings.a_name} vs. #{match.settings.b_name}"
     )
   end
 
@@ -248,7 +130,6 @@ defmodule VolleyWeb.ScratchMatchLive do
     share_link = url(socket, ~p"/scratch/#{match}")
 
     socket
-    |> assign(:page_title, "#{match.settings.a_name} vs. #{match.settings.b_name}")
     |> assign(:share_link, share_link)
     |> assign(:scorer?, scorer?)
     |> assign(:editing?, false)

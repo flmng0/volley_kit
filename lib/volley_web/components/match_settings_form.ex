@@ -30,7 +30,7 @@ defmodule VolleyWeb.MatchSettingsForm do
             </.button>
           <% else %>
             <div
-              :if={to_string(@form[:set_limit].value) != to_string(@settings.set_limit)}
+              :if={used_input?(f[:set_limit])}
               class="alert alert-warning grow py-2"
             >
               <.icon name="hero-exclamation-triangle" />
@@ -52,8 +52,12 @@ defmodule VolleyWeb.MatchSettingsForm do
 
     changeset = Match.settings_changeset(settings)
 
-    {:ok,
-     assign(socket, id: assigns.id, type: type, settings: settings) |> assign_form(changeset)}
+    socket =
+      socket
+      |> assign(id: assigns.id, type: type, settings: settings)
+      |> assign_form(changeset)
+
+    {:ok, socket}
   end
 
   @impl true

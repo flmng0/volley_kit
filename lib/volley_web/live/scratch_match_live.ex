@@ -37,17 +37,17 @@ defmodule VolleyWeb.ScratchMatchLive do
       />
       <:action>
         <.button variant="scorer-action" phx-click={show_modal("shareModal")}>
-          <.icon name="hero-share" /> Share Match
+          <.icon name="hero-share" /> Share
         </.button>
       </:action>
       <:action :if={@scorer?}>
         <.button variant="scorer-action" phx-click="undo">
-          <.icon name="hero-arrow-uturn-left" /> Undo Score
+          <.icon name="hero-arrow-uturn-left" /> Undo
         </.button>
       </:action>
       <:action :if={@scorer?}>
         <.button variant="scorer-action" phx-click={show_modal("resetConfirmModal")}>
-          <.icon name="hero-stop-solid" /> Open Reset Menu
+          <.icon name="hero-stop-solid" /> Reset...
         </.button>
       </:action>
       <:action :if={@scorer?} show_in_fullscreen?={false}>
@@ -56,7 +56,7 @@ defmodule VolleyWeb.ScratchMatchLive do
           <%= if @editing? do %>
             Close Settings
           <% else %>
-            Edit Settings
+            Settings
           <% end %>
         </.button>
       </:action>

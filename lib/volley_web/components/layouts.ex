@@ -57,7 +57,7 @@ defmodule VolleyWeb.Layouts do
   def scorer(assigns) do
     ~H"""
     <Layouts.app flash={@flash}>
-      <main class="max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto space-y-6 pb-16">
+      <main class="w-full max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto space-y-6 pb-16">
         <div
           class={[
             "fullscreen:max-w-none space-y-2 fullscreen:z-40",
@@ -66,39 +66,36 @@ defmodule VolleyWeb.Layouts do
           id="scoringContainer"
         >
           {render_slot(@inner_block)}
-          <div class={[
-            "hidden fullscreen:flex",
-            "fixed w-auto bottom-4 gap-2",
-            "landscape:left-1/2 landscape:-translate-x-1/2",
-            "portrait:left-4 portrait:flex-col-reverse"
-          ]}>
+          <div
+            class="hidden fullscreen:flex fixed bottom-4 gap-2 inset-x-4 bg-transparent"
+            data-theme="dark"
+          >
             <.button
-              class="aspect-square h-auto p-2"
+              class="btn-lg btn-circle"
               phx-click={toggle_fullscreen("#scoringContainer")}
             >
               <.icon name="hero-arrows-pointing-in" class="size-5" />
             </.button>
-            <details class="dropdown dropdown-top">
-              <summary class="btn p-2 aspect-square h-auto">
+            <div class="fab absolute right-0 bottom-0">
+              <div tabindex="0" role="button" class="btn btn-lg btn-circle">
                 <.icon name="hero-ellipsis-horizontal" class="size-5" />
-              </summary>
+              </div>
 
-              <ul
-                class="menu dropdown-content bg-base-300 rounded-box w-56 gap-1"
-                onclick="scoringContainer.querySelector('.dropdown').open = false"
-              >
-                <li :for={action <- @action} :if={Map.get(action, :show_in_fullscreen?, true)}>
-                  {render_slot(action)}
-                </li>
-              </ul>
-            </details>
+              <div class="fab-close btn btn-lg btn-circle btn-error">
+                <.icon name="hero-x-mark" class="size-5" />
+              </div>
+
+              <%= for action <- @action, Map.get(action, :show_in_fullscreen?, true) do %>
+                {render_slot(action)}
+              <% end %>
+            </div>
           </div>
         </div>
 
-        <div class="flex flex-col sm:flex-row gap-1 w-full flex-wrap">
+        <div class="flex gap-1 w-full flex-wrap">
           <div class="text-nowrap basis-max flex-1">
             <.button variant="scorer-action" phx-click={toggle_fullscreen("#scoringContainer")}>
-              <.icon name="hero-arrows-pointing-out" /> Toggle Fullscreen
+              <.icon name="hero-arrows-pointing-out" /> Fullscreen
             </.button>
           </div>
           <div :for={action <- @action} class="text-nowrap basis-max flex-1">

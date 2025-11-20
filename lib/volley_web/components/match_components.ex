@@ -12,7 +12,7 @@ defmodule VolleyWeb.MatchComponents do
     ~H"""
     <div class="size-full touch-none">
       <div class={[
-        "grid rounded-md not-fullscreen:overflow-hidden h-full",
+        "grid rounded-md not-fullscreen:overflow-hidden w-full fullscreen:h-full",
         "not-fullscreen:grid-cols-2 fullscreen:landscape:grid-cols-2 fullscreen:portrait:grid-rows-2"
       ]}>
         <.score_card

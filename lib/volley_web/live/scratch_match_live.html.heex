@@ -51,10 +51,11 @@
 </Layouts.scorer>
 
 <.modal
+  :if={@live_action == :share}
   id="shareModal"
-  class="flex flex-col items-center text-sm md:text-base"
-  open={@live_action == :share}
+  class="flex flex-col items-center text-sm md:text-base z-10"
   close={JS.patch(~p"/scratch/#{@match}")}
+  auto_open
 >
   <hgroup class="prose">
     <h3>Share Match</h3>
@@ -67,10 +68,10 @@
 </.modal>
 
 <.modal
-  :if={@scorer?}
+  :if={@scorer? && @live_action == :reset}
   id="resetConfirmModal"
-  open={@live_action == :reset}
   close={JS.patch(~p"/scratch/#{@match}")}
+  auto_open
 >
   <hgroup class="prose">
     <h3>Are you sure?</h3>
@@ -94,8 +95,7 @@
 <.modal
   :if={@scorer? and @winning_team in [:a, :b]}
   id="setCompleteModal"
-  allow_close={false}
-  phx-mounted={show_modal("setCompleteModal")}
+  auto_open
 >
   <hgroup>
     <h3 class="text-lg font-bold">Set Complete!</h3>

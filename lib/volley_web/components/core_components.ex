@@ -428,7 +428,7 @@ defmodule VolleyWeb.CoreComponents do
   attr :id, :string, required: true
   attr :class, :string, default: ""
   attr :close, JS, default: nil
-  attr :allow_close, :boolean, default: true
+  attr :auto_open, :boolean, default: false
   attr :rest, :global, include: ~w(open)
 
   slot :inner_block, required: true
@@ -437,7 +437,14 @@ defmodule VolleyWeb.CoreComponents do
   def modal(assigns) do
     ~H"""
     <.portal id={"#{@id}Portal"} target="body">
-      <dialog id={@id} {@rest} class="modal" closedby={@allow_close && "auto"}>
+      <dialog
+        id={@id}
+        {@rest}
+        class="modal"
+        data-onclose={@close}
+        closedby={@close || "none"}
+        phx-mounted={@auto_open && show_modal(@id)}
+      >
         <div class={[@class, "modal-box"]}>
           {render_slot(@inner_block)}
 
@@ -451,19 +458,15 @@ defmodule VolleyWeb.CoreComponents do
               <% end %>
             </form>
           </div>
-          <div :if={@close}>
-            <.button
-              class="btn-sm btn-circle btn-ghost absolute right-2 top-2"
-              phx-click={@close}
-              aria-label="close"
-            >
+          <form :if={@close} method="dialog">
+            <.button class="btn-sm btn-circle btn-ghost absolute right-2 top-2" aria-label="close">
               <.icon name="hero-x-mark" class="size-5 text-base-content/50" />
             </.button>
-          </div>
+          </form>
         </div>
-        <div :if={@close} class="modal-backdrop">
-          <button phx-click={@close}>close</button>
-        </div>
+        <form :if={@close} method="dialog" class="modal-backdrop">
+          <button>close</button>
+        </form>
       </dialog>
     </.portal>
     """

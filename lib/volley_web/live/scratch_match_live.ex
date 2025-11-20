@@ -85,9 +85,7 @@ defmodule VolleyWeb.ScratchMatchLive do
     {:ok, match} =
       Scoring.reset_match_scores(socket.assigns.current_scope, socket.assigns.match, clear_sets?)
 
-    socket
-    |> assign_match(match, true)
-    |> push_patch(to: ~p"/scratch/#{match}")
+    assign_match(socket, match, true)
   end
 
   def apply_event(socket, "next_set", _params) do

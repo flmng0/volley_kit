@@ -2,10 +2,16 @@
 // JS.dispatch/2 events.
 
 import { requestFullscreen, exitFullscreen } from "./polyfill";
+import { liveSocket } from "./app";
 
 window.addEventListener("vk:showmodal", function (e) {
   if (e.target instanceof HTMLDialogElement) {
     e.target.showModal();
+    if (e.target.dataset.onclose) {
+      e.target.onclose = () => {
+        liveSocket.execJS(e.target, e.target.dataset.onclose);
+      };
+    }
   } else {
     console.warn("Tried to send `vk:showmodal` event to non-dialog element!");
   }

@@ -56,4 +56,3 @@ Consider some sort of rotation helper:
 - Pre-fill information (optional)
     - Courts
     - Time slots
-

@@ -461,7 +461,11 @@ defmodule VolleyWeb.CoreComponents do
             </form>
           </div>
           <form :if={@close} method="dialog">
-            <.button class="btn-sm btn-circle btn-ghost absolute right-2 top-2" aria-label="close">
+            <.button
+              class="btn-sm btn-circle btn-ghost absolute right-2 top-2"
+              aria-label="close"
+              autofocus
+            >
               <.icon name="hero-x-mark" class="size-5 text-base-content/50" />
             </.button>
           </form>

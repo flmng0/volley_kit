@@ -21,7 +21,7 @@ defmodule VolleyWeb.MatchSettingsForm do
         <.input field={f[:a_name]} label="Team A's Name" />
         <.input field={f[:b_name]} label="Team B's Name" />
 
-        <.input field={f[:set_limit]} label="Set Limit" />
+        <.input field={f[:set_limit]} label="Set Limit" type="text" inputmode="numeric" />
 
         <div class="mt-6 flex justify-end items-center gap-4">
           <%= if @type == :create do %>

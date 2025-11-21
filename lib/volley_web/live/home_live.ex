@@ -121,7 +121,7 @@ defmodule VolleyWeb.HomeLive do
       </:action>
     </.hero_card>
     <.modal id="deleteConfirmation">
-      <h3 class="text-lg font-bold">Are you sure?</h3>
+      <.header header_tag="h3">Are you sure?</.header>
       <p>Are you sure you want to delete this scratch match?</p>
 
       <:action>

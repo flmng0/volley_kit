@@ -20,7 +20,7 @@
       <.icon name="hero-stop-solid" /> Reset...
     </.button>
   </:action>
-  <:action :if={@scorer?}>
+  <:action :if={@scorer?} show_in_fullscreen?={false}>
     <.button variant="scorer-action" patch={~p"/scratch/#{@match}/settings"}>
       <.icon name="hero-adjustments-vertical" /> Settings...
     </.button>

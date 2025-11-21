@@ -28,6 +28,7 @@ defmodule VolleyWeb.Router do
       live "/scratch/:id", ScratchMatchLive
       live "/scratch/:id/share", ScratchMatchLive, :share
       live "/scratch/:id/reset", ScratchMatchLive, :reset
+      live "/scratch/:id/settings", ScratchMatchLive, :settings
     end
   end
 

@@ -40,6 +40,7 @@ defmodule VolleyWeb.ScratchMatchLive do
       socket
       |> assign(:editing?, false)
       |> assign_match(match, true)
+      |> push_patch(to: ~p"/scratch/#{match}")
 
     {:noreply, socket}
   end
@@ -67,10 +68,6 @@ defmodule VolleyWeb.ScratchMatchLive do
 
   def handle_event(event, params, socket) do
     {:noreply, apply_event(socket, event, params)}
-  end
-
-  def apply_event(socket, "edit", _params) do
-    assign(socket, :editing?, not socket.assigns.editing?)
   end
 
   def apply_event(socket, "undo", _params) do
@@ -117,12 +114,14 @@ defmodule VolleyWeb.ScratchMatchLive do
   end
 
   defp assign_new_match(socket, %Match{} = match, scorer?) do
-    if old_match = socket.assigns[:match] do
-      Scoring.unsubscribe(old_match)
-    end
+    if connected?(socket) do
+      if old_match = socket.assigns[:match] do
+        Scoring.unsubscribe(old_match)
+      end
 
-    unless scorer? do
-      Scoring.subscribe(match)
+      unless scorer? do
+        Scoring.subscribe(match)
+      end
     end
 
     share_link = url(socket, ~p"/scratch/#{match}")

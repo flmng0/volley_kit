@@ -7,7 +7,7 @@
   />
   <:action>
     <.button variant="scorer-action" patch={~p"/scratch/#{@match}/share"}>
-      <.icon name="hero-share" /> Share
+      <.icon name="hero-share" /> Share...
     </.button>
   </:action>
   <:action :if={@scorer?}>
@@ -20,34 +20,11 @@
       <.icon name="hero-stop-solid" /> Reset...
     </.button>
   </:action>
-  <:action :if={@scorer?} show_in_fullscreen?={false}>
-    <.button variant="scorer-action" phx-click="edit">
-      <.icon name={if @editing?, do: "hero-x-mark", else: "hero-adjustments-vertical"} />
-      <%= if @editing? do %>
-        Close Settings
-      <% else %>
-        Settings
-      <% end %>
+  <:action :if={@scorer?}>
+    <.button variant="scorer-action" patch={~p"/scratch/#{@match}/settings"}>
+      <.icon name="hero-adjustments-vertical" /> Settings...
     </.button>
   </:action>
-
-  <:footer :if={@editing?}>
-    <div class="card">
-      <div class="card-body bg-base-200">
-        <h3 class="card-title">
-          <span class="grow">Edit Match Settings</span>
-          <.icon class="size-6" name="hero-adjustments-vertical" />
-        </h3>
-        <.live_component
-          id="settingsEditForm"
-          module={VolleyWeb.MatchSettingsForm}
-          type={:update}
-          settings={@match.settings}
-        >
-        </.live_component>
-      </div>
-    </div>
-  </:footer>
 </Layouts.scorer>
 
 <.modal
@@ -57,10 +34,12 @@
   close={JS.patch(~p"/scratch/#{@match}")}
   auto_open
 >
-  <hgroup class="prose">
-    <h3>Share Match</h3>
-    <p>Scan the QR code below, or copy the sharing link, so other users to view this match.</p>
-  </hgroup>
+  <.header header_tag="h3">
+    Share Match
+    <:subtitle>
+      Scan the QR code below, or copy the sharing link, so other users to view this match.
+    </:subtitle>
+  </.header>
 
   <.qr_code class="my-6 rounded-md shadow-xl outline outline-base-300" target={@share_link} />
 
@@ -73,12 +52,11 @@
   close={JS.patch(~p"/scratch/#{@match}")}
   auto_open
 >
-  <hgroup class="prose">
-    <h3>Are you sure?</h3>
-    <p>
-      Ressetting scores will clear the history for the current set. You can also reset the set counts as well, but this will clear all history.
-    </p>
-  </hgroup>
+  <.header header_tag="h3">Are you sure?</.header>
+
+  <p>
+    Ressetting scores will clear the history for the current set. You can also reset the set counts as well, but this will clear all history.
+  </p>
 
   <:action>
     <.button variant="delete" phx-click="reset" phx-value-clear_sets={true}>
@@ -90,6 +68,24 @@
       Only Reset Scores
     </.button>
   </:action>
+</.modal>
+
+<.modal
+  :if={@live_action == :settings}
+  id="settingsModal"
+  class="flex flex-col items-center text-sm md:text-base z-10"
+  close={JS.patch(~p"/scratch/#{@match}")}
+  auto_open
+>
+  <.header header_tag="h3">Edit Match Settings</.header>
+
+  <.live_component
+    id="settingsEditForm"
+    module={VolleyWeb.MatchSettingsForm}
+    type={:update}
+    settings={@match.settings}
+    class="w-full"
+  />
 </.modal>
 
 <.modal

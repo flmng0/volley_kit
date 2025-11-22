@@ -119,9 +119,7 @@ defmodule VolleyWeb.ScratchMatchLive do
         Scoring.unsubscribe(old_match)
       end
 
-      unless scorer? do
-        Scoring.subscribe(match)
-      end
+      Scoring.subscribe(match)
     end
 
     share_link = url(socket, ~p"/scratch/#{match}")

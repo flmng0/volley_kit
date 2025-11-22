@@ -60,7 +60,6 @@ defmodule VolleyWeb.MatchComponents do
       <span class="w-full text-xl">{@team_name}</span>
       <score-card
         id={"score_card_#{@team}"}
-        phx-update={@can_score && "ignore"}
         class="basis-score-min min-w-score-min grow select-none"
         score={@score}
       />

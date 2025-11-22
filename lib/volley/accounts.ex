@@ -80,6 +80,12 @@ defmodule Volley.Accounts do
     |> Repo.insert()
   end
 
+  def create_admin!(email) do
+    %User{email: email, admin?: true}
+    |> User.confirm_changeset()
+    |> Repo.insert!()
+  end
+
   def known_user?(%Scope{user: user}), do: known_user?(user)
   def known_user?(%User{}), do: true
   def known_user?(_), do: false

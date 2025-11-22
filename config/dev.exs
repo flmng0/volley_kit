@@ -67,6 +67,9 @@ config :volley, VolleyWeb.Endpoint,
 config :volley, dev_routes: true
 config :volley, skip_admin_check: true
 
+# Use test email for admin
+config :volley, admin_email: "admin@email.com"
+
 # Do not include metadata nor timestamps in development logs
 config :logger, :default_formatter, format: "[$level] $message\n"
 

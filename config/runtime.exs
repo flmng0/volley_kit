@@ -120,4 +120,6 @@ if config_env() == :prod do
   config :volley, Volley.Mailer,
     adapter: Swoosh.Adapters.SMTP2GO,
     api_key: System.get_env("SMTP2GO_API_KEY")
+
+  config :volley, admin_email: System.get_env("VK_ADMIN_EMAIL")
 end

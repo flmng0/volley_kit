@@ -4,6 +4,8 @@ defmodule Volley.Scoring.Match do
 
   @derive {Phoenix.Param, key: :public_id}
 
+  alias Volley.Scoring.{Event, Settings}
+
   schema "matches" do
     field :public_id, Ecto.UUID, autogenerate: true
 
@@ -13,13 +15,14 @@ defmodule Volley.Scoring.Match do
     field :a_sets, :integer, default: 0
     field :b_sets, :integer, default: 0
 
-    embeds_one :settings, Volley.Scoring.Settings, on_replace: :update
+    embeds_one :settings, Settings, on_replace: :update
 
+    belongs_to :fixture, Volley.Tournaments.Fixture
     belongs_to :owner, Volley.Accounts.User
 
     field :anonymous_owner_id, Ecto.UUID
 
-    has_many :events, Volley.Scoring.Event, on_replace: :delete
+    has_many :events, Event, on_replace: :delete
 
     timestamps()
   end

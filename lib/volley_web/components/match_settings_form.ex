@@ -1,10 +1,10 @@
 defmodule VolleyWeb.MatchSettingsForm do
   use VolleyWeb, :live_component
 
-  alias Volley.Scoring.Match
+  alias Volley.Scoring.Settings
 
   attr :type, :atom, values: [:create, :update]
-  attr :settings, Match.Settings, default: nil
+  attr :settings, Settings, default: nil
 
   @impl true
   def render(assigns) do
@@ -48,9 +48,9 @@ defmodule VolleyWeb.MatchSettingsForm do
 
   @impl true
   def update(%{type: type} = assigns, socket) do
-    settings = assigns[:settings] || %Match.Settings{}
+    settings = assigns[:settings] || %Settings{}
 
-    changeset = Match.settings_changeset(settings)
+    changeset = Settings.changeset(settings)
 
     socket =
       socket
@@ -64,14 +64,14 @@ defmodule VolleyWeb.MatchSettingsForm do
   def handle_event("validate", %{"settings" => params}, socket) do
     changeset =
       socket.assigns.settings
-      |> Match.settings_changeset(params)
+      |> Settings.changeset(params)
       |> Map.put(:action, :validate)
 
     {:noreply, assign_form(socket, changeset)}
   end
 
   def handle_event("submit", %{"settings" => params}, socket) do
-    case Match.settings_changeset(%Match.Settings{}, params) do
+    case Settings.changeset(socket.assigns.settings, params) do
       %Ecto.Changeset{valid?: true} ->
         send(self(), {:submit_settings, params})
         {:noreply, socket}

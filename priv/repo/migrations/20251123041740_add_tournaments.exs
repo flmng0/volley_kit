@@ -2,7 +2,7 @@ defmodule Volley.Repo.Migrations.AddTournaments do
   use Ecto.Migration
 
   def change do
-    create table(:leagues) do
+    create table(:tournaments) do
       add :name, :string, null: false
 
       add :owner_id, references(:users), null: false
@@ -14,14 +14,7 @@ defmodule Volley.Repo.Migrations.AddTournaments do
       add :name, :string, null: false
       add :players, :map, null: false
 
-      add :league_id, references(:leagues), null: false
-
-      timestamps()
-    end
-
-    create table(:tournaments) do
-      add :name, :string, null: false
-
+      add :tournament_id, references(:tournaments), null: false
       add :owner_id, references(:users), null: false
 
       timestamps()
@@ -35,6 +28,7 @@ defmodule Volley.Repo.Migrations.AddTournaments do
       add :team_b, references(:teams), null: false
 
       add :tournament_id, references(:tournaments)
+      add :owner_id, references(:users)
 
       timestamps()
     end

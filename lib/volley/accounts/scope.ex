@@ -34,4 +34,14 @@ defmodule Volley.Accounts.Scope do
   end
 
   def for_user(nil), do: nil
+
+  def own_resource?(%__MODULE__{user: %User{id: user_id}}, %{owner_id: user_id}), do: true
+
+  def own_resource?(
+        %__MODULE__{user: %AnonymousUser{id: anonymous_id}},
+        %{anonymous_owner_id: anonymous_id}
+      ),
+      do: true
+
+  def own_resource?(_, _), do: false
 end

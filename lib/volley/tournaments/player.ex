@@ -5,7 +5,7 @@ defmodule Volley.Tournaments.Player do
   @derive Phoenix.Param
 
   embedded_schema do
-    field :name, :string
+    field :name, :string, default: ""
     field :number, :integer
 
     field :libero?, :boolean, default: false

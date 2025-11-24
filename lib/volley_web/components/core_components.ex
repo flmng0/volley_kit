@@ -90,7 +90,7 @@ defmodule VolleyWeb.CoreComponents do
   """
   attr :rest, :global, include: ~w(href navigate patch method download name value disabled)
   attr :class, :any, default: ""
-  attr :variant, :string, values: ~w(primary secondary neutral delete ghost scorer-action)
+  attr :variant, :string, values: ~w(primary secondary neutral create delete ghost scorer-action)
   slot :inner_block, required: true
 
   def button(%{rest: rest} = assigns) do
@@ -98,6 +98,7 @@ defmodule VolleyWeb.CoreComponents do
       "primary" => "btn-primary",
       "secondary" => "btn-secondary",
       "neutral" => "btn-neutral",
+      "create" => "btn-success",
       "delete" => "btn-error",
       "ghost" => "btn-ghost",
       "scorer-action" => "btn-block btn-md p-4",
@@ -168,6 +169,7 @@ defmodule VolleyWeb.CoreComponents do
   attr :multiple, :boolean, default: false, doc: "the multiple flag for select inputs"
   attr :class, :string, default: nil, doc: "the input class to use over defaults"
   attr :error_class, :string, default: nil, doc: "the input error class to use over defaults"
+  attr :container_class, :string, default: nil, doc: "the container class to use over defaults"
 
   attr :rest, :global,
     include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
@@ -191,7 +193,7 @@ defmodule VolleyWeb.CoreComponents do
       end)
 
     ~H"""
-    <div class="fieldset mb-2">
+    <div class={@container_class || "fieldset mb-2 py-0"}>
       <label>
         <input type="hidden" name={@name} value="false" disabled={@rest[:disabled]} />
         <span class="label">
@@ -213,7 +215,7 @@ defmodule VolleyWeb.CoreComponents do
 
   def input(%{type: "select"} = assigns) do
     ~H"""
-    <div class="fieldset mb-2">
+    <div class={@container_class || "fieldset mb-2 py-0"}>
       <label>
         <span :if={@label} class="label mb-1">{@label}</span>
         <select
@@ -234,7 +236,7 @@ defmodule VolleyWeb.CoreComponents do
 
   def input(%{type: "textarea"} = assigns) do
     ~H"""
-    <div class="fieldset mb-2">
+    <div class={@container_class || "fieldset mb-2 py-0"}>
       <label>
         <span :if={@label} class="label mb-1">{@label}</span>
         <textarea
@@ -255,7 +257,7 @@ defmodule VolleyWeb.CoreComponents do
   # All other inputs text, datetime-local, url, password, etc. are handled here...
   def input(assigns) do
     ~H"""
-    <div class="fieldset mb-2">
+    <div class={@container_class || "fieldset mb-2 py-0"}>
       <label>
         <span :if={@label} class="label mb-1">{@label}</span>
         <input

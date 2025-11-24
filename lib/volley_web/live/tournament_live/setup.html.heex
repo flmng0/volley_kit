@@ -1,1 +1,25 @@
-<Layouts.app flash={@flash} current_scope={@current_scope}></Layouts.app>
+<Layouts.app flash={@flash} current_scope={@current_scope}>
+  <div class="bg-base-200 p-4 rounded-sm shadow-sm space-y-4">
+    <.header>
+      Setup A New Tournament
+      <:subtitle>
+        Follow the steps below to create a new Volley Kit tournament.
+      </:subtitle>
+    </.header>
+
+    <p>
+      Setting up a tournament will allow you to fixture and score multiple different games at once.
+    </p>
+    <p>
+      Official FIVB formatted scoresheets can be generated afterwards.
+    </p>
+    <p>
+      The main benefit of the Volley Kit system is to share scoring updates with spectators in real time.
+    </p>
+  </div>
+
+  <.live_component
+    id="tournament_setup_form"
+    module={VolleyWeb.TournamentLive.FormComponent}
+  />
+</Layouts.app>

@@ -20,7 +20,7 @@ defmodule VolleyWeb.HomeLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash} current_scope={@current_scope} hide_home_button={true}>
+    <Layouts.app flash={@flash} current_scope={@current_scope} hide_home_button centered>
       <main class="full-bleed hero">
         <div class="hero-content flex flex-col lg:flex-row gap-y-12">
           <div class="text-center lg:text-left prose">
@@ -48,11 +48,12 @@ defmodule VolleyWeb.HomeLive do
               <.start_match_card />
             <% end %>
 
-            <%!-- <span class="divider">OR</span> --%>
-            <%!----%>
-            <%!-- <.button navigate={~p"/tournament/new"}> --%>
-            <%!--   <.icon name="hero-cog-8-tooth-solid" /> Configure a Tournament --%>
-            <%!-- </.button> --%>
+            <span class="divider">OR</span>
+
+            <.button navigate={~p"/tournaments/setup"}>
+              <.icon name="hero-cog-8-tooth-solid" /> Setup a Tournament
+            </.button>
+            <p class="text-sm text-base-content/70 p-2">Note that you must have an account to setup a tournament.</p>
           </nav>
         </div>
       </main>

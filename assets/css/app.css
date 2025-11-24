@@ -111,6 +111,8 @@
 
 @custom-variant fullscreen (:is([data-fullscreen=true]&, [data-fullscreen=true] &));
 
+@custom-variant is-collapse-open (:is(:where(.collapse):has(> :checked) &, :where(.collapse[open]) &));
+
 /* Make LiveView wrapper divs transparent for layout */
 [data-phx-session],
 [data-phx-teleported-src] {

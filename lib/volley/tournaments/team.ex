@@ -7,7 +7,7 @@ defmodule Volley.Tournaments.Team do
   alias Volley.Tournaments.{Player, League}
 
   schema "teams" do
-    field :name, :string
+    field :name, :string, default: ""
     embeds_many :players, Player, on_replace: :delete
 
     belongs_to :league, League
@@ -18,6 +18,7 @@ defmodule Volley.Tournaments.Team do
   def changeset(team, params \\ %{}) do
     team
     |> cast(params, [:name])
+    |> validate_required([:name])
     |> cast_embed(:players, sort_param: :players_sort, drop_param: :players_drop)
   end
 end

@@ -29,6 +29,7 @@ defmodule VolleyWeb.Layouts do
   attr :flash, :map, required: true, doc: "the map of flash messages"
 
   attr :hide_home_button, :boolean, default: false
+  attr :centered, :boolean, default: false
   attr :current_scope, :map, default: nil
 
   slot :inner_block, required: true
@@ -40,7 +41,7 @@ defmodule VolleyWeb.Layouts do
       current_scope={@current_scope}
     />
 
-    <main class="w-full px-2 sm:px-6 lg:px-8">
+    <main class={["w-full px-2 sm:px-6 lg:px-8", @centered && "place-self-center"]}>
       <div class="bleed-container gap-y-4">
         {render_slot(@inner_block)}
       </div>
@@ -63,7 +64,7 @@ defmodule VolleyWeb.Layouts do
 
   def scorer(assigns) do
     ~H"""
-    <Layouts.app flash={@flash} current_scope={@current_scope}>
+    <Layouts.app flash={@flash} current_scope={@current_scope} centered>
       <main class="w-full max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto space-y-6 pb-16">
         <div
           class={[

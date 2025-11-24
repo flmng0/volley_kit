@@ -7,7 +7,7 @@ defmodule Volley.Tournaments.Tournament do
   @derive Phoenix.Param
 
   schema "tournaments" do
-    field :name, :string
+    field :name, :string, default: ""
 
     has_many :fixtures, Fixture
     has_many :teams, Team
@@ -20,6 +20,7 @@ defmodule Volley.Tournaments.Tournament do
   def changeset(tournament, params \\ %{}) do
     tournament
     |> cast(params, [:name])
+    |> validate_required([:name])
     |> cast_assoc(:fixtures, sort_param: :fixtures_sort, drop_param: :fixtures_drop)
     |> cast_assoc(:teams, sort_param: :teams_sort, drop_param: :teams_drop)
   end

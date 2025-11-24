@@ -77,6 +77,7 @@ defmodule VolleyWeb.TournamentLive.FormComponent do
 
     case Tournament.changeset(socket.assigns.tournament, tournament_params) do
       %Ecto.Changeset{valid?: true} = _changeset ->
+        send(self(), {:submit_tournament, tournament_params})
         {:noreply, socket}
 
       changeset ->

@@ -17,6 +17,12 @@ defmodule Volley.Tournaments do
     Repo.all_by(Tournament, owner_id: user.id)
   end
 
+  def get_tournament(%Scope{user: user}, id) do
+    query = from tournament in Tournament, where: tournament.owner_id == ^user.id
+
+    Repo.get(query, id)
+  end
+
   def delete_tournament(%Scope{} = scope, %Tournament{} = tournament) do
     if Scope.own_resource?(scope, tournament) do
       Repo.delete(tournament)

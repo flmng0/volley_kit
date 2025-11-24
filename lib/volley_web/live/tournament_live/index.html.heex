@@ -3,4 +3,10 @@
     Tournaments
     <:subtitle>View your existing tournaments, or setup a new one.</:subtitle>
   </.header>
+
+  <ul id="tournament_cards" phx-update="stream">
+    <li :for={{dom_id, tournament} <- @streams.tournaments} id={dom_id}>
+      <.tournament_card tournament={tournament} />
+    </li>
+  </ul>
 </Layouts.app>

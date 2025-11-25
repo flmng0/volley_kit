@@ -142,7 +142,8 @@ defmodule VolleyWeb.TournamentLive.FormComponent do
     <details
       class="collapse bg-base-200 group"
       phx-mounted={
-        JS.remove_attribute("open", to: ".collapse")
+        JS.ignore_attributes("open")
+        |> JS.remove_attribute("open", to: ".collapse")
         |> JS.set_attribute({"open", "true"})
       }
     >

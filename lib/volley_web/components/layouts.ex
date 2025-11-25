@@ -127,19 +127,70 @@ defmodule VolleyWeb.Layouts do
 
   def app_header(assigns) do
     ~H"""
-    <header class={["navbar max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8", @class]} {@rest}>
-      <div class="">
-        <.link :if={!@hide_home_button} navigate="/" class="flex w-fit items-center gap-2">
-          <.icon name="hero-home-solid" class="size-6" />
-          <%!-- <img src={~p"/images/logo.svg"} width="36" /> --%>
-          <span class="text-sm font-semibold text-nowrap">Home</span>
-        </.link>
-      </div>
-      <ul class="menu menu-horizontal w-full relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
-        <.theme_toggle />
-        <.user_buttons current_scope={@current_scope} />
+    <header
+      class={["navbar max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 gap-2 lg:gap-4", @class]}
+      {@rest}
+    >
+      <ul class="menu menu-horizontal grow items-center">
+        <%= if !@hide_home_button do %>
+          <li class="lg:hidden">
+            <.link navigate="/" class="btn btn-ghost btn-square">
+              <.icon name="hero-home-solid" class="size-4" />
+            </.link>
+          </li>
+          <li class="max-lg:hidden">
+            <.link navigate="/">
+              <.icon name="hero-home-solid" class="size-4" />
+              <span class="hidden lg:inline">Home</span>
+            </.link>
+          </li>
+        <% end %>
+        <li>
+          <.link navigate={~p"/tournaments"}>Tournaments</.link>
+        </li>
       </ul>
+      <.theme_toggle />
+      <.user_menu current_scope={@current_scope} />
+      <%!-- <ul class="menu menu-horizontal items-center gap-4"> --%>
+      <%!--   <.user_buttons current_scope={@current_scope} /> --%>
+      <%!-- </ul> --%>
     </header>
+    """
+  end
+
+  attr :current_scope, :map, default: nil
+
+  def user_menu(assigns) do
+    ~H"""
+    <%= if Accounts.known_user?(@current_scope) do %>
+      <details class="dropdown dropdown-end" phx-click-away={JS.remove_attribute("open")}>
+        <summary class="btn btn-neutral max-lg:btn-square p-2">
+          <.icon name="hero-user-solid" class="size-4 lg:hidden" />
+          <span class="hidden lg:inline">{@current_scope.user.email}</span>
+        </summary>
+
+        <ul class="dropdown-content menu bg-base-200 rounded-box shadow-sm p-2 w-52 gap-1">
+          <li class="lg:hidden menu-title">
+            {@current_scope.user.email}
+          </li>
+          <li>
+            <.link href={~p"/users/settings"}>Settings</.link>
+          </li>
+          <li>
+            <.link href={~p"/users/log-out"} method="delete">Log out</.link>
+          </li>
+        </ul>
+      </details>
+    <% else %>
+      <ul class="menu menu-horizontal">
+        <li class="hidden lg:block">
+          <.link href={~p"/users/register"}>Register</.link>
+        </li>
+        <li>
+          <.link href={~p"/users/log-in"}>Log in</.link>
+        </li>
+      </ul>
+    <% end %>
     """
   end
 
@@ -152,17 +203,10 @@ defmodule VolleyWeb.Layouts do
         {@current_scope.user.email}
       </li>
       <li>
-        <.button variant="ghost" href={~p"/users/settings"}>Settings</.button>
+        <.link href={~p"/users/settings"}>Settings</.link>
       </li>
       <li>
-        <.button variant="ghost" href={~p"/users/log-out"} method="delete">Log out</.button>
-      </li>
-    <% else %>
-      <li>
-        <.button variant="ghost" href={~p"/users/register"}>Register</.button>
-      </li>
-      <li>
-        <.button variant="ghost" href={~p"/users/log-in"}>Log in</.button>
+        <.link href={~p"/users/log-out"} method="delete">Log out</.link>
       </li>
     <% end %>
     """

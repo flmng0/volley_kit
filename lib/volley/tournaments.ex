@@ -13,14 +13,18 @@ defmodule Volley.Tournaments do
     |> Repo.insert()
   end
 
+  defp user_tournaments(%{id: user_id}), do: from(t in Tournament, where: t.owner_id == ^user_id)
+
+  def count_tournaments(%Scope{user: user}) do
+    user_tournaments(user) |> Repo.aggregate(:count)
+  end
+
   def list_tournaments(%Scope{user: user}) do
-    Repo.all_by(Tournament, owner_id: user.id)
+    user_tournaments(user) |> Repo.all()
   end
 
   def get_tournament(%Scope{user: user}, id) do
-    query = from tournament in Tournament, where: tournament.owner_id == ^user.id
-
-    Repo.get(query, id)
+    user_tournaments(user) |> Repo.get(id)
   end
 
   def delete_tournament(%Scope{} = scope, %Tournament{} = tournament) do

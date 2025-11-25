@@ -7,14 +7,19 @@ defmodule VolleyWeb.HomeLive do
 
   @impl true
   def mount(_params, _session, socket) do
+    scope = socket.assigns.current_scope
+
     match =
-      if socket.assigns.current_scope do
-        Scoring.get_match(socket.assigns.current_scope)
+      if scope do
+        Scoring.get_match(scope)
       end
 
-    socket = assign(socket, :match, match)
+    has_tournaments? =
+      if Volley.Accounts.known_user?(scope) do
+        Volley.Tournaments.count_tournaments(scope) > 0
+      end
 
-    {:ok, socket}
+    {:ok, assign(socket, match: match, has_tournaments?: has_tournaments?)}
   end
 
   @impl true
@@ -51,9 +56,17 @@ defmodule VolleyWeb.HomeLive do
             <span class="divider">OR</span>
 
             <.button navigate={~p"/tournaments/setup"}>
-              <.icon name="hero-cog-8-tooth-solid" /> Setup a Tournament
+              Setup a Tournament <.icon name="hero-cog-8-tooth-solid" />
             </.button>
-            <p class="text-sm text-base-content/70 p-2">Note that you must have an account to setup a tournament.</p>
+            <%= if Volley.Accounts.known_user?(@current_scope) do %>
+              <.button :if={@has_tournaments?} navigate={~p"/tournaments"} class="mt-2">
+                Manage Existing Tournaments <.icon name="hero-calendar-days-solid" />
+              </.button>
+            <% else %>
+              <p class="text-sm text-base-content/70 p-2">
+                Note that you must have an account to setup a tournament.
+              </p>
+            <% end %>
           </nav>
         </div>
       </main>

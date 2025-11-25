@@ -35,58 +35,66 @@ defmodule VolleyWeb.UserLive.Login do
           </div>
         </div>
 
-        <.form
-          :let={f}
-          for={@form}
-          id="login_form_magic"
-          action={~p"/users/log-in"}
-          phx-submit="submit_magic"
-        >
-          <.input
-            readonly={Accounts.known_user?(@current_scope)}
-            field={f[:email]}
-            type="email"
-            label="Email"
-            autocomplete="username"
-            required
-            phx-mounted={JS.focus()}
-          />
-          <.button class="btn btn-primary w-full">
-            Log in with email <span aria-hidden="true">→</span>
-          </.button>
-        </.form>
+        <%= if @live_action == :new do %>
+          <.form
+            :let={f}
+            for={@form}
+            id="login_form_magic"
+            action={~p"/users/log-in"}
+            phx-submit="submit_magic"
+          >
+            <.input
+              readonly={Accounts.known_user?(@current_scope)}
+              field={f[:email]}
+              type="email"
+              label="Email"
+              autocomplete="username"
+              required
+              phx-mounted={JS.focus()}
+            />
+            <.button class="btn btn-primary w-full">
+              Log in with email <span aria-hidden="true">→</span>
+            </.button>
+          </.form>
 
-        <div class="divider">or</div>
+          <div class="divider">or</div>
 
-        <.form
-          :let={f}
-          for={@form}
-          id="login_form_password"
-          action={~p"/users/log-in"}
-          phx-submit="submit_password"
-          phx-trigger-action={@trigger_submit}
-        >
-          <.input
-            readonly={Accounts.known_user?(@current_scope)}
-            field={f[:email]}
-            type="email"
-            label="Email"
-            autocomplete="username"
-            required
-          />
-          <.input
-            field={@form[:password]}
-            type="password"
-            label="Password"
-            autocomplete="current-password"
-          />
-          <.button class="btn btn-primary w-full" name={@form[:remember_me].name} value="true">
-            Log in and stay logged in <span aria-hidden="true">→</span>
-          </.button>
-          <.button class="btn btn-primary btn-soft w-full mt-2">
-            Log in only this time
-          </.button>
-        </.form>
+          <.form
+            :let={f}
+            for={@form}
+            id="login_form_password"
+            action={~p"/users/log-in"}
+            phx-submit="submit_password"
+            phx-trigger-action={@trigger_submit}
+          >
+            <.input
+              readonly={Accounts.known_user?(@current_scope)}
+              field={f[:email]}
+              type="email"
+              label="Email"
+              autocomplete="username"
+              required
+            />
+            <.input
+              field={@form[:password]}
+              type="password"
+              label="Password"
+              autocomplete="current-password"
+            />
+            <.button class="btn btn-primary w-full" name={@form[:remember_me].name} value="true">
+              Log in and stay logged in <span aria-hidden="true">→</span>
+            </.button>
+            <.button class="btn btn-primary btn-soft w-full mt-2">
+              Log in only this time
+            </.button>
+          </.form>
+        <% end %>
+
+        <%= if @live_action == :confirm do %>
+          <div class="alert alert-info">
+            If your email is in our system, you will receive instructions for logging in shortly.
+          </div>
+        <% end %>
       </div>
     </Layouts.app>
     """
@@ -104,6 +112,17 @@ defmodule VolleyWeb.UserLive.Login do
   end
 
   @impl true
+  def handle_params(_params, _uri, socket) do
+    page_title =
+      case socket.assigns.live_action do
+        :confirm -> "Log In Confirmed"
+        _ -> "Log In"
+      end
+
+    {:noreply, assign(socket, page_title: page_title)}
+  end
+
+  @impl true
   def handle_event("submit_password", _params, socket) do
     {:noreply, assign(socket, :trigger_submit, true)}
   end
@@ -116,13 +135,7 @@ defmodule VolleyWeb.UserLive.Login do
       )
     end
 
-    info =
-      "If your email is in our system, you will receive instructions for logging in shortly."
-
-    {:noreply,
-     socket
-     |> put_flash(:info, info)
-     |> push_navigate(to: ~p"/users/log-in")}
+    {:noreply, push_patch(socket, to: ~p"/users/log-in/confirm")}
   end
 
   defp local_mail_adapter? do

@@ -5,6 +5,9 @@ defmodule Volley.Repo.Migrations.AddTournaments do
     create table(:tournaments) do
       add :name, :string, null: false
 
+      add :date_start, :date
+      add :date_end, :date
+
       add :owner_id, references(:users), null: false
 
       timestamps()
@@ -15,7 +18,6 @@ defmodule Volley.Repo.Migrations.AddTournaments do
       add :players, :map, null: false
 
       add :tournament_id, references(:tournaments), null: false
-      add :owner_id, references(:users), null: false
 
       timestamps()
     end

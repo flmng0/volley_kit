@@ -4,13 +4,13 @@ defmodule Volley.Tournaments.Team do
 
   @derive Phoenix.Param
 
-  alias Volley.Tournaments.{Player, League}
+  alias Volley.Tournaments.{Player, Tournament}
 
   schema "teams" do
     field :name, :string, default: ""
     embeds_many :players, Player, on_replace: :delete
 
-    belongs_to :league, League
+    belongs_to :tournament, Tournament
 
     timestamps()
   end

@@ -41,7 +41,7 @@ defmodule VolleyWeb.Layouts do
       current_scope={@current_scope}
     />
 
-    <main class={["w-full px-2 sm:px-6 lg:px-8", @centered && "place-self-center"]}>
+    <main class={["w-full px-2 sm:px-6 lg:px-8 pb-6 lg:pb-10", @centered && "place-self-center"]}>
       <div class="bleed-container gap-y-4">
         {render_slot(@inner_block)}
       </div>

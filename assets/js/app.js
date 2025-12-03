@@ -24,7 +24,9 @@ import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import { hooks as colocatedHooks } from "phoenix-colocated/volley";
 import topbar from "../vendor/topbar";
-import Hooks from "./hooks.js";
+import "../vendor/cally";
+
+import Hooks from "./hooks";
 import "./elements";
 import "./events.js";
 

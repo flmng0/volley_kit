@@ -16,8 +16,34 @@ defmodule VolleyWeb.TournamentLive.FormComponent do
         phx-target={@myself}
         class="flex flex-col"
       >
-        <.step number={1} title="Name Your Tournament">
+        <.step number={1} title="Enter Tournament Details">
           <.input field={f[:name]} label="Tournament Name*" />
+
+          <fieldset class="fieldset">
+            <span class="fieldset-label">Select Tournament Date Range</span>
+            <calendar-range
+              id="tournamentDateRange"
+              class="cally bg-base-200 shadow-sm"
+              phx-hook=".DateRange"
+            >
+              <.icon slot="previous" aria-label="Previous" name="hero-chevron-left" />
+              <.icon slot="next" aria-label="Next" name="hero-chevron-right" />
+              <calendar-month></calendar-month>
+              <input
+                type="hidden"
+                data-input="start"
+                name={f[:date_start].name}
+                value={f[:date_start].value}
+              />
+              <input
+                type="hidden"
+                data-input="end"
+                name={f[:date_end].name}
+                value={f[:date_end].value}
+              />
+            </calendar-range>
+            <p class="text-base-content/50">NOTE: This is optional, and can be set later.</p>
+          </fieldset>
         </.step>
 
         <div class="divider" />
@@ -51,6 +77,24 @@ defmodule VolleyWeb.TournamentLive.FormComponent do
           <.button type="submit" variant="primary" class="btn-wide">Submit</.button>
         </div>
       </.form>
+
+      <script :type={Phoenix.LiveView.ColocatedHook} name=".DateRange">
+        export default {
+          mounted() {
+            const startInput = this.el.querySelector("[data-input='start']");
+            const endInput = this.el.querySelector("[data-input='end']");
+
+            this.el.onchange = () => {
+              const [start, end] = this.el.value.split("/");
+
+              startInput.value = start;
+              endInput.value = end;
+
+              startInput.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
+            }
+          }
+        }
+      </script>
     </div>
     """
   end
@@ -177,6 +221,7 @@ defmodule VolleyWeb.TournamentLive.FormComponent do
 
         <fieldset class="fieldset gap-1">
           <span class="fieldset-label">Players</span>
+          <p>Names are required. Numbers are optional.</p>
 
           <.inputs_for :let={player} field={@team[:players]}>
             <input type="hidden" name={"#{@team.name}[players_sort][]"} value={player.index} />
@@ -187,6 +232,7 @@ defmodule VolleyWeb.TournamentLive.FormComponent do
                 placeholder="Name*"
                 container_class="grow py-0"
                 class="w-full input input-sm"
+                phx-mounted={JS.focus()}
               />
               <.input
                 field={player[:number]}

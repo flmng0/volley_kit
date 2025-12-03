@@ -3,6 +3,8 @@ defmodule VolleyWeb.TournamentLive.Show do
 
   alias Volley.Tournaments
 
+  embed_templates "show/*"
+
   @impl true
   def mount(%{"id" => id}, _session, socket) do
     if tournament = Tournaments.get_tournament(socket.assigns.current_scope, id) do
@@ -19,5 +21,38 @@ defmodule VolleyWeb.TournamentLive.Show do
 
       {:ok, socket}
     end
+  end
+
+  @impl true
+  def handle_params(params, _uri, socket) do
+    socket = assign(socket, :editing, !is_nil(params["edit"]))
+
+    {:noreply, socket}
+  end
+
+  attr :live_action, :atom
+  attr :tournament, Tournaments.Tournament
+  attr :editing, :boolean
+
+  def view(assigns) do
+    {live_action, assigns} = Map.pop(assigns, :live_action)
+
+    apply(__MODULE__, live_action, [assigns])
+  end
+
+  attr :action, :atom
+  attr :live_action, :atom
+
+  attr :name, :string
+  attr :patch, :string
+
+  def menu_item(assigns) do
+    ~H"""
+    <li class={@live_action == @action && "menu-active"}>
+      <.link patch={@patch} aria-current={@live_action == @action && "page"}>
+        {@name}
+      </.link>
+    </li>
+    """
   end
 end

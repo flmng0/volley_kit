@@ -31,6 +31,8 @@ defmodule VolleyWeb.Layouts do
   attr :hide_home_button, :boolean, default: false
   attr :centered, :boolean, default: false
   attr :current_scope, :map, default: nil
+  attr :class, :string, default: ""
+  attr :rest, :global
 
   slot :inner_block, required: true
 
@@ -41,7 +43,10 @@ defmodule VolleyWeb.Layouts do
       current_scope={@current_scope}
     />
 
-    <main class={["w-full px-2 sm:px-6 lg:px-8 pb-6 lg:pb-10", @centered && "place-self-center"]}>
+    <main
+      class={["w-full px-2 sm:px-6 lg:px-8 pb-6 lg:pb-10", @centered && "place-self-center", @class]}
+      {@rest}
+    >
       <div class="bleed-container gap-y-4">
         {render_slot(@inner_block)}
       </div>

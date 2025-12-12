@@ -1,12 +1,24 @@
 <Layouts.app flash={@flash} current_scope={@current_scope}>
   <div class="grid lg:grid-cols-[auto_1fr] gap-4">
+    <header class="col-span-full">
+      <h1>
+        <span class="text-base-content/70">Tournament:</span>
+        {@tournament.name}
+      </h1>
+    </header>
+
     <aside class="bg-base-200 rounded-box shadow-sm self-start">
-      <ul class="menu">
-        <li class="menu-title">{@tournament.name}</li>
+      <ul class="menu w-56">
         <.menu_item
-          action={nil}
+          action={:overview}
           live_action={@live_action}
           patch={~p"/tournaments/#{@tournament}"}
+          name="Overview"
+        />
+        <.menu_item
+          action={:details}
+          live_action={@live_action}
+          patch={~p"/tournaments/#{@tournament}/details"}
           name="Details"
         />
         <.menu_item
@@ -25,7 +37,7 @@
     </aside>
 
     <main>
-      <.view live_action={@live_action} tournament={@tournament} editing={@editing} />
+      <.view live_action={@live_action} tournament={@tournament} />
     </main>
   </div>
 </Layouts.app>

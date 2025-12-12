@@ -24,9 +24,7 @@ defmodule VolleyWeb.TournamentLive.Show do
   end
 
   @impl true
-  def handle_params(params, _uri, socket) do
-    socket = assign(socket, :editing, !is_nil(params["edit"]))
-
+  def handle_params(_params, _uri, socket) do
     {:noreply, socket}
   end
 

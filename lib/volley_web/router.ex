@@ -40,7 +40,8 @@ defmodule VolleyWeb.Router do
       live "/tournaments", TournamentLive.Index
       live "/tournaments/setup", TournamentLive.Setup
 
-      live "/tournaments/:id", TournamentLive.Show, :details
+      live "/tournaments/:id", TournamentLive.Show, :overview
+      live "/tournaments/:id/details", TournamentLive.Show, :details
       live "/tournaments/:id/teams", TournamentLive.Show, :teams
       live "/tournaments/:id/fixtures", TournamentLive.Show, :fixtures
     end

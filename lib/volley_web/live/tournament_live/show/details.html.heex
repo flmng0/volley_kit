@@ -1,16 +1,9 @@
-<div class="flex justify-end">
-  <.button :if={!@editing} variant="primary" patch={~p"/tournaments/#{@tournament}/?edit"}>
-    Edit
-  </.button>
-  <.button :if={@editing} variant="primary" patch={~p"/tournaments/#{@tournament}"}>
-    Cancel
-  </.button>
-</div>
+<div class="flex justify-end"></div>
 
 <fieldset class="fieldset">
   <label>
     <legend class="fieldset-legend">Tournament Name</legend>
-    <input class="input" disabled={!@editing} value={@tournament.name} />
+    <input class="input" value={@tournament.name} />
   </label>
 </fieldset>
 <fieldset class="fieldset">
@@ -18,10 +11,10 @@
 
   <label>
     <span class="fieldset-label">Start Date</span>
-    <input class="input" disabled={!@editing} value={@tournament.date_start} />
+    <input class="input" value={@tournament.date_start} />
   </label>
   <label>
     <span class="fieldset-label">End Date</span>
-    <input class="input" disabled={!@editing} value={@tournament.date_end} />
+    <input class="input" value={@tournament.date_end} />
   </label>
 </fieldset>

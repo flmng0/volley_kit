@@ -3,6 +3,106 @@ defmodule VolleyWeb.UserLive.Login do
 
   alias Volley.Accounts
 
+  defp render_intro(assigns) do
+    ~H"""
+    <.button phx-click="choose_magic" variant="neutral" class="w-full">
+      Log in with Email and Magic Link
+    </.button>
+    <div class="divider">or</div>
+    <.button phx-click="choose_password" variant="neutral" class="w-full">
+      Log in with Email and Password
+    </.button>
+    """
+  end
+
+  attr :form, :map, required: true
+  attr :current_scope, :map, default: nil
+
+  defp render_magic_form(assigns) do
+    ~H"""
+    <.form
+      :let={f}
+      for={@form}
+      id="login_form_magic"
+      action={~p"/users/log-in"}
+      phx-submit="submit_magic"
+    >
+      <.input
+        readonly={Accounts.known_user?(@current_scope)}
+        field={f[:email]}
+        type="email"
+        label="Email"
+        autocomplete="username"
+        required
+        phx-mounted={JS.focus()}
+      />
+      <.button class="btn btn-primary w-full">
+        Log in <span aria-hidden="true">→</span>
+      </.button>
+    </.form>
+
+    <div class="divider">or</div>
+
+    <.button phx-click="choose_password" variant="neutral" class="w-full">
+      Use Email and Password
+    </.button>
+    """
+  end
+
+  attr :form, :map, required: true
+  attr :trigger_submit, :boolean
+  attr :current_scope, :map, default: nil
+
+  defp render_password_form(assigns) do
+    ~H"""
+    <.form
+      :let={f}
+      for={@form}
+      id="login_form_password"
+      action={~p"/users/log-in"}
+      phx-submit="submit_password"
+      phx-trigger-action={@trigger_submit}
+    >
+      <.input
+        readonly={Accounts.known_user?(@current_scope)}
+        field={f[:email]}
+        type="email"
+        label="Email"
+        autocomplete="username"
+        required
+      />
+      <.input
+        field={@form[:password]}
+        type="password"
+        label="Password"
+        autocomplete="current-password"
+      />
+      <.input field={@form[:remember_me]} type="checkbox" label="Stay logged in on this device?" />
+      <.button variant="primary" class="w-full">
+        Log in <span aria-hidden="true">→</span>
+      </.button>
+    </.form>
+
+    <div class="divider">or</div>
+
+    <.button variant="neutral" class="w-full" phx-click="choose_magic">
+      Use Email and Magic Link
+    </.button>
+    """
+  end
+
+  defp render_magic_submitted(assigns) do
+    ~H"""
+    <div class="alert alert-success">
+      <.icon name="hero-check-circle" class="size-6 shrink-0" />
+      <div>
+        <p>Log in requested successfully.</p>
+        <p>If your email is in our system, you will receive instructions for logging in shortly.</p>
+      </div>
+    </div>
+    """
+  end
+
   @impl true
   def render(assigns) do
     ~H"""
@@ -35,58 +135,15 @@ defmodule VolleyWeb.UserLive.Login do
           </div>
         </div>
 
-        <.form
-          :let={f}
-          for={@form}
-          id="login_form_magic"
-          action={~p"/users/log-in"}
-          phx-submit="submit_magic"
-        >
-          <.input
-            readonly={Accounts.known_user?(@current_scope)}
-            field={f[:email]}
-            type="email"
-            label="Email"
-            autocomplete="username"
-            required
-            phx-mounted={JS.focus()}
-          />
-          <.button class="btn btn-primary w-full">
-            Log in with email <span aria-hidden="true">→</span>
-          </.button>
-        </.form>
-
-        <div class="divider">or</div>
-
-        <.form
-          :let={f}
-          for={@form}
-          id="login_form_password"
-          action={~p"/users/log-in"}
-          phx-submit="submit_password"
-          phx-trigger-action={@trigger_submit}
-        >
-          <.input
-            readonly={Accounts.known_user?(@current_scope)}
-            field={f[:email]}
-            type="email"
-            label="Email"
-            autocomplete="username"
-            required
-          />
-          <.input
-            field={@form[:password]}
-            type="password"
-            label="Password"
-            autocomplete="current-password"
-          />
-          <.button class="btn btn-primary w-full" name={@form[:remember_me].name} value="true">
-            Log in and stay logged in <span aria-hidden="true">→</span>
-          </.button>
-          <.button class="btn btn-primary btn-soft w-full mt-2">
-            Log in only this time
-          </.button>
-        </.form>
+        <.render_intro :if={@state == :intro} />
+        <.render_magic_form :if={@state == :magic} form={@form} current_scope={@current_scope} />
+        <.render_password_form
+          :if={@state == :password}
+          form={@form}
+          current_scope={@current_scope}
+          trigger_submit={@trigger_submit}
+        />
+        <.render_magic_submitted :if={@state == :magic_submitted} />
       </div>
     </Layouts.app>
     """
@@ -100,7 +157,7 @@ defmodule VolleyWeb.UserLive.Login do
 
     form = to_form(%{"email" => email}, as: "user")
 
-    {:ok, assign(socket, form: form, trigger_submit: false)}
+    {:ok, assign(socket, form: form, trigger_submit: false, state: :intro)}
   end
 
   @impl true
@@ -116,13 +173,15 @@ defmodule VolleyWeb.UserLive.Login do
       )
     end
 
-    info =
-      "If your email is in our system, you will receive instructions for logging in shortly."
+    {:noreply, assign(socket, :state, :magic_submitted)}
+  end
 
-    {:noreply,
-     socket
-     |> put_flash(:info, info)
-     |> push_navigate(to: ~p"/users/log-in")}
+  def handle_event("choose_magic", _params, socket) do
+    {:noreply, assign(socket, :state, :magic)}
+  end
+
+  def handle_event("choose_password", _params, socket) do
+    {:noreply, assign(socket, :state, :password)}
   end
 
   defp local_mail_adapter? do

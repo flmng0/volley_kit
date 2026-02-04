@@ -97,7 +97,7 @@ defmodule VolleyWeb.CoreComponents do
     variants = %{
       "primary" => "btn-primary",
       "secondary" => "btn-secondary",
-      "neutral" => "btn-neutral",
+      "neutral" => "not-dark:btn-neutral dark:btn-soft",
       "delete" => "btn-error",
       "ghost" => "btn-ghost",
       "scorer-action" => "btn-block btn-md p-4",

@@ -71,7 +71,7 @@ defmodule VolleyWeb.MatchSettingsForm do
   end
 
   def handle_event("submit", %{"settings" => params}, socket) do
-    case Match.settings_changeset(%Match.Settings{}, params) do
+    case Match.settings_changeset(socket.assigns.settings, params) do
       %Ecto.Changeset{valid?: true} ->
         send(self(), {:submit_settings, params})
         {:noreply, socket}

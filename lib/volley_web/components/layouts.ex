@@ -27,18 +27,31 @@ defmodule VolleyWeb.Layouts do
 
   """
   attr :flash, :map, required: true, doc: "the map of flash messages"
-
-  attr :hide_home_button, :boolean, default: false
   attr :current_scope, :map, default: nil
-
   slot :inner_block, required: true
 
   def app(assigns) do
     ~H"""
-    <.app_header
-      hide_home_button={@hide_home_button}
-      current_scope={@current_scope}
-    />
+    <.app_header current_scope={@current_scope} />
+
+    <main class="w-full px-2 sm:px-6 lg:px-8 h-full pt-4">
+      <div class="bleed-container gap-y-4">
+        {render_slot(@inner_block)}
+      </div>
+    </main>
+
+    <.flash_group flash={@flash} />
+    """
+  end
+
+  attr :flash, :map, required: true
+  attr :current_scope, :map, default: nil
+
+  slot :inner_block, required: true
+
+  def home(assigns) do
+    ~H"""
+    <.app_header hide_home_button={true} current_scope={@current_scope} />
 
     <main class="w-full px-2 sm:px-6 lg:px-8">
       <div class="bleed-container gap-y-4">
@@ -63,58 +76,60 @@ defmodule VolleyWeb.Layouts do
 
   def scorer(assigns) do
     ~H"""
-    <Layouts.app flash={@flash} current_scope={@current_scope}>
-      <main class="w-full max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto space-y-6 pb-16">
+    <.app_header current_scope={@current_scope} />
+
+    <main class="w-full max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto space-y-6 pb-16">
+      <div
+        class={[
+          "fullscreen:max-w-none space-y-2 fullscreen:z-40",
+          "fullscreen:fixed fullscreen:inset-0 fullscreen:isolate"
+        ]}
+        id="scoringContainer"
+      >
+        {render_slot(@inner_block)}
         <div
-          class={[
-            "fullscreen:max-w-none space-y-2 fullscreen:z-40",
-            "fullscreen:fixed fullscreen:inset-0 fullscreen:isolate"
-          ]}
-          id="scoringContainer"
+          class="hidden fullscreen:flex fixed bottom-4 gap-2 inset-x-4 bg-transparent"
+          data-theme="dark"
         >
-          {render_slot(@inner_block)}
-          <div
-            class="hidden fullscreen:flex fixed bottom-4 gap-2 inset-x-4 bg-transparent"
-            data-theme="dark"
+          <.button
+            class="btn-lg btn-circle"
+            phx-click={toggle_fullscreen("#scoringContainer")}
           >
-            <.button
-              class="btn-lg btn-circle"
-              phx-click={toggle_fullscreen("#scoringContainer")}
-            >
-              <.icon name="hero-arrows-pointing-in" class="size-5" />
-            </.button>
-            <div class="fab absolute right-0 bottom-0">
-              <div tabindex="0" role="button" class="btn btn-lg btn-circle">
-                <.icon name="hero-ellipsis-horizontal" class="size-5" />
-              </div>
-
-              <div class="fab-close btn btn-lg btn-circle btn-error">
-                <.icon name="hero-x-mark" class="size-5" />
-              </div>
-
-              <%= for action <- @action, Map.get(action, :show_in_fullscreen?, true) do %>
-                {render_slot(action)}
-              <% end %>
+            <.icon name="hero-arrows-pointing-in" class="size-5" />
+          </.button>
+          <div class="fab absolute right-0 bottom-0">
+            <div tabindex="0" role="button" class="btn btn-lg btn-circle">
+              <.icon name="hero-ellipsis-horizontal" class="size-5" />
             </div>
+
+            <div class="fab-close btn btn-lg btn-circle btn-error">
+              <.icon name="hero-x-mark" class="size-5" />
+            </div>
+
+            <%= for action <- @action, Map.get(action, :show_in_fullscreen?, true) do %>
+              {render_slot(action)}
+            <% end %>
           </div>
         </div>
+      </div>
 
-        <div class="flex gap-1 w-full flex-wrap">
-          <div class="text-nowrap basis-max flex-1">
-            <.button variant="scorer-action" phx-click={toggle_fullscreen("#scoringContainer")}>
-              <.icon name="hero-arrows-pointing-out" /> Fullscreen
-            </.button>
-          </div>
-          <div :for={action <- @action} class="text-nowrap basis-max flex-1">
-            {render_slot(action)}
-          </div>
+      <div class="flex gap-1 w-full flex-wrap">
+        <div class="text-nowrap basis-max flex-1">
+          <.button variant="scorer-action" phx-click={toggle_fullscreen("#scoringContainer")}>
+            <.icon name="hero-arrows-pointing-out" /> Fullscreen
+          </.button>
         </div>
+        <div :for={action <- @action} class="text-nowrap basis-max flex-1">
+          {render_slot(action)}
+        </div>
+      </div>
 
-        <%= for footer <- @footer do %>
-          {render_slot(footer)}
-        <% end %>
-      </main>
-    </Layouts.app>
+      <%= for footer <- @footer do %>
+        {render_slot(footer)}
+      <% end %>
+    </main>
+
+    <.flash_group flash={@flash} />
     """
   end
 

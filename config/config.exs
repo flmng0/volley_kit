@@ -7,6 +7,8 @@
 # General application configuration
 import Config
 
+config :elixir, :time_zone_database, TimeZoneInfo.TimeZoneDatabase
+
 config :volley, Volley.Repo, migration_timestamps: [type: :utc_datetime]
 
 config :volley, Oban,

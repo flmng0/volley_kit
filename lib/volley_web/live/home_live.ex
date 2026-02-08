@@ -20,7 +20,7 @@ defmodule VolleyWeb.HomeLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash} current_scope={@current_scope} hide_home_button={true}>
+    <Layouts.home flash={@flash} current_scope={@current_scope}>
       <main class="full-bleed hero">
         <div class="hero-content flex flex-col lg:flex-row gap-y-12">
           <div class="text-center lg:text-left prose">
@@ -56,7 +56,7 @@ defmodule VolleyWeb.HomeLive do
           </nav>
         </div>
       </main>
-    </Layouts.app>
+    </Layouts.home>
     """
   end
 

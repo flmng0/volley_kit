@@ -90,7 +90,7 @@ defmodule VolleyWeb.CoreComponents do
   """
   attr :rest, :global, include: ~w(href navigate patch method download name value disabled)
   attr :class, :any, default: ""
-  attr :variant, :string, values: ~w(primary secondary neutral delete ghost scorer-action)
+  attr :variant, :string, values: ~w(primary create secondary neutral delete ghost scorer-action)
   slot :inner_block, required: true
 
   def button(%{rest: rest} = assigns) do
@@ -98,6 +98,7 @@ defmodule VolleyWeb.CoreComponents do
       "primary" => "btn-primary",
       "secondary" => "btn-secondary",
       "neutral" => "not-dark:btn-neutral dark:btn-soft",
+      "create" => "btn-success dark:btn-soft",
       "delete" => "btn-error",
       "ghost" => "btn-ghost",
       "scorer-action" => "btn-block btn-md p-4",

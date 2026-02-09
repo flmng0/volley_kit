@@ -2,7 +2,7 @@ defmodule VolleyWeb.TournamentLive.View do
   use VolleyWeb, :live_view
 
   alias Volley.Tournaments
-  alias VolleyWeb.TournamentLive.{OverviewView, RegistrationView, TeamsView}
+  alias VolleyWeb.TournamentLive.{OverviewView, TeamsView}
 
   defp views(),
     do: [
@@ -11,12 +11,6 @@ defmodule VolleyWeb.TournamentLive.View do
         route: &~p"/tournament/#{&1}/",
         title: "Overview",
         module: OverviewView
-      },
-      %{
-        action: :registration,
-        route: &~p"/tournament/#{&1}/registration",
-        title: "Registration",
-        module: RegistrationView
       },
       %{action: :teams, route: &~p"/tournament/#{&1}/teams", title: "Teams", module: TeamsView}
     ]

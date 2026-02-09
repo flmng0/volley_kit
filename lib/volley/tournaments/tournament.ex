@@ -42,23 +42,24 @@ defmodule Volley.Tournaments.Tournament do
   def overview_changeset(tournament, params \\ %{}) do
     # TODO: Validate that start < end
     tournament
-    |> cast(params, [:name, :timezone, :location, :start, :end])
-    |> validate_required([:name, :timezone])
-  end
-
-  def update_changeset(tournament, params \\ %{}) do
-    tournament
     |> cast(params, [
       :name,
       :timezone,
       :location,
       :start,
       :end,
-      :registration_opened_at,
       :registration_closed_at,
+      :registration_opened_at,
       :registration_price
     ])
     |> validate_timezone()
+    |> validate_required([:name, :timezone])
+    |> validate_number(:registration_price, greater_than: 0)
+  end
+
+  def teams_changeset(tournament, params \\ %{}) do
+    tournament
+    |> cast(params, [])
     |> cast_embed(:divisions, sort_param: :sort_divisions, drop_param: :drop_divisions)
     |> cast_embed(:teams, sort_param: :sort_teams, drop_param: :drop_teams)
   end

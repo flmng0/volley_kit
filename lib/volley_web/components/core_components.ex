@@ -157,7 +157,7 @@ defmodule VolleyWeb.CoreComponents do
   attr :type, :string,
     default: "text",
     values: ~w(checkbox color date datetime-local email file month number password
-               search select tel text textarea time url week)
+               search select tel text textarea time url week money)
 
   attr :field, Phoenix.HTML.FormField,
     doc: "a form field struct retrieved from the form, for example: @form[:email]"
@@ -249,6 +249,37 @@ defmodule VolleyWeb.CoreComponents do
         >{Phoenix.HTML.Form.normalize_value("textarea", @value)}</textarea>
       </label>
       <.error :for={msg <- @errors}>{msg}</.error>
+    </div>
+    """
+  end
+
+  def input(%{type: "money"} = assigns) do
+    ~H"""
+    <div class="fieldset mb-2">
+      <label>
+        <span :if={@label} class="label mb-1">{@label}</span>
+        <div class={[
+          @class || "w-full join",
+          @errors != [] && (@error_class || "input-error")
+        ]}>
+          <span class="grid place-items-center px-6 text-base-content/75 text-lg bg-base-200 join-item">
+            $
+          </span>
+          <input
+            type="text"
+            inputmode="numeric"
+            pattern="\d*"
+            class="input flex-grow"
+            name={@name}
+            id={@id}
+            value={Phoenix.HTML.Form.normalize_value("number", @value)}
+            {@rest}
+          />
+          <span class="grid place-items-center px-6 text-base-content/75 text-lg bg-base-200 join-item">
+            .00
+          </span>
+        </div>
+      </label>
     </div>
     """
   end

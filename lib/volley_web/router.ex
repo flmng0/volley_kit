@@ -38,7 +38,9 @@ defmodule VolleyWeb.Router do
     live_session :tournament,
       on_mount: [{VolleyWeb.UserAuth, :require_authenticated}] do
       live "/tournament/", TournamentLive.Index
-      live "/tournament/:id", TournamentLive.View
+      live "/tournament/:id", TournamentLive.View, :overview
+      live "/tournament/:id/teams", TournamentLive.View, :teams
+      live "/tournament/:id/registration", TournamentLive.View, :registration
     end
   end
 

@@ -39,6 +39,13 @@ defmodule Volley.Tournaments.Tournament do
     |> validate_timezone()
   end
 
+  def overview_changeset(tournament, params \\ %{}) do
+    # TODO: Validate that start < end
+    tournament
+    |> cast(params, [:name, :timezone, :location, :start, :end])
+    |> validate_required([:name, :timezone])
+  end
+
   def update_changeset(tournament, params \\ %{}) do
     tournament
     |> cast(params, [

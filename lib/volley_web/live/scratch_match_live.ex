@@ -9,17 +9,22 @@ defmodule VolleyWeb.ScratchMatchLive do
 
   @impl true
   def handle_params(%{"id" => match_id}, _uri, socket) do
-    if match = Scoring.get_match_by_public_id(socket.assigns.current_scope, match_id) do
-      scorer? = Scoring.can_score_match?(socket.assigns.current_scope, match)
+    cond do
+      socket.assigns[:match] && socket.assigns.public_id == match_id ->
+        {:noreply, socket}
 
-      {:noreply, assign_new_match(socket, match, scorer?)}
-    else
-      socket =
-        socket
-        |> put_flash(:error, "Match with saved ID no longer exists")
-        |> redirect(to: ~p"/")
+      match = Scoring.get_match_by_public_id(socket.assigns.current_scope, match_id) ->
+        scorer? = Scoring.can_score_match?(socket.assigns.current_scope, match)
 
-      {:noreply, socket}
+        {:noreply, assign_new_match(socket, match, scorer?)}
+
+      true ->
+        socket =
+          socket
+          |> put_flash(:error, "Match with saved ID no longer exists")
+          |> redirect(to: ~p"/")
+
+        {:noreply, socket}
     end
   end
 

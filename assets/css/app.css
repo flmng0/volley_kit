@@ -127,15 +127,15 @@
   --font-score: "Noto Sans";
 }
 
-.bleed-container {
+@utility bleed-container {
   display: grid;
   grid-template-columns: 1fr min(42rem, 100%) 1fr;
 
-  > * {
+  & > * {
     grid-column: 2;
   }
 }
 
-.full-bleed {
+@utility full-bleed {
   grid-column: 1 / -1;
 }

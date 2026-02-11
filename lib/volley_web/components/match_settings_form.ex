@@ -18,8 +18,8 @@ defmodule VolleyWeb.MatchSettingsForm do
         phx-submit="submit"
         phx-target={@myself}
       >
-        <.input field={f[:a_name]} label="Team A's Name" />
-        <.input field={f[:b_name]} label="Team B's Name" />
+        <.input field={f[:a_name]} label="Team A's Name" placeholder="Team A" />
+        <.input field={f[:b_name]} label="Team B's Name" placeholder="Team B" />
 
         <.input field={f[:set_limit]} label="Set Limit" type="text" inputmode="numeric" />
 

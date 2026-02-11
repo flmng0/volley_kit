@@ -27,6 +27,17 @@ window.addEventListener("vk:copytext", function (e) {
   });
 });
 
+window.addEventListener("vk:filldate", function (e) {
+  const input = e.target;
+  const now = new Date();
+  now.setMilliseconds(0);
+  now.setSeconds(0);
+  input.valueAsDate = now;
+
+  const event = new Event("input", {bubbles: true});
+  input.dispatchEvent(event);
+})
+
 const fullscreen = {
   get enabled() {
     return document.documentElement.dataset.fullscreen === "true";

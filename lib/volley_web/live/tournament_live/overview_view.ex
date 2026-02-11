@@ -7,24 +7,57 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
   def render(assigns) do
     ~H"""
     <div>
-      <.form :let={f} for={@form} phx-change="validate" phx-submit="submit" phx-target={@myself}>
-        <.input field={f[:name]} label="Tournament Name" />
-
-        <.input field={f[:timezone]} label="Timezone" options={@valid_time_zones} type="select" />
-
-        <.input field={f[:location]} label="Location" />
-
-        <.input field={f[:start]} label="Tournament Start" type="datetime-local" />
-        <.input field={f[:end]} label="Tournament End" type="datetime-local" />
+      <.form
+        :let={f}
+        for={@form}
+        phx-change="validate"
+        phx-submit="submit"
+        phx-target={@myself}
+        class="flex flex-col gap-8"
+      >
+        <.header>
+          Overview
+          <:subtitle>Adjust basic settings for your tournament.</:subtitle>
+          <:actions>
+            <.button variant="save" disabled={@clean?}>Save</.button>
+            <.button variant="cancel" phx-click="cancel" phx-target={@myself}>Cancel</.button>
+          </:actions>
+        </.header>
 
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Registration Settings</legend>
-          <.button phx-click="open_registration_now" disabled={@tournament.registration_opened_at}>
-            Open Registration Now
-          </.button>
-          <.button phx-click="close_registration_now" disabled={@tournament.registration_closed_at}>
-            Close Registration Now
-          </.button>
+          <legend class="fieldset-legend text-lg">Basic Details</legend>
+
+          <.input field={f[:name]} label="Tournament Name" />
+
+          <.input field={f[:timezone]} label="Timezone" options={@valid_time_zones} type="select" />
+
+          <.input field={f[:location]} label="Location" />
+
+          <.input field={f[:start]} label="Tournament Start" type="datetime-local" />
+          <.input field={f[:end]} label="Tournament End" type="datetime-local" />
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend text-lg">Registration Settings</legend>
+
+          <div class="grid gap-4 lg:grid-cols-2">
+            <.button
+              variant="create"
+              type="button"
+              phx-click={JS.dispatch("vk:filldate", to: "##{f[:registration_opened_at].id}")}
+              disabled={@tournament.registration_opened_at}
+            >
+              Set Open Time to Now
+            </.button>
+            <.button
+              variant="delete"
+              type="button"
+              phx-click={JS.dispatch("vk:filldate", to: "##{f[:registration_closed_at].id}")}
+              disabled={@tournament.registration_closed_at}
+            >
+              Set Close Time to Now
+            </.button>
+          </div>
 
           <.input
             field={f[:registration_opened_at]}
@@ -85,9 +118,25 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
     end
   end
 
+  def handle_event("cancel", _params, socket) do
+    {:noreply, assign_form(socket, %{})}
+  end
+
+  def handle_event("close_registration_now", params, socket) do
+    IO.inspect(params, label: "Params for close")
+    {:noreply, socket}
+  end
+
   defp assign_form(socket, params_or_changeset, opts \\ [])
 
   defp assign_form(socket, %Ecto.Changeset{} = changeset, opts) do
+    clean? = Enum.empty?(changeset.changes)
+
+    socket =
+      socket
+      |> assign(:clean?, clean?)
+      |> assign(:form, to_form(changeset, opts ++ [as: "tournament"]))
+
     assign(socket, :form, to_form(changeset, opts ++ [as: "tournament"]))
   end
 

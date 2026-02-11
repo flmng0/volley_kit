@@ -10,7 +10,7 @@ defmodule VolleyWeb.ScratchMatchLive do
   @impl true
   def handle_params(%{"id" => match_id}, _uri, socket) do
     cond do
-      socket.assigns[:match] && socket.assigns.public_id == match_id ->
+      socket.assigns[:match] && socket.assigns.match.public_id == match_id ->
         {:noreply, socket}
 
       match = Scoring.get_match_by_public_id(socket.assigns.current_scope, match_id) ->

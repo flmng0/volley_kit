@@ -4,38 +4,22 @@ defmodule VolleyWeb.TournamentLive.View do
   alias Volley.Tournaments
   alias VolleyWeb.TournamentLive.{OverviewView, TeamsView}
 
-  defp views(),
-    do: [
-      %{
-        action: :overview,
-        route: &~p"/tournament/#{&1}/",
-        title: "Overview",
-        module: OverviewView
-      },
-      %{action: :teams, route: &~p"/tournament/#{&1}/teams", title: "Teams", module: TeamsView}
-    ]
-
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app current_scope={@current_scope} flash={@flash}>
-      <div class="grid lg:grid-cols-subgrid lg:col-span-2 gap-6">
-        <ul class="menu bg-base-200 border border-base-300 shadow-sm menu-horizontal lg:menu-vertical lg:justify-self-end lg:self-start">
-          <li class="menu-title">{@tournament.name}</li>
-          <li :for={view <- views()} class={@live_action == view.action && "menu-active"}>
-            <.link patch={view.route.(@tournament)}>{view.title}</.link>
-          </li>
-        </ul>
-
-        <.live_component
-          :for={view <- views()}
-          :if={@live_action == view.action}
-          id={Atom.to_string(view.action) <> "_view"}
-          module={view.module}
-          tournament={@tournament}
-        />
-      </div>
-    </Layouts.app>
+    <Layouts.tabbed current_scope={@current_scope} flash={@flash} title={@tournament.name}>
+      <:tab name="Overview" link={~p"/tournament/#{@tournament}"} active={@live_action == :overview}>
+        <.live_component id="overview_view" module={OverviewView} tournament={@tournament} />
+      </:tab>
+      <:tab
+        name="Teams"
+        link={~p"/tournament/#{@tournament}/teams"}
+        active={@live_action == :teams}
+        warning={@tournament.divisions == [] && "No divisions have been setup"}
+      >
+        <.live_component id="teams_view" module={TeamsView} tournament={@tournament} />
+      </:tab>
+    </Layouts.tabbed>
     """
   end
 

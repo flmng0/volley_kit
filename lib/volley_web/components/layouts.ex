@@ -66,6 +66,44 @@ defmodule VolleyWeb.Layouts do
   attr :flash, :map, required: true
   attr :current_scope, :map, default: nil
 
+  attr :title, :string
+
+  slot :tab do
+    attr :name, :string
+    attr :link, :string
+    attr :active, :boolean
+    attr :warning, :string
+  end
+
+  def tabbed(assigns) do
+    ~H"""
+    <Layouts.app current_scope={@current_scope} flash={@flash}>
+      <div class="grid lg:grid-cols-subgrid lg:col-span-2 gap-6">
+        <ul class="menu bg-base-200 min-w-48 border border-base-300 shadow-sm menu-horizontal lg:menu-vertical lg:justify-self-end lg:self-start">
+          <li class="menu-title">{@title}</li>
+          <li :for={tab <- @tab} class={tab.active && "menu-active"}>
+            <.link patch={tab.link}>
+              {tab.name}
+              <span
+                :if={Map.get(tab, :warning)}
+                class="badge badge-warning tooltip tooltip-bottom"
+                data-tip={tab.warning}
+              >
+                <.icon name="hero-exclamation-triangle" />
+              </span>
+            </.link>
+          </li>
+        </ul>
+
+        {render_slot(Enum.find(@tab, &Map.get(&1, :active)))}
+      </div>
+    </Layouts.app>
+    """
+  end
+
+  attr :flash, :map, required: true
+  attr :current_scope, :map, default: nil
+
   slot :inner_block, required: true
 
   slot :action do

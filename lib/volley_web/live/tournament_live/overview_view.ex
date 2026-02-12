@@ -20,7 +20,13 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
           <:subtitle>Adjust basic settings for your tournament.</:subtitle>
           <:actions>
             <.button variant="save" disabled={@clean?}>Save</.button>
-            <.button variant="cancel" phx-click="cancel" phx-target={@myself} disabled={@clean?}>
+            <.button
+              type="button"
+              variant="cancel"
+              phx-click="cancel"
+              phx-target={@myself}
+              disabled={@clean?}
+            >
               Revert Changes
             </.button>
           </:actions>

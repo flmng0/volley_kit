@@ -36,6 +36,14 @@ window.addEventListener("vk:filldate", function (e) {
 
   const event = new Event("input", {bubbles: true});
   input.dispatchEvent(event);
+});
+
+window.addEventListener("vk:clear", function (e) {
+  const input = e.target;
+  e.target.value = null;
+
+  const event = new Event("input", {bubbles: true});
+  input.dispatchEvent(event);
 })
 
 const fullscreen = {

@@ -179,6 +179,8 @@ defmodule VolleyWeb.CoreComponents do
     include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
                 multiple pattern placeholder readonly required rows size step)
 
+  slot :actions
+
   def input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
     errors = if Phoenix.Component.used_input?(field), do: field.errors, else: []
 
@@ -222,16 +224,18 @@ defmodule VolleyWeb.CoreComponents do
     <div class="mb-2">
       <label>
         <span :if={@label} class="label mb-1">{@label}</span>
-        <select
-          id={@id}
-          name={@name}
-          class={[@class || "w-full select", @errors != [] && (@error_class || "select-error")]}
-          multiple={@multiple}
-          {@rest}
-        >
-          <option :if={@prompt} value="">{@prompt}</option>
-          {Phoenix.HTML.Form.options_for_select(@options, @value)}
-        </select>
+        <.wrap_actions actions={@actions}>
+          <select
+            id={@id}
+            name={@name}
+            class={[@class || "w-full select", @errors != [] && (@error_class || "select-error")]}
+            multiple={@multiple}
+            {@rest}
+          >
+            <option :if={@prompt} value="">{@prompt}</option>
+            {Phoenix.HTML.Form.options_for_select(@options, @value)}
+          </select>
+        </.wrap_actions>
       </label>
       <.error :for={msg <- @errors}>{msg}</.error>
     </div>
@@ -243,15 +247,17 @@ defmodule VolleyWeb.CoreComponents do
     <div class="mb-2">
       <label>
         <span :if={@label} class="label mb-1">{@label}</span>
-        <textarea
-          id={@id}
-          name={@name}
-          class={[
-            @class || "w-full textarea",
-            @errors != [] && (@error_class || "textarea-error")
-          ]}
-          {@rest}
-        >{Phoenix.HTML.Form.normalize_value("textarea", @value)}</textarea>
+        <.wrap_actions actions={@actions}>
+          <textarea
+            id={@id}
+            name={@name}
+            class={[
+              @class || "w-full textarea",
+              @errors != [] && (@error_class || "textarea-error")
+            ]}
+            {@rest}
+          >{Phoenix.HTML.Form.normalize_value("textarea", @value)}</textarea>
+        </.wrap_actions>
       </label>
       <.error :for={msg <- @errors}>{msg}</.error>
     </div>
@@ -263,27 +269,29 @@ defmodule VolleyWeb.CoreComponents do
     <div class="mb-2">
       <label>
         <span :if={@label} class="label mb-1">{@label}</span>
-        <div class={[
-          @class || "w-full join",
-          @errors != [] && (@error_class || "input-error")
-        ]}>
-          <span class="grid place-items-center px-6 text-base-content/75 text-lg bg-base-200 join-item">
-            $
-          </span>
-          <input
-            type="text"
-            inputmode="numeric"
-            pattern="\d*"
-            class="input flex-grow"
-            name={@name}
-            id={@id}
-            value={Phoenix.HTML.Form.normalize_value("number", @value)}
-            {@rest}
-          />
-          <span class="grid place-items-center px-6 text-base-content/75 text-lg bg-base-200 join-item">
-            .00
-          </span>
-        </div>
+        <.wrap_actions actions={@actions}>
+          <div class={[
+            @class || "w-full join",
+            @errors != [] && (@error_class || "input-error")
+          ]}>
+            <span class="grid place-items-center px-6 text-base-content/75 text-lg bg-base-200 join-item">
+              $
+            </span>
+            <input
+              type="text"
+              inputmode="numeric"
+              pattern="\d*"
+              class="input flex-grow"
+              name={@name}
+              id={@id}
+              value={Phoenix.HTML.Form.normalize_value("number", @value)}
+              {@rest}
+            />
+            <span class="grid place-items-center px-6 text-base-content/75 text-lg bg-base-200 join-item">
+              .00
+            </span>
+          </div>
+        </.wrap_actions>
       </label>
       <.error :for={msg <- @errors}>{msg}</.error>
     </div>
@@ -296,17 +304,19 @@ defmodule VolleyWeb.CoreComponents do
     <div class="mb-2">
       <label>
         <span :if={@label} class="label mb-1">{@label}</span>
-        <input
-          type={@type}
-          name={@name}
-          id={@id}
-          value={Phoenix.HTML.Form.normalize_value(@type, @value)}
-          class={[
-            @class || "w-full input",
-            @errors != [] && (@error_class || "input-error")
-          ]}
-          {@rest}
-        />
+        <.wrap_actions actions={@actions}>
+          <input
+            type={@type}
+            name={@name}
+            id={@id}
+            value={Phoenix.HTML.Form.normalize_value(@type, @value)}
+            class={[
+              @class || "w-full input",
+              @errors != [] && (@error_class || "input-error")
+            ]}
+            {@rest}
+          />
+        </.wrap_actions>
       </label>
       <.error :for={msg <- @errors}>{msg}</.error>
     </div>
@@ -320,6 +330,25 @@ defmodule VolleyWeb.CoreComponents do
       <.icon name="hero-exclamation-circle" class="size-5" />
       {render_slot(@inner_block)}
     </p>
+    """
+  end
+
+  # Helper to align actions with input boxes, instead of validations
+  attr :actions, :list
+  slot :inner_block, required: true
+
+  defp wrap_actions(assigns) do
+    ~H"""
+    <%= if @actions == [] do %>
+      {render_slot(@inner_block)}
+    <% else %>
+      <div class="grid grid-cols-[1fr_auto] gap-x-4">
+        {render_slot(@inner_block)}
+        <div class="flex gap-x-2">
+          {render_slot(@actions)}
+        </div>
+      </div>
+    <% end %>
     """
   end
 

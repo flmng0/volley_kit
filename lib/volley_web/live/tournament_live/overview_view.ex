@@ -20,7 +20,9 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
           <:subtitle>Adjust basic settings for your tournament.</:subtitle>
           <:actions>
             <.button variant="save" disabled={@clean?}>Save</.button>
-            <.button variant="cancel" phx-click="cancel" phx-target={@myself}>Cancel</.button>
+            <.button variant="cancel" phx-click="cancel" phx-target={@myself} disabled={@clean?}>
+              Revert Changes
+            </.button>
           </:actions>
         </.header>
 
@@ -29,6 +31,13 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
 
           <.input field={f[:name]} label="Tournament Name" />
 
+          <div class="alert alert-info mt-2">
+            <.icon name="hero-information-circle" class="size-6" />
+            <div>
+              <p>All time-related settings will be in the timezone you have set below.</p>
+              <p>Visitors will see the time as-is, listed alongside the timezone.</p>
+            </div>
+          </div>
           <.input field={f[:timezone]} label="Timezone" options={@valid_time_zones} type="select" />
 
           <.input field={f[:location]} label="Location" />
@@ -40,40 +49,44 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
         <fieldset class="fieldset">
           <legend class="fieldset-legend text-lg">Registration Settings</legend>
 
-          <div class="grid gap-4 lg:grid-cols-2">
-            <.button
-              variant="create"
-              type="button"
-              phx-click={JS.dispatch("vk:filldate", to: "##{f[:registration_opened_at].id}")}
-              disabled={@tournament.registration_opened_at}
-            >
-              Set Open Time to Now
-            </.button>
-            <.button
-              variant="delete"
-              type="button"
-              phx-click={JS.dispatch("vk:filldate", to: "##{f[:registration_closed_at].id}")}
-              disabled={@tournament.registration_closed_at}
-            >
-              Set Close Time to Now
-            </.button>
-          </div>
+          <div class="grid gap-4 lg:grid-cols-2"></div>
 
-          <.input
-            field={f[:registration_opened_at]}
-            label="Registration Close Time"
-            type="datetime-local"
-          />
-          <.input
-            field={f[:registration_closed_at]}
-            label="Registration Close Time"
-            type="datetime-local"
-          />
+          <.datetime_input label="Registration Open Time" field={f[:registration_opened_at]} />
+          <.datetime_input label="Registration Close Time" field={f[:registration_closed_at]} />
 
           <.input field={f[:registration_price]} label="Registration Price" type="money" />
         </fieldset>
       </.form>
     </div>
+    """
+  end
+
+  attr :field, Phoenix.HTML.FormField, required: true
+  attr :label, :string, required: true
+
+  def datetime_input(assigns) do
+    ~H"""
+    <.input
+      field={@field}
+      label={@label}
+      type="datetime-local"
+    >
+      <:actions>
+        <.button
+          type="button"
+          phx-click={JS.dispatch("vk:filldate", to: "##{@field.id}")}
+        >
+          Set to Now
+        </.button>
+        <.button
+          variant="neutral"
+          type="button"
+          phx-click={JS.dispatch("vk:clear", to: "##{@field.id}")}
+        >
+          Clear
+        </.button>
+      </:actions>
+    </.input>
     """
   end
 
@@ -110,7 +123,7 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
   def handle_event("submit", %{"tournament" => params}, socket) do
     case Tournament.overview_changeset(socket.assigns.tournament, params) do
       %Ecto.Changeset{valid?: true} = changeset ->
-        send(self(), {:submit_overview_update, changeset})
+        send(self(), {:update_tournament, changeset})
         {:noreply, socket}
 
       changeset ->
@@ -120,11 +133,6 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
 
   def handle_event("cancel", _params, socket) do
     {:noreply, assign_form(socket, %{})}
-  end
-
-  def handle_event("close_registration_now", params, socket) do
-    IO.inspect(params, label: "Params for close")
-    {:noreply, socket}
   end
 
   defp assign_form(socket, params_or_changeset, opts \\ [])

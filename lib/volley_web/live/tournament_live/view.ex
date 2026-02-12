@@ -59,4 +59,11 @@ defmodule VolleyWeb.TournamentLive.View do
         {:noreply, socket}
     end
   end
+
+  @impl true
+  def handle_info({:update_tournament, %Ecto.Changeset{} = changeset}, socket) do
+    tournament = Volley.Repo.update!(changeset)
+
+    {:noreply, assign(socket, :tournament, tournament)}
+  end
 end

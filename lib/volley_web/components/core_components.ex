@@ -435,6 +435,12 @@ defmodule VolleyWeb.CoreComponents do
             </div>
           </td>
         </tr>
+        <tr
+          id={@id <> "_empty_text"}
+          class="hidden only:table-row text-center italic text-base-content/50"
+        >
+          <td colspan={length(@col) + if(@action == [], do: 0, else: 1)}>No items</td>
+        </tr>
       </tbody>
     </table>
     """

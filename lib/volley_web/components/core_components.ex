@@ -511,7 +511,7 @@ defmodule VolleyWeb.CoreComponents do
 
   def modal(assigns) do
     ~H"""
-    <.portal id={"#{@id}Portal"} target="body">
+    <.portal id={@id <> "_portal"} target="body">
       <dialog
         id={@id}
         {@rest}

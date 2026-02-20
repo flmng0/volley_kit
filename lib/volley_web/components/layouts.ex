@@ -95,7 +95,9 @@ defmodule VolleyWeb.Layouts do
           </li>
         </ul>
 
-        {render_slot(Enum.find(@tab, &Map.get(&1, :active)))}
+        <div>
+          {render_slot(Enum.find(@tab, &Map.get(&1, :active)))}
+        </div>
       </div>
     </Layouts.app>
     """

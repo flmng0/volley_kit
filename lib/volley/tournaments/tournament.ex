@@ -34,8 +34,8 @@ defmodule Volley.Tournaments.Tournament do
 
   def create_changeset(tournament, params \\ %{}) do
     tournament
-    |> cast(params, [:name, :timezone])
-    |> validate_required([:name, :timezone])
+    |> cast(params, [:timezone])
+    |> validate_required([:timezone])
     |> validate_timezone()
   end
 

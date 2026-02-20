@@ -7,7 +7,11 @@ defmodule VolleyWeb.TournamentLive.View do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.tabbed current_scope={@current_scope} flash={@flash} title={@tournament.name}>
+    <Layouts.tabbed
+      current_scope={@current_scope}
+      flash={@flash}
+      title={@tournament.name || "Unnamed Tournament"}
+    >
       <:tab name="Overview" link={~p"/tournament/#{@tournament}"} active={@live_action == :overview}>
         <.live_component id="overview_view" module={OverviewView} tournament={@tournament} />
       </:tab>

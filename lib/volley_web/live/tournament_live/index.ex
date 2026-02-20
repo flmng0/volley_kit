@@ -10,14 +10,11 @@ defmodule VolleyWeb.TournamentLive.Index do
       <.header>
         Tournaments
         <:actions>
-          <.button variant="create" phx-click="create_new">Create New Tournament</.button>
+          <.create_tournament_button />
         </:actions>
       </.header>
 
       <ul id="tournaments_list" phx-update="stream" class="peer list">
-        <li :if={assigns[:new_form]} id="new_tournament_item">
-          <.inline_tournament_form form={@new_form} />
-        </li>
         <li
           :for={{id, tournament} <- @streams.tournaments}
           id={id}
@@ -53,32 +50,17 @@ defmodule VolleyWeb.TournamentLive.Index do
     """
   end
 
-  attr :form, :map, required: true
-
-  defp inline_tournament_form(assigns) do
+  defp create_tournament_button(assigns) do
     ~H"""
-    <.form
-      :let={f}
-      for={@form}
-      class="list-row"
-      phx-change="validate_new"
-      phx-submit="submit_new"
-      phx-mounted={JS.focus(to: {:inner, "input"})}
-    >
-      <div class="list-col-grow">
-        <.input field={f[:name]} type="text" placeholder="Tournament Name" />
-      </div>
-
-      <.button variant="create" class="mb-2 mt-1"><.icon name="hero-check" /></.button>
-
+    <form phx-submit="create_new">
+      <.button variant="create">Create New Tournament</.button>
       <input
         type="hidden"
-        phx-update="ignore"
-        name={f[:timezone].name}
-        id={f[:timezone].id}
+        name="tournament[timezone]"
+        id="timezone_input"
         phx-hook=".AutofillTimezone"
       />
-    </.form>
+    </form>
     <script :type={Phoenix.LiveView.ColocatedHook} name=".AutofillTimezone">
       export default {
         mounted() {
@@ -99,24 +81,13 @@ defmodule VolleyWeb.TournamentLive.Index do
   end
 
   @impl true
-  def handle_event("create_new", _params, socket) do
-    {:noreply, assign_new_form(socket)}
-  end
-
-  def handle_event("validate_new", %{"tournament" => params}, socket) do
-    {:noreply, assign_new_form(socket, params, action: :validate)}
-  end
-
-  def handle_event("submit_new", %{"tournament" => params}, socket) do
+  def handle_event("create_new", %{"tournament" => params}, socket) do
     case Tournaments.create_tournament_draft(socket.assigns.current_scope, params) do
       {:ok, tournament} ->
         socket =
           socket
-          |> stream_insert(:tournaments, tournament)
-          |> assign(:tournaments_empty?, false)
-          |> assign(:new_form, nil)
-          # Janky workaround for deleting the inline item
-          |> stream_delete_by_dom_id(:tournaments, "new_tournament_item")
+          |> put_flash(:info, "Successfully created new tournament!")
+          |> push_navigate(to: ~p"/tournament/#{tournament}")
 
         {:noreply, socket}
 
@@ -143,15 +114,5 @@ defmodule VolleyWeb.TournamentLive.Index do
 
       {:noreply, socket}
     end
-  end
-
-  defp assign_new_form(socket, params \\ %{}, opts \\ []) do
-    data = %{}
-    types = %{name: :string, timezone: :string}
-
-    changeset = Tournaments.Tournament.create_changeset({data, types}, params)
-    form = to_form(changeset, opts ++ [as: "tournament"])
-
-    assign(socket, :new_form, form)
   end
 end

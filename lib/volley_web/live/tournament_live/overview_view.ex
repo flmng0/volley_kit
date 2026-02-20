@@ -6,7 +6,7 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
   @impl true
   def render(assigns) do
     ~H"""
-    <div>
+    <div phx-mounted={JS.focus(to: "#tournament_name_input")}>
       <.form
         :let={f}
         for={@form}
@@ -35,7 +35,7 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
         <fieldset class="fieldset">
           <legend class="fieldset-legend text-lg">Basic Details</legend>
 
-          <.input field={f[:name]} label="Tournament Name" />
+          <.input field={f[:name]} label="Tournament Name" id="tournament_name_input" />
 
           <div class="alert alert-info mt-2">
             <.icon name="hero-information-circle" class="size-6" />

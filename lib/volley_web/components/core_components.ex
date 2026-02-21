@@ -173,6 +173,7 @@ defmodule VolleyWeb.CoreComponents do
   attr :options, :list, doc: "the options to pass to Phoenix.HTML.Form.options_for_select/2"
   attr :multiple, :boolean, default: false, doc: "the multiple flag for select inputs"
   attr :class, :string, default: nil, doc: "the input class to use over defaults"
+  attr :wrapper_class, :string, default: nil, doc: "the class to use for the root element"
   attr :error_class, :string, default: nil, doc: "the input error class to use over defaults"
 
   attr :rest, :global,
@@ -199,7 +200,7 @@ defmodule VolleyWeb.CoreComponents do
       end)
 
     ~H"""
-    <div class="mb-2">
+    <div class={@wrapper_class || "mb-2"}>
       <label>
         <input type="hidden" name={@name} value="false" disabled={@rest[:disabled]} />
         <span class="label">
@@ -221,7 +222,7 @@ defmodule VolleyWeb.CoreComponents do
 
   def input(%{type: "select"} = assigns) do
     ~H"""
-    <div class="mb-2">
+    <div class={@wrapper_class || "mb-2"}>
       <label>
         <span :if={@label} class="label mb-1">{@label}</span>
         <.wrap_actions actions={@actions}>
@@ -244,7 +245,7 @@ defmodule VolleyWeb.CoreComponents do
 
   def input(%{type: "textarea"} = assigns) do
     ~H"""
-    <div class="mb-2">
+    <div class={@wrapper_class || "mb-2"}>
       <label>
         <span :if={@label} class="label mb-1">{@label}</span>
         <.wrap_actions actions={@actions}>
@@ -266,7 +267,7 @@ defmodule VolleyWeb.CoreComponents do
 
   def input(%{type: "money"} = assigns) do
     ~H"""
-    <div class="mb-2">
+    <div class={@wrapper_class || "mb-2"}>
       <label>
         <span :if={@label} class="label mb-1">{@label}</span>
         <.wrap_actions actions={@actions}>
@@ -301,7 +302,7 @@ defmodule VolleyWeb.CoreComponents do
   # All other inputs text, datetime-local, url, password, etc. are handled here...
   def input(assigns) do
     ~H"""
-    <div class="mb-2">
+    <div class={@wrapper_class || "mb-2"}>
       <label>
         <span :if={@label} class="label mb-1">{@label}</span>
         <.wrap_actions actions={@actions}>

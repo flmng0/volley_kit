@@ -151,7 +151,7 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
       |> assign(:clean?, clean?)
       |> assign(:form, to_form(changeset, opts ++ [as: "tournament"]))
 
-    assign(socket, :form, to_form(changeset, opts ++ [as: "tournament"]))
+    socket
   end
 
   defp assign_form(socket, params, opts) do

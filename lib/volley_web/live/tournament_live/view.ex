@@ -24,9 +24,17 @@ defmodule VolleyWeb.TournamentLive.View do
         name="Teams"
         link={~p"/tournament/#{@tournament}/teams"}
         active={@live_action == :teams}
-        warning={@tournament.divisions == [] && "No divisions have been setup"}
+        warning={
+          !assigns[:division_created?] && @tournament.divisions == [] &&
+            "No divisions have been setup"
+        }
       >
-        <.live_component id="teams_view" module={TeamsView} tournament={@tournament} />
+        <.live_component
+          id="teams_view"
+          module={TeamsView}
+          tournament={@tournament}
+          scope={@current_scope}
+        />
       </:tab>
     </Layouts.tabbed>
     """
@@ -54,7 +62,11 @@ defmodule VolleyWeb.TournamentLive.View do
   end
 
   @impl true
-  def handle_info({:update_tournament, tournament}, socket) do
+  def handle_info({:updated_tournament, tournament}, socket) do
     {:noreply, assign(socket, :tournament, tournament)}
+  end
+
+  def handle_info(:division_created, socket) do
+    {:noreply, assign(socket, :division_created?, true)}
   end
 end

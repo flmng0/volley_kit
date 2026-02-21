@@ -112,10 +112,11 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
   end
 
   @impl true
-  def update(%{tournament: tournament}, socket) do
+  def update(%{tournament: tournament, scope: scope}, socket) do
     socket =
       socket
       |> assign(:tournament, tournament)
+      |> assign(:scope, scope)
       |> assign_form(%{})
 
     {:ok, socket}
@@ -127,12 +128,14 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
   end
 
   def handle_event("submit", %{"tournament" => params}, socket) do
-    case Tournament.overview_changeset(socket.assigns.tournament, params) do
-      %Ecto.Changeset{valid?: true} = changeset ->
-        send(self(), {:update_tournament, changeset})
+    %{scope: scope, tournament: tournament} = socket.assigns
+
+    case Volley.Tournaments.update_tournament_overview(scope, tournament, params) do
+      {:ok, tournament} ->
+        send(self(), {:update_tournament, tournament})
         {:noreply, socket}
 
-      changeset ->
+      {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign_form(socket, changeset)}
     end
   end

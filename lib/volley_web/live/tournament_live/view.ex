@@ -13,7 +13,12 @@ defmodule VolleyWeb.TournamentLive.View do
       title={@tournament.name || "Unnamed Tournament"}
     >
       <:tab name="Overview" link={~p"/tournament/#{@tournament}"} active={@live_action == :overview}>
-        <.live_component id="overview_view" module={OverviewView} tournament={@tournament} />
+        <.live_component
+          id="overview_view"
+          module={OverviewView}
+          tournament={@tournament}
+          scope={@current_scope}
+        />
       </:tab>
       <:tab
         name="Teams"
@@ -49,9 +54,7 @@ defmodule VolleyWeb.TournamentLive.View do
   end
 
   @impl true
-  def handle_info({:update_tournament, %Ecto.Changeset{} = changeset}, socket) do
-    tournament = Volley.Repo.update!(changeset)
-
+  def handle_info({:update_tournament, tournament}, socket) do
     {:noreply, assign(socket, :tournament, tournament)}
   end
 end

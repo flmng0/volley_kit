@@ -31,11 +31,11 @@ defmodule Volley.Tournaments do
   def is_tournament_owner?(%User{id: user_id}, %Tournament{owner_id: user_id}), do: true
   def is_tournament_owner?(_, _), do: false
 
-  def update_tournament(%Scope{} = scope, %Tournament{} = tournament, params) do
+  def update_tournament_overview(%Scope{} = scope, %Tournament{} = tournament, params) do
     true = is_tournament_owner?(scope, tournament)
 
     tournament
-    |> Tournament.update_changeset(params)
+    |> Tournament.overview_changeset(params)
     |> Repo.update()
   end
 

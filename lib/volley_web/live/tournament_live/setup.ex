@@ -13,12 +13,7 @@ defmodule VolleyWeb.TournamentLive.Setup do
         <.details form={@form} />
       </:step>
       <:step name="Divisions" key={:divisions} complete={@divisions_complete?} icon="hero-users-solid">
-        <.divisions />
-
-        <div class="flex justify-between">
-          <.button patch={~p"/tournament/setup/details"}>Back</.button>
-          <.button patch={~p"/tournament/setup/registration"}>Next</.button>
-        </div>
+        <.divisions form={@form} />
       </:step>
       <:step name="Registration" key={:registration} complete={false} icon="hero-book-open-solid">
         <.registration />
@@ -32,22 +27,26 @@ defmodule VolleyWeb.TournamentLive.Setup do
     """
   end
 
+  defp divisions_empty?(%Phoenix.HTML.Form{} = form) do
+    (form.source.changes[:divisions] || []) == []
+  end
+
   @impl true
   def mount(_params, _session, socket) do
     socket =
       socket
       |> assign(:tournament, %Tournament{})
-      |> assign(:divisions, [])
-      |> assign(details_complete?: false, divisions_complete?: false)
+      |> assign(details_complete?: false, divisions_complete?: false, enable_divisions?: false)
 
     {:ok, socket}
   end
 
   @impl true
   def handle_params(_params, _uri, socket) do
-    if socket.assigns.live_action do
+    if action = socket.assigns.live_action do
       socket =
         socket
+        |> apply_action(action)
         |> assign_form(%{})
 
       {:noreply, socket}
@@ -56,12 +55,13 @@ defmodule VolleyWeb.TournamentLive.Setup do
     end
   end
 
+  defp apply_action(socket, _action), do: socket
+
   @impl true
   def handle_event("update", %{"tournament" => params}, socket) do
     {:noreply, assign_form(socket, params, action: :validate)}
   end
 
-  @impl true
   def handle_event("next", %{"tournament" => params}, socket) do
     changeset_fn = changeset(socket.assigns.live_action)
     changeset = changeset_fn.(socket.assigns.tournament, params)
@@ -80,6 +80,10 @@ defmodule VolleyWeb.TournamentLive.Setup do
     end
   end
 
+  def handle_event("skip", _params, socket) do
+    {:noreply, apply_next(socket, :divisions)}
+  end
+
   defp apply_next(socket, :details) do
     socket
     |> assign(:details_complete?, true)
@@ -94,6 +98,7 @@ defmodule VolleyWeb.TournamentLive.Setup do
 
   defp changeset(:details), do: &Tournament.details_setup_changeset/2
   defp changeset(:divisions), do: &Tournament.divisions_setup_changeset/2
+  defp changeset(:registration), do: &Tournament.divisions_setup_changeset/2
 
   defp assign_form(socket, params_or_changeset, opts \\ [])
 

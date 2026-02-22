@@ -11,17 +11,16 @@ defmodule VolleyWeb.MatchSettingsForm do
     ~H"""
     <div>
       <.form
-        :let={f}
         for={@form}
         id={@id}
         phx-change="validate"
         phx-submit="submit"
         phx-target={@myself}
       >
-        <.input field={f[:a_name]} label="Team A's Name" placeholder="Team A" />
-        <.input field={f[:b_name]} label="Team B's Name" placeholder="Team B" />
+        <.input field={@form[:a_name]} label="Team A's Name" placeholder="Team A" />
+        <.input field={@form[:b_name]} label="Team B's Name" placeholder="Team B" />
 
-        <.input field={f[:set_limit]} label="Set Limit" type="text" inputmode="numeric" />
+        <.input field={@form[:set_limit]} label="Set Limit" type="text" inputmode="numeric" />
 
         <div class="mt-6 flex justify-end items-center gap-4">
           <%= if @type == :create do %>
@@ -30,7 +29,7 @@ defmodule VolleyWeb.MatchSettingsForm do
             </.button>
           <% else %>
             <div
-              :if={used_input?(f[:set_limit])}
+              :if={used_input?(@form[:set_limit])}
               class="alert alert-warning grow py-2"
             >
               <.icon name="hero-exclamation-triangle" />

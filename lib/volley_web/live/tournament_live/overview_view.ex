@@ -8,7 +8,6 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
     ~H"""
     <div phx-mounted={JS.focus(to: "#tournament_name_input")}>
       <.form
-        :let={f}
         for={@form}
         phx-change="validate"
         phx-submit="submit"
@@ -35,7 +34,7 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
         <fieldset class="fieldset">
           <legend class="fieldset-legend text-lg">Basic Details</legend>
 
-          <.input field={f[:name]} label="Tournament Name" id="tournament_name_input" />
+          <.input field={@form[:name]} label="Tournament Name" id="tournament_name_input" />
 
           <div class="alert alert-info mt-2">
             <.icon name="hero-information-circle" class="size-6" />
@@ -44,12 +43,12 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
               <p>Visitors will see the time as-is, listed alongside the timezone.</p>
             </div>
           </div>
-          <.input field={f[:timezone]} label="Timezone" options={@valid_time_zones} type="select" />
+          <.input field={@form[:timezone]} label="Timezone" options={@valid_time_zones} type="select" />
 
-          <.input field={f[:location]} label="Location" />
+          <.input field={@form[:location]} label="Location" />
 
-          <.input field={f[:start]} label="Tournament Start" type="datetime-local" />
-          <.input field={f[:end]} label="Tournament End" type="datetime-local" />
+          <.input field={@form[:start]} label="Tournament Start" type="datetime-local" />
+          <.input field={@form[:end]} label="Tournament End" type="datetime-local" />
         </fieldset>
 
         <fieldset class="fieldset">
@@ -57,10 +56,10 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
 
           <div class="grid gap-4 lg:grid-cols-2"></div>
 
-          <.datetime_input label="Registration Open Time" field={f[:registration_opened_at]} />
-          <.datetime_input label="Registration Close Time" field={f[:registration_closed_at]} />
+          <.datetime_input label="Registration Open Time" field={@form[:registration_opened_at]} />
+          <.datetime_input label="Registration Close Time" field={@form[:registration_closed_at]} />
 
-          <.input field={f[:registration_price]} label="Registration Price" type="money" />
+          <.input field={@form[:registration_price]} label="Registration Price" type="money" />
         </fieldset>
       </.form>
     </div>

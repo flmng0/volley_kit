@@ -1,10 +1,10 @@
 <.header>Details</.header>
 
-<.form :let={f} for={@form} phx-change="update" phx-submit="next">
-  <.input type="text" field={f[:name]} />
-  <.input type="text" field={f[:timezone]} />
+<.form for={@form} phx-change="update" phx-submit="next">
+  <.input type="text" field={@form[:name]} />
+  <.input type="text" field={@form[:timezone]} />
 
   <div class="flex justify-end">
-    <.button disabled={not f.source.valid?}>Next</.button>
+    <.button variant="create" disabled={not @form.source.valid?}>Next</.button>
   </div>
 </.form>

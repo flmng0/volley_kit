@@ -105,6 +105,47 @@ defmodule VolleyWeb.Layouts do
 
   attr :flash, :map, required: true
   attr :current_scope, :map, default: nil
+  attr :current_step, :any
+
+  slot :step do
+    attr :name, :string
+    attr :icon, :string
+    attr :key, :any
+    attr :complete, :boolean
+  end
+
+  def stepped(assigns) do
+    assigns =
+      assign_new(assigns, :current_step_block, fn %{current_step: current_step, step: step} ->
+        Enum.find(step, fn s -> s.key == current_step end)
+      end)
+
+    ~H"""
+    <Layouts.app current_scope={@current_scope} flash={@flash}>
+      <ol class="steps">
+        <li
+          :for={{step, idx} <- Enum.with_index(@step)}
+          class={["step", step.complete && "step-primary"]}
+        >
+          <span class={[
+            "step-icon",
+            step.key == @current_step && "outline-2 outline-primary outline-offset-2"
+          ]}>
+            <.icon name={step.icon} />
+          </span>
+          {step.name}
+        </li>
+      </ol>
+
+      <div>
+        {render_slot(@current_step_block)}
+      </div>
+    </Layouts.app>
+    """
+  end
+
+  attr :flash, :map, required: true
+  attr :current_scope, :map, default: nil
 
   slot :inner_block, required: true
 

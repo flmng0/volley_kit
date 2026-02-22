@@ -55,7 +55,7 @@ defmodule VolleyWeb.TournamentLive.View do
         socket =
           socket
           |> put_flash(:error, "Tournament with that ID does not exist, or you can't access it")
-          |> push_navigate(redirect)
+          |> push_navigate(to: redirect)
 
         {:noreply, socket}
     end

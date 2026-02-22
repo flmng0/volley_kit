@@ -1,0 +1,108 @@
+defmodule VolleyWeb.TournamentLive.Setup do
+  use VolleyWeb, :live_view
+
+  alias Volley.Tournaments.Tournament
+
+  embed_templates "setup/*.html"
+
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <Layouts.stepped current_scope={@current_scope} flash={@flash} current_step={@live_action}>
+      <:step name="Details" key={:details} complete={@details_complete?} icon="hero-pencil-solid">
+        <.details form={@form} />
+      </:step>
+      <:step name="Divisions" key={:divisions} complete={@divisions_complete?} icon="hero-users-solid">
+        <.divisions />
+
+        <div class="flex justify-between">
+          <.button patch={~p"/tournament/setup/details"}>Back</.button>
+          <.button patch={~p"/tournament/setup/registration"}>Next</.button>
+        </div>
+      </:step>
+      <:step name="Registration" key={:registration} complete={false} icon="hero-book-open-solid">
+        <.registration />
+
+        <div class="flex justify-between">
+          <.button patch={~p"/tournament/setup/divisions"}>Back</.button>
+          <.button variant="create">Create Tournament</.button>
+        </div>
+      </:step>
+    </Layouts.stepped>
+    """
+  end
+
+  @impl true
+  def mount(_params, _session, socket) do
+    socket =
+      socket
+      |> assign(:tournament, %Tournament{})
+      |> assign(:divisions, [])
+      |> assign(details_complete?: false, divisions_complete?: false)
+
+    {:ok, socket}
+  end
+
+  @impl true
+  def handle_params(_params, _uri, socket) do
+    if socket.assigns.live_action do
+      socket =
+        socket
+        |> assign_form(%{})
+
+      {:noreply, socket}
+    else
+      {:noreply, push_patch(socket, to: ~p"/tournament/setup/details")}
+    end
+  end
+
+  @impl true
+  def handle_event("update", %{"tournament" => params}, socket) do
+    {:noreply, assign_form(socket, params, action: :validate)}
+  end
+
+  @impl true
+  def handle_event("next", %{"tournament" => params}, socket) do
+    changeset_fn = changeset(socket.assigns.live_action)
+    changeset = changeset_fn.(socket.assigns.tournament, params)
+
+    case Ecto.Changeset.apply_action(changeset, :insert) do
+      {:ok, tournament} ->
+        socket =
+          socket
+          |> assign(:tournament, tournament)
+          |> apply_next(socket.assigns.live_action)
+
+        {:noreply, socket}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply, assign_form(socket, changeset)}
+    end
+  end
+
+  defp apply_next(socket, :details) do
+    socket
+    |> assign(:details_complete?, true)
+    |> push_patch(to: ~p"/tournament/setup/divisions")
+  end
+
+  defp apply_next(socket, :divisions) do
+    socket
+    |> assign(:divisions_complete?, true)
+    |> push_patch(to: ~p"/tournament/setup/registration")
+  end
+
+  defp changeset(:details), do: &Tournament.details_setup_changeset/2
+  defp changeset(:divisions), do: &Tournament.divisions_setup_changeset/2
+
+  defp assign_form(socket, params_or_changeset, opts \\ [])
+
+  defp assign_form(socket, %Ecto.Changeset{} = changeset, opts) do
+    assign(socket, :form, to_form(changeset, opts ++ [as: "tournament"]))
+  end
+
+  defp assign_form(socket, params, opts) do
+    changeset_fn = changeset(socket.assigns.live_action)
+    assign_form(socket, changeset_fn.(socket.assigns.tournament, params), opts)
+  end
+end

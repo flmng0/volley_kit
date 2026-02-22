@@ -1,7 +1,7 @@
 defmodule Volley.Tournaments.Team do
   use Ecto.Schema
 
-  alias Volley.Tournaments.{Player, Tournament}
+  alias Volley.Tournaments.{Division, Player, Tournament}
 
   schema "teams" do
     field :name, :string
@@ -14,6 +14,7 @@ defmodule Volley.Tournaments.Team do
 
     embeds_many :players, Player
 
+    belongs_to :division, Division
     belongs_to :tournament, Tournament
   end
 end

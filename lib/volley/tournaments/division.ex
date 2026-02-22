@@ -11,16 +11,12 @@ defmodule Volley.Tournaments.Division do
   schema "divisions" do
     field :name, :string
 
-    field :type, Ecto.Enum, values: @types
-    field :max_age, :integer
-
     belongs_to :tournament, Tournament
   end
 
   def changeset(division, params \\ %{}) do
     division
-    |> cast(params, [:name, :type, :max_age])
-    |> validate_required([:name, :type])
-    |> validate_number(:max_age, greater_than: 0)
+    |> cast(params, [:name])
+    |> validate_required([:name])
   end
 end

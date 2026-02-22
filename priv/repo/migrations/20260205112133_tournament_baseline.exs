@@ -5,7 +5,7 @@ defmodule Volley.Repo.Migrations.TournamentBaseline do
     create table(:tournaments) do
       add :name, :string
 
-      add :draft, :boolean
+      add :draft, :boolean, null: false
       add :timezone, :string
 
       add :location, :string
@@ -25,10 +25,8 @@ defmodule Volley.Repo.Migrations.TournamentBaseline do
 
     create table(:divisions) do
       add :name, :string
-      add :type, :string
-      add :max_age, :integer
 
-      add :tournament_id, references(:tournaments)
+      add :tournament_id, references(:tournaments), null: false
     end
 
     create table(:teams) do
@@ -41,6 +39,7 @@ defmodule Volley.Repo.Migrations.TournamentBaseline do
 
       add :players, :map
 
+      add :division_id, references(:divisions)
       add :tournament_id, references(:tournaments)
     end
   end

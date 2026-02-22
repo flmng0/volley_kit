@@ -66,7 +66,7 @@ defmodule VolleyWeb.TournamentLive.View do
     {:noreply, assign(socket, :tournament, tournament)}
   end
 
-  def handle_info(:division_created, socket) do
+  def handle_info(:created_division, socket) do
     {:noreply, assign(socket, :division_created?, true)}
   end
 end

@@ -132,7 +132,7 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
 
     case Volley.Tournaments.update_tournament_overview(scope, tournament, params) do
       {:ok, tournament} ->
-        send(self(), {:update_tournament, tournament})
+        send(self(), {:updated_tournament, tournament})
         {:noreply, socket}
 
       {:error, %Ecto.Changeset{} = changeset} ->

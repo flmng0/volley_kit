@@ -58,18 +58,9 @@ defmodule VolleyWeb.TournamentLive.Index do
         type="hidden"
         name="tournament[timezone]"
         id="timezone_input"
-        phx-hook=".AutofillTimezone"
+        phx-hook="AutofillTimezone"
       />
     </form>
-    <script :type={Phoenix.LiveView.ColocatedHook} name=".AutofillTimezone">
-      export default {
-        mounted() {
-          const format = Intl.DateTimeFormat();
-          const options = format.resolvedOptions();
-          this.el.value = options.timeZone;
-        }
-      }
-    </script>
     """
   end
 

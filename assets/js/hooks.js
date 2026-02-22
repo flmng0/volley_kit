@@ -1,6 +1,14 @@
 /** @type {import("phoenix_live_view").HooksOptions} */
 const Hooks = {};
 
+Hooks.AutofillTimezone = {
+  mounted() {
+    const format = Intl.DateTimeFormat();
+    const options = format.resolvedOptions();
+    this.el.value = options.timeZone;
+  }
+}
+
 Hooks.ScoreCard = {
   mounted() {
     /** @type {import("./elements").ScoreCard} */

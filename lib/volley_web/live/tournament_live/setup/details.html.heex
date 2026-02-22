@@ -1,8 +1,26 @@
-<.header>Details</.header>
+<.header>
+  Details
+  <:subtitle>Adjust the basic settings for your tournament.</:subtitle>
+</.header>
 
 <.form for={@form} phx-change="update" phx-submit="next">
-  <.input type="text" field={@form[:name]} />
-  <.input type="text" field={@form[:timezone]} />
+  <fieldset class="fieldset">
+    <.input field={@form[:name]} label="Tournament Name*" id="tournament_name_input" />
+    <.input field={@form[:location]} label="Location" />
+
+    <div class="alert alert-info mt-4">
+      <.icon name="hero-information-circle" class="size-6" />
+      <div>
+        <p>All time-related settings will be in the timezone you have set below.</p>
+        <p>Visitors will see this listed next to any times.</p>
+      </div>
+    </div>
+    <.input field={@form[:timezone]} label="Timezone" options={@valid_time_zones} type="select" id="timezone_select" phx-hook="AutofillTimezone" />
+
+
+    <.input field={@form[:start]} label="Tournament Start" type="datetime-local" wrapper_class="mb-2 mt-4" />
+    <.input field={@form[:end]} label="Tournament End" type="datetime-local" />
+  </fieldset>
 
   <div class="flex justify-end">
     <.button variant="create" disabled={not @form.source.valid?}>Next</.button>

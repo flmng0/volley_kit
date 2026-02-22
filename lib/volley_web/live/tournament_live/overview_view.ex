@@ -97,15 +97,7 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
 
   @impl true
   def mount(socket) do
-    time_zones =
-      TimeZoneInfo.time_zones()
-      |> Enum.group_by(fn tz ->
-        case String.split(tz, "/", parts: 2) do
-          [prefix, _] -> prefix
-          prefix -> prefix
-        end
-      end)
-      |> Enum.sort_by(&elem(&1, 1))
+    time_zones = VolleyWeb.TournamentLive.Common.collect_timezone_options()
 
     {:ok, assign(socket, :valid_time_zones, time_zones)}
   end

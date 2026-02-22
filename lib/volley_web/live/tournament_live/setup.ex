@@ -10,7 +10,7 @@ defmodule VolleyWeb.TournamentLive.Setup do
     ~H"""
     <Layouts.stepped current_scope={@current_scope} flash={@flash} current_step={@live_action}>
       <:step name="Details" key={:details} complete={@details_complete?} icon="hero-pencil-solid">
-        <.details form={@form} />
+        <.details form={@form} valid_time_zones={@valid_time_zones} />
       </:step>
       <:step name="Divisions" key={:divisions} complete={@divisions_complete?} icon="hero-users-solid">
         <.divisions form={@form} />
@@ -53,6 +53,10 @@ defmodule VolleyWeb.TournamentLive.Setup do
     else
       {:noreply, push_patch(socket, to: ~p"/tournament/setup/details")}
     end
+  end
+
+  defp apply_action(socket, :details) do
+    assign(socket, :valid_time_zones, VolleyWeb.TournamentLive.Common.collect_timezone_options())
   end
 
   defp apply_action(socket, _action), do: socket

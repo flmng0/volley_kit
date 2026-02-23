@@ -50,15 +50,15 @@ defmodule VolleyWeb.TournamentLive.Setup do
 
   @impl true
   def handle_params(_params, _uri, socket) do
-    if action = socket.assigns.live_action do
+    if socket.assigns.live_action != :details && socket.assigns.completed_steps == [] do
+      {:noreply, push_patch(socket, to: ~p"/tournament/setup/details", replace: true)}
+    else
       socket =
         socket
-        |> apply_action(action)
+        |> apply_action(socket.assigns.live_action)
         |> assign_form(%{})
 
       {:noreply, socket}
-    else
-      {:noreply, push_patch(socket, to: ~p"/tournament/setup/details", replace: true)}
     end
   end
 

@@ -10,7 +10,7 @@ defmodule VolleyWeb.TournamentLive.Index do
       <.header>
         Tournaments
         <:actions>
-          <.create_tournament_button />
+          <.button navigate={~p"/tournament/setup"} variant="create">Create New Tournament</.button>
         </:actions>
       </.header>
 
@@ -47,20 +47,6 @@ defmodule VolleyWeb.TournamentLive.Index do
         <p class="text-center">You currently have no tournaments.</p>
       </div>
     </Layouts.app>
-    """
-  end
-
-  defp create_tournament_button(assigns) do
-    ~H"""
-    <form phx-submit="create_new">
-      <.button variant="create">Create New Tournament</.button>
-      <input
-        type="hidden"
-        name="tournament[timezone]"
-        id="timezone_input"
-        phx-hook="AutofillTimezone"
-      />
-    </form>
     """
   end
 

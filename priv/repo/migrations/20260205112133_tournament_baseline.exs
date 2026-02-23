@@ -18,6 +18,8 @@ defmodule Volley.Repo.Migrations.TournamentBaseline do
       add :registration_closed_at, :naive_datetime
       add :registration_price, :integer
 
+      add :use_divisions?, :boolean
+
       add :owner_id, references(:users)
 
       timestamps()

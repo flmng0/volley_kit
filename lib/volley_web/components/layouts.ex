@@ -106,12 +106,12 @@ defmodule VolleyWeb.Layouts do
   attr :flash, :map, required: true
   attr :current_scope, :map, default: nil
   attr :current_step, :any
+  attr :complete, :list
 
   slot :step do
     attr :name, :string
     attr :icon, :string
     attr :key, :any
-    attr :complete, :boolean
   end
 
   def stepped(assigns) do
@@ -125,7 +125,7 @@ defmodule VolleyWeb.Layouts do
       <ol class="steps">
         <li
           :for={{step, idx} <- Enum.with_index(@step)}
-          class={["step", step.complete && "step-primary"]}
+          class={["step", step.key in @complete && "step-primary"]}
         >
           <span class={[
             "step-icon",

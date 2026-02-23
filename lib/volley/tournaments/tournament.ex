@@ -24,6 +24,8 @@ defmodule Volley.Tournaments.Tournament do
     # Stored in AUD Cents
     field :registration_price, :integer
 
+    field :use_divisions?, :boolean, default: false
+
     has_many :divisions, Division, on_replace: :delete
     has_many :teams, Team
 

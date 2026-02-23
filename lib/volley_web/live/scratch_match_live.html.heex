@@ -59,13 +59,13 @@
   </p>
 
   <:action>
-    <.button variant="delete" phx-click="reset" phx-value-clear_sets={true}>
-      Also Reset Sets
+    <.button variant="primary" phx-click="reset" phx-value-clear_sets={false}>
+      Only Reset Scores
     </.button>
   </:action>
   <:action>
-    <.button variant="primary" phx-click="reset" phx-value-clear_sets={false}>
-      Only Reset Scores
+    <.button variant="delete" phx-click="reset" phx-value-clear_sets={true}>
+      Also Reset Sets
     </.button>
   </:action>
 </.modal>

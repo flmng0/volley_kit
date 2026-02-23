@@ -8,14 +8,19 @@ defmodule VolleyWeb.TournamentLive.Setup do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.stepped current_scope={@current_scope} flash={@flash} current_step={@live_action}>
-      <:step name="Details" key={:details} complete={@details_complete?} icon="hero-pencil-solid">
+    <Layouts.stepped
+      current_scope={@current_scope}
+      flash={@flash}
+      current_step={@live_action}
+      complete={@completed_steps}
+    >
+      <:step name="Details" key={:details} icon="hero-pencil-solid">
         <.details form={@form} valid_time_zones={@valid_time_zones} />
       </:step>
-      <:step name="Divisions" key={:divisions} complete={@divisions_complete?} icon="hero-users-solid">
+      <:step name="Divisions" key={:divisions} icon="hero-users-solid">
         <.divisions form={@form} />
       </:step>
-      <:step name="Registration" key={:registration} complete={false} icon="hero-book-open-solid">
+      <:step name="Registration" key={:registration} icon="hero-book-open-solid">
         <.registration />
 
         <div class="flex justify-between">
@@ -31,12 +36,16 @@ defmodule VolleyWeb.TournamentLive.Setup do
     (form.source.changes[:divisions] || []) == []
   end
 
+  defp use_divisions?(form) do
+    form[:use_divisions?].value == "true"
+  end
+
   @impl true
   def mount(_params, _session, socket) do
     socket =
       socket
       |> assign(:tournament, %Tournament{})
-      |> assign(details_complete?: false, divisions_complete?: false, enable_divisions?: false)
+      |> assign(:completed_steps, [])
 
     {:ok, socket}
   end
@@ -51,12 +60,12 @@ defmodule VolleyWeb.TournamentLive.Setup do
 
       {:noreply, socket}
     else
-      {:noreply, push_patch(socket, to: ~p"/tournament/setup/details")}
+      {:noreply, push_patch(socket, to: ~p"/tournament/setup/details", replace: true)}
     end
   end
 
   defp apply_action(socket, :details) do
-    assign(socket, :valid_time_zones, VolleyWeb.TournamentLive.Common.collect_timezone_options())
+    assign(socket, :valid_time_zones, VolleyWeb.Util.collect_timezone_options())
   end
 
   defp apply_action(socket, _action), do: socket
@@ -88,17 +97,14 @@ defmodule VolleyWeb.TournamentLive.Setup do
     {:noreply, apply_next(socket, :divisions)}
   end
 
-  defp apply_next(socket, :details) do
+  defp apply_next(socket, action) do
     socket
-    |> assign(:details_complete?, true)
-    |> push_patch(to: ~p"/tournament/setup/divisions")
+    |> update(:completed_steps, &(&1 ++ [action]))
+    |> push_patch(to: next_route(action))
   end
 
-  defp apply_next(socket, :divisions) do
-    socket
-    |> assign(:divisions_complete?, true)
-    |> push_patch(to: ~p"/tournament/setup/registration")
-  end
+  defp next_route(:details), do: ~p"/tournament/setup/divisions"
+  defp next_route(:divisions), do: ~p"/tournament/setup/registration"
 
   defp changeset(:details), do: &Tournament.details_setup_changeset/2
   defp changeset(:divisions), do: &Tournament.divisions_setup_changeset/2

@@ -6,16 +6,7 @@
 </.header>
 
 <.form for={@form} phx-change="update" phx-submit="next">
-  <.input
-    type="checkbox"
-    label="Enable divisions for my tournament."
-    field={@form[:use_divisions?]}
-  />
-
-  <div
-    :if={use_divisions?(@form)}
-    class="bg-base-300 border border-base-200 w-md px-4 py-2 mx-auto mt-4"
-  >
+  <div class="bg-base-300 border border-base-200 w-md px-4 py-2 mx-auto mt-4">
     <ul :if={not divisions_empty?(@form)} class="mb-4">
       <.inputs_for :let={div} field={@form[:divisions]}>
         <li class="text-sm">
@@ -36,12 +27,14 @@
       </.inputs_for>
     </ul>
 
+    <input type="hidden" name="tournament[drop_divisions][]" />
+
     <.button
       type="button"
       name="tournament[sort_divisions][]"
       value="new"
       phx-click={JS.dispatch("change")}
-      class="btn-soft btn-block"
+      class="dark:btn-soft btn-block"
     >
       Add Division
     </.button>
@@ -50,8 +43,8 @@
   <div class="flex justify-between mt-4">
     <.button patch={~p"/tournament/setup/details"}>Back</.button>
 
-    <.button disabled={use_divisions?(@form) && divisions_empty?(@form)} variant="create">
-      Next
+    <.button variant="create" class={divisions_empty?(@form) && "btn-outline"}>
+      {if divisions_empty?(@form), do: "Skip", else: "Next"}
     </.button>
   </div>
 </.form>

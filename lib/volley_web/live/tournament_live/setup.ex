@@ -33,18 +33,16 @@ defmodule VolleyWeb.TournamentLive.Setup do
   end
 
   defp divisions_empty?(%Phoenix.HTML.Form{} = form) do
-    (form.source.changes[:divisions] || []) == []
-  end
-
-  defp use_divisions?(form) do
-    form[:use_divisions?].value == "true"
+    a = form[:divisions].value || []
+    b = form.source.changes[:divisions] || []
+    a ++ b == []
   end
 
   @impl true
   def mount(_params, _session, socket) do
     socket =
       socket
-      |> assign(:tournament, %Tournament{})
+      |> assign(:tournament, %Tournament{divisions: []})
       |> assign(:completed_steps, [])
 
     {:ok, socket}

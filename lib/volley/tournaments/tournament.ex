@@ -52,6 +52,11 @@ defmodule Volley.Tournaments.Tournament do
     |> cast_assoc(:divisions, sort_param: :sort_divisions, drop_param: :drop_divisions)
   end
 
+  def registration_setup_changeset(tournament, params \\ %{}) do
+    tournament
+    |> cast(params, [:registration_opened_at, :registration_closed_at, :registration_price])
+  end
+
   def overview_changeset(tournament, params \\ %{}) do
     # TODO: Validate that start < end
     tournament

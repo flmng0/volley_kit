@@ -21,12 +21,7 @@ defmodule VolleyWeb.TournamentLive.Setup do
         <.divisions form={@form} />
       </:step>
       <:step name="Registration" key={:registration} icon="hero-book-open-solid">
-        <.registration />
-
-        <div class="flex justify-between">
-          <.button patch={~p"/tournament/setup/divisions"}>Back</.button>
-          <.button variant="create">Create Tournament</.button>
-        </div>
+        <.registration form={@form} />
       </:step>
     </Layouts.stepped>
     """
@@ -69,11 +64,11 @@ defmodule VolleyWeb.TournamentLive.Setup do
   defp apply_action(socket, _action), do: socket
 
   @impl true
-  def handle_event("update", %{"tournament" => params}, socket) do
+  def handle_event("validate", %{"tournament" => params}, socket) do
     {:noreply, assign_form(socket, params, action: :validate)}
   end
 
-  def handle_event("next", %{"tournament" => params}, socket) do
+  def handle_event("submit", %{"tournament" => params}, socket) do
     changeset_fn = changeset(socket.assigns.live_action)
     changeset = changeset_fn.(socket.assigns.tournament, params)
 
@@ -91,8 +86,14 @@ defmodule VolleyWeb.TournamentLive.Setup do
     end
   end
 
-  def handle_event("skip", _params, socket) do
-    {:noreply, apply_next(socket, :divisions)}
+  defp apply_next(socket, :registration) do
+    tournament =
+      Volley.Tournaments.complete_tournament_setup!(
+        socket.assigns.current_scope,
+        socket.assigns.tournament
+      )
+
+    push_navigate(socket, to: ~p"/tournament/#{tournament}")
   end
 
   defp apply_next(socket, action) do
@@ -106,7 +107,7 @@ defmodule VolleyWeb.TournamentLive.Setup do
 
   defp changeset(:details), do: &Tournament.details_setup_changeset/2
   defp changeset(:divisions), do: &Tournament.divisions_setup_changeset/2
-  defp changeset(:registration), do: &Tournament.divisions_setup_changeset/2
+  defp changeset(:registration), do: &Tournament.registration_setup_changeset/2
 
   defp assign_form(socket, params_or_changeset, opts \\ [])
 

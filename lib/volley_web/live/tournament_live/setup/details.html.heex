@@ -5,7 +5,7 @@
   </:subtitle>
 </.header>
 
-<.form for={@form} phx-change="update" phx-submit="next">
+<.form for={@form} phx-change="validate" phx-submit="submit">
   <fieldset class="fieldset">
     <.input field={@form[:name]} label="Tournament Name*" id="tournament_name_input" />
     <.input field={@form[:location]} label="Location" />
@@ -35,7 +35,7 @@
     <.input field={@form[:end]} label="Tournament End" type="datetime-local" />
   </fieldset>
 
-  <div class="flex justify-end">
+  <div class="flex justify-end mt-4">
     <.button variant="create">Next</.button>
   </div>
 </.form>

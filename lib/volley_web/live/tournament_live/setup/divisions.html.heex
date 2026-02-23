@@ -5,12 +5,12 @@
   </:subtitle>
 </.header>
 
-<.form for={@form} phx-change="update" phx-submit="next">
+<.form for={@form} phx-change="validate" phx-submit="submit">
   <div class="bg-base-300 border border-base-200 w-md px-4 py-2 mx-auto mt-4">
     <ul :if={not divisions_empty?(@form)} class="mb-4">
       <.inputs_for :let={div} field={@form[:divisions]}>
         <li class="text-sm">
-          <.input type="text" field={div[:name]}>
+          <.input type="text" field={div[:name]} placeholder="Name of division">
             <:actions>
               <.button
                 type="button"

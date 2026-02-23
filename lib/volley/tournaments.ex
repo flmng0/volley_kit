@@ -23,11 +23,12 @@ defmodule Volley.Tournaments do
     Repo.get(query, id)
   end
 
-  def create_tournament_draft(%Scope{user: user}, params) when is_struct(user, User) do
-    %Tournament{draft: true}
-    |> Tournament.create_changeset(params)
+  def complete_tournament_setup!(%Scope{user: user}, %Tournament{} = tournament)
+      when is_struct(user, User) do
+    tournament
+    |> Changeset.change()
     |> Changeset.put_assoc(:owner, user)
-    |> Repo.insert()
+    |> Repo.insert!()
   end
 
   def is_tournament_owner?(%Scope{user: %User{id: user_id}}, %Tournament{owner_id: user_id}),

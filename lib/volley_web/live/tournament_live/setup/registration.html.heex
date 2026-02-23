@@ -1,1 +1,25 @@
-<.header>Registration</.header>
+<.header>
+  Registration
+  <:subtitle>The below configures from what dates users will be allowed to register.</:subtitle>
+</.header>
+
+<.form for={@form} phx-change="validate" phx-submit="submit">
+  <fieldset class="fieldset">
+    <.input field={@form[:regstration_price]} label="Registration Price" type="money" />
+    <.input
+      field={@form[:regstration_opened_at]}
+      label="Registration Open Date"
+      type="date"
+    />
+    <.input
+      field={@form[:regstration_closed_at]}
+      label="Registration Close Date"
+      type="date"
+    />
+  </fieldset>
+
+  <div class="flex justify-between mt-4">
+    <.button type="button" patch={~p"/tournament/setup/divisions"}>Back</.button>
+    <.button variant="create">Create Tournament!</.button>
+  </div>
+</.form>

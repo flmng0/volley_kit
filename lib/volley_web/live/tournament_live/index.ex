@@ -58,26 +58,6 @@ defmodule VolleyWeb.TournamentLive.Index do
   end
 
   @impl true
-  def handle_event("create_new", %{"tournament" => params}, socket) do
-    case Tournaments.create_tournament_draft(socket.assigns.current_scope, params) do
-      {:ok, tournament} ->
-        socket =
-          socket
-          |> put_flash(:info, "Successfully created new tournament!")
-          |> push_navigate(to: ~p"/tournament/#{tournament}")
-
-        {:noreply, socket}
-
-      {:error, _changeset} ->
-        socket =
-          socket
-          |> put_flash(:error, "Failed to create tournament!")
-          |> push_navigate(to: ~p"/tournament/")
-
-        {:noreply, socket}
-    end
-  end
-
   def handle_event("delete", %{"id" => id}, socket) do
     if t = Tournaments.get_tournament(socket.assigns.current_scope, id) do
       {:ok, t} = Tournaments.delete_tournament(socket.assigns.current_scope, t)

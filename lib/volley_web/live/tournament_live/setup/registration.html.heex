@@ -5,16 +5,16 @@
 
 <.form for={@form} phx-change="validate" phx-submit="submit">
   <fieldset class="fieldset">
-    <.input field={@form[:regstration_price]} label="Registration Price" type="money" />
+    <.input field={@form[:registration_price]} label="Registration Price" type="money" />
     <.input
-      field={@form[:regstration_opened_at]}
+      field={@form[:registration_opened_at]}
       label="Registration Open Date"
-      type="date"
+      type="datetime-local"
     />
     <.input
-      field={@form[:regstration_closed_at]}
+      field={@form[:registration_closed_at]}
       label="Registration Close Date"
-      type="date"
+      type="datetime-local"
     />
   </fieldset>
 

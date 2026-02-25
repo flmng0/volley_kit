@@ -272,23 +272,22 @@ defmodule VolleyWeb.CoreComponents do
         <span :if={@label} class="label mb-1">{@label}</span>
         <.wrap_actions actions={@actions}>
           <div class={[
-            @class || "w-full join",
+            @class || "w-full input",
             @errors != [] && (@error_class || "input-error")
           ]}>
-            <span class="grid place-items-center px-6 text-base-content/75 text-lg bg-base-200 join-item">
+            <span class="grid place-items-center text-base-content/75">
               $
             </span>
             <input
               type="text"
               inputmode="numeric"
               pattern="\d*"
-              class="input flex-grow"
               name={@name}
               id={@id}
               value={Phoenix.HTML.Form.normalize_value("number", @value)}
               {@rest}
             />
-            <span class="grid place-items-center px-6 text-base-content/75 text-lg bg-base-200 join-item">
+            <span class="grid place-items-center text-base-content/75">
               .00
             </span>
           </div>
@@ -499,6 +498,36 @@ defmodule VolleyWeb.CoreComponents do
     ~H"""
     <span class={[@name, @class]} />
     """
+  end
+
+  attr :title, :string, required: true
+  attr :collapsible, :boolean, default: false
+  slot :inner_block, required: true
+
+  def section_card(assigns) do
+    assigns =
+      assign(assigns,
+        wrapper_class: "bg-base-200 border border-base-300 rounded-md",
+        title_class: "text-md font-semibold"
+      )
+
+    if assigns[:collapsible] do
+      ~H"""
+      <details class={["collapse", @wrapper_class]} phx-mounted={JS.ignore_attributes("open")} open>
+        <summary class="collapse-title">
+          <h2 class={@title_class}>{@title}</h2>
+        </summary>
+        <div class="collapse-content">{render_slot(@inner_block)}</div>
+      </details>
+      """
+    else
+      ~H"""
+      <div class={[@wrapper_class, "p-4"]}>
+        <h2 class={[@title_class, "pb-4"]}>{@title}</h2>
+        <div>{render_slot(@inner_block)}</div>
+      </div>
+      """
+    end
   end
 
   attr :id, :string, required: true

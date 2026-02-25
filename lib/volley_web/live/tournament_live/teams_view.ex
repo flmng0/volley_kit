@@ -7,21 +7,9 @@ defmodule VolleyWeb.TournamentLive.TeamsView do
   def render(assigns) do
     ~H"""
     <div>
-      <div :if={@divisions_empty?} class="alert alert-warning mb-4">
-        <.icon name="hero-exclamation-triangle" class="size-6" />
-        <div>
-          <p class="font-bold">No divisions!</p>
-          <p>There are currently no divisions set up for your tournament.</p>
-          <p>Create your first one below.</p>
-        </div>
-      </div>
-
-      <.render_create_form
-        :if={@divisions_empty?}
-        variant="block"
-        form={@form}
-        target={@myself}
-      />
+      <.header>
+        Teams & Divisions
+      </.header>
     </div>
     """
   end
@@ -79,60 +67,6 @@ defmodule VolleyWeb.TournamentLive.TeamsView do
   attr :form, Phoenix.HTML.Form
   attr :variant, :string, default: "block", values: ~w(block inline)
   attr :target, :any
-
-  defp render_create_form(assigns) do
-    assigns =
-      assign_new(assigns, :division_options, fn ->
-        Division.types_list()
-        |> Enum.map(fn type ->
-          {div_type_text(type), type}
-        end)
-      end)
-
-    ~H"""
-    <.form
-      :let={f}
-      for={@form}
-      phx-change="validate_division"
-      phx-submit="submit_division"
-      phx-target={@target}
-    >
-      <fieldset class={[
-        "flex fieldset bg-base-200 border border-base-300 px-4 py-2 rounded-md",
-        @variant == "block" && "flex-col",
-        @variant == "inline" && "flex-row gap-x-2"
-      ]}>
-        <legend class="fieldset-legend">New Division Details</legend>
-        <.input
-          type="text"
-          field={f[:name]}
-          placeholder={@variant == "inline" && "Name"}
-          label={@variant == "block" && "Name"}
-          wrapper_class={@variant == "inline" && "flex-grow"}
-        />
-        <.input
-          type="select"
-          field={f[:type]}
-          options={@division_options}
-          label={@variant == "block" && "Type"}
-          wrapper_class={@variant == "inline" && "flex-grow"}
-        />
-        <.input
-          type="number"
-          field={f[:max_age]}
-          placeholder={@variant == "inline" && "Max Age"}
-          label={@variant == "block" && "Max Age"}
-          wrapper_class={@variant == "inline" && "flex-grow"}
-        />
-
-        <.button variant="create" class={@variant == "block" && "self-end"}>
-          <.icon name="hero-plus" />
-          {if @variant == "block", do: "Create"}
-        </.button>
-      </fieldset>
-    </.form>
-    """
-  end
 
   defp div_type_text(:mixed), do: "Mixed"
   defp div_type_text(:men), do: "Men's"

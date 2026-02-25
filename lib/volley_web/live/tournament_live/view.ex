@@ -21,7 +21,7 @@ defmodule VolleyWeb.TournamentLive.View do
         />
       </:tab>
       <:tab
-        name="Teams"
+        name="Teams & Divisions"
         link={~p"/tournament/#{@tournament}/teams"}
         active={@live_action == :teams}
         warning={

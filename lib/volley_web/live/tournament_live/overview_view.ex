@@ -2,6 +2,7 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
   use VolleyWeb, :live_component
 
   alias Volley.Tournaments.Tournament
+  alias VolleyWeb.TournamentLive.FormComponents
 
   @impl true
   def render(assigns) do
@@ -31,36 +32,12 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
           </:actions>
         </.header>
 
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend text-lg">Basic Details</legend>
-
-          <.input field={@form[:name]} label="Tournament Name" id="tournament_name_input" />
-
-          <div class="alert alert-info mt-2">
-            <.icon name="hero-information-circle" class="size-6" />
-            <div>
-              <p>All time-related settings will be in the timezone you have set below.</p>
-              <p>Visitors will see the time as-is, listed alongside the timezone.</p>
-            </div>
-          </div>
-          <.input field={@form[:timezone]} label="Timezone" options={@valid_time_zones} type="select" />
-
-          <.input field={@form[:location]} label="Location" />
-
-          <.input field={@form[:start]} label="Tournament Start" type="datetime-local" />
-          <.input field={@form[:end]} label="Tournament End" type="datetime-local" />
-        </fieldset>
-
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend text-lg">Registration Settings</legend>
-
-          <div class="grid gap-4 lg:grid-cols-2"></div>
-
-          <.datetime_input label="Registration Open Time" field={@form[:registration_opened_at]} />
-          <.datetime_input label="Registration Close Time" field={@form[:registration_closed_at]} />
-
-          <.input field={@form[:registration_price]} label="Registration Price" type="money" />
-        </fieldset>
+        <.section_card title="Basic Details" collapsible>
+          <FormComponents.details form={@form} time_zone_options={@valid_time_zones} />
+        </.section_card>
+        <.section_card title="Registration Settings">
+          <FormComponents.registration form={@form} />
+        </.section_card>
       </.form>
     </div>
     """
@@ -69,7 +46,7 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
   attr :field, Phoenix.HTML.FormField, required: true
   attr :label, :string, required: true
 
-  def datetime_input(assigns) do
+  defp datetime_input(assigns) do
     ~H"""
     <.input
       field={@field}

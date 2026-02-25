@@ -39,20 +39,20 @@ defmodule Volley.Tournaments.Tournament do
     |> validate_timezone()
   end
 
-  def details_setup_changeset(tournament, params \\ %{}) do
+  def details_changeset(tournament, params \\ %{}) do
     tournament
     |> cast(params, [:name, :location, :start, :end, :timezone])
     |> validate_required([:name, :timezone])
     |> validate_timezone()
   end
 
-  def divisions_setup_changeset(tournament, params \\ %{}) do
+  def divisions_changeset(tournament, params \\ %{}) do
     tournament
     |> cast(params, [])
     |> cast_assoc(:divisions, sort_param: :sort_divisions, drop_param: :drop_divisions)
   end
 
-  def registration_setup_changeset(tournament, params \\ %{}) do
+  def registration_changeset(tournament, params \\ %{}) do
     tournament
     |> cast(params, [:registration_opened_at, :registration_closed_at, :registration_price])
   end

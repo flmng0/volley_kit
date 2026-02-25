@@ -2,8 +2,7 @@ defmodule VolleyWeb.TournamentLive.Setup do
   use VolleyWeb, :live_view
 
   alias Volley.Tournaments.Tournament
-
-  embed_templates "setup/*.html"
+  alias VolleyWeb.TournamentLive.FormComponents
 
   @impl true
   def render(assigns) do
@@ -15,22 +14,59 @@ defmodule VolleyWeb.TournamentLive.Setup do
       complete={@completed_steps}
     >
       <:step name="Details" key={:details} icon="hero-pencil-solid">
-        <.details form={@form} valid_time_zones={@valid_time_zones} />
+        <.header>
+          Details
+          <:subtitle>
+            Adjust the basic settings for your tournament. The only required field is the Name, and everything can be altered later.
+          </:subtitle>
+        </.header>
+
+        <.form for={@form} phx-change="validate" phx-submit="submit">
+          <FormComponents.details form={@form} time_zone_options={@valid_time_zones} />
+          <div class="flex justify-end mt-4">
+            <.button variant="create">Next</.button>
+          </div>
+        </.form>
       </:step>
       <:step name="Divisions" key={:divisions} icon="hero-users-solid">
-        <.divisions form={@form} />
+        <.header>
+          Divisions
+          <:subtitle>
+            Optionally define divisions for teams registering for your competition. For example, a men's vs. a women's division in the same tournament.
+          </:subtitle>
+        </.header>
+
+        <.form for={@form} phx-change="validate" phx-submit="submit">
+          <div class="bg-base-300 border border-base-200 w-md px-4 py-2 mx-auto mt-4">
+            <FormComponents.divisions form={@form} />
+          </div>
+
+          <div class="flex justify-between mt-4">
+            <.button patch={~p"/tournament/setup/details"}>Back</.button>
+
+            <.button variant="create">Next</.button>
+          </div>
+        </.form>
       </:step>
       <:step name="Registration" key={:registration} icon="hero-book-open-solid">
-        <.registration form={@form} />
+        <.header>
+          Registration
+          <:subtitle>
+            The below configures from what dates users will be allowed to register.
+          </:subtitle>
+        </.header>
+
+        <.form for={@form} phx-change="validate" phx-submit="submit">
+          <FormComponents.registration form={@form} />
+
+          <div class="flex justify-between mt-4">
+            <.button type="button" patch={~p"/tournament/setup/divisions"}>Back</.button>
+            <.button variant="create">Create Tournament!</.button>
+          </div>
+        </.form>
       </:step>
     </Layouts.stepped>
     """
-  end
-
-  defp divisions_empty?(%Phoenix.HTML.Form{} = form) do
-    a = form[:divisions].value || []
-    b = form.source.changes[:divisions] || []
-    a ++ b == []
   end
 
   @impl true
@@ -105,9 +141,9 @@ defmodule VolleyWeb.TournamentLive.Setup do
   defp next_route(:details), do: ~p"/tournament/setup/divisions"
   defp next_route(:divisions), do: ~p"/tournament/setup/registration"
 
-  defp changeset(:details), do: &Tournament.details_setup_changeset/2
-  defp changeset(:divisions), do: &Tournament.divisions_setup_changeset/2
-  defp changeset(:registration), do: &Tournament.registration_setup_changeset/2
+  defp changeset(:details), do: &Tournament.details_changeset/2
+  defp changeset(:divisions), do: &Tournament.divisions_changeset/2
+  defp changeset(:registration), do: &Tournament.registration_changeset/2
 
   defp assign_form(socket, params_or_changeset, opts \\ [])
 

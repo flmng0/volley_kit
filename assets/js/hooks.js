@@ -1,6 +1,21 @@
 /** @type {import("phoenix_live_view").HooksOptions} */
 const Hooks = {};
 
+Hooks.HijackEnter = {
+  mounted() {
+    const cmd = this.el.dataset.onenter;
+
+    this.el.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" || e.shiftKey) {
+        return;
+      }
+
+      e.preventDefault();
+      this.js().exec(cmd);
+    })
+  }
+}
+
 Hooks.AutofillTimezone = {
   mounted() {
     const format = Intl.DateTimeFormat();

@@ -97,7 +97,7 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
 
   @impl true
   def mount(socket) do
-    time_zones = VolleyWeb.TournamentLive.Common.collect_timezone_options()
+    time_zones = VolleyWeb.Util.collect_timezone_options()
 
     {:ok, assign(socket, :valid_time_zones, time_zones)}
   end

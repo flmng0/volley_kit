@@ -2,7 +2,7 @@ defmodule VolleyWeb.TournamentLive.View do
   use VolleyWeb, :live_view
 
   alias Volley.Tournaments
-  alias VolleyWeb.TournamentLive.{OverviewView, TeamsView}
+  alias VolleyWeb.TournamentLive.FormComponent
 
   @impl true
   def render(assigns) do
@@ -14,11 +14,21 @@ defmodule VolleyWeb.TournamentLive.View do
     >
       <:tab name="Overview" link={~p"/tournament/#{@tournament}"} active={@live_action == :overview}>
         <.live_component
-          id="overview_view"
-          module={OverviewView}
-          tournament={@tournament}
-          scope={@current_scope}
-        />
+          :let={form}
+          module={FormComponent}
+          id="overview_tab"
+          title="Overview"
+          subtitle="Adjust basic settings for your tournament."
+          changeset_fn={&Tournaments.Tournament.overview_changeset(@tournament, &1)}
+          submit_fn={&Tournaments.update_tournament_overview(@current_scope, @tournament, &1)}
+        >
+          <.section_card title="Basic Details" collapsible>
+            <FormComponent.details form={form} time_zone_options={@valid_time_zones} />
+          </.section_card>
+          <.section_card title="Registration Settings">
+            <FormComponent.registration form={form} />
+          </.section_card>
+        </.live_component>
       </:tab>
       <:tab
         name="Teams & Divisions"
@@ -30,11 +40,18 @@ defmodule VolleyWeb.TournamentLive.View do
         }
       >
         <.live_component
-          id="teams_view"
-          module={TeamsView}
-          tournament={@tournament}
-          scope={@current_scope}
-        />
+          :let={form}
+          module={FormComponent}
+          id="teams_tab"
+          title="Teams & Divisions"
+          subtitle="Modify teams and divisions for your tournament."
+          changeset_fn={&Tournaments.Tournament.teams_changeset(@tournament, &1)}
+          submit_fn={&Tournaments.update_tournament_teams(@current_scope, @tournament, &1)}
+        >
+          <.section_card title="Divisions" collapsible>
+            <FormComponent.divisions form={form} disable_focus? />
+          </.section_card>
+        </.live_component>
       </:tab>
     </Layouts.tabbed>
     """
@@ -44,10 +61,15 @@ defmodule VolleyWeb.TournamentLive.View do
   def handle_params(%{"id" => id}, _uri, socket) do
     cond do
       socket.assigns[:tournament] && socket.assigns.tournament == id ->
-        {:noreply, socket}
+        {:noreply, apply_action(socket, socket.assigns.live_action)}
 
       tournament = Tournaments.get_tournament(socket.assigns.current_scope, id) ->
-        {:noreply, assign(socket, :tournament, tournament)}
+        socket =
+          socket
+          |> assign(:tournament, tournament)
+          |> apply_action(socket.assigns.live_action)
+
+        {:noreply, socket}
 
       true ->
         redirect = if socket.assigns.current_scope, do: ~p"/tournament/", else: ~p"/"
@@ -61,12 +83,14 @@ defmodule VolleyWeb.TournamentLive.View do
     end
   end
 
+  defp apply_action(socket, :overview) do
+    assign(socket, :valid_time_zones, VolleyWeb.Util.collect_timezone_options())
+  end
+
+  defp apply_action(socket, _), do: socket
+
   @impl true
   def handle_info({:updated_tournament, tournament}, socket) do
     {:noreply, assign(socket, :tournament, tournament)}
-  end
-
-  def handle_info(:created_division, socket) do
-    {:noreply, assign(socket, :division_created?, true)}
   end
 end

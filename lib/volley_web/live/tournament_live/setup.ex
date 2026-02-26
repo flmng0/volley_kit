@@ -2,7 +2,7 @@ defmodule VolleyWeb.TournamentLive.Setup do
   use VolleyWeb, :live_view
 
   alias Volley.Tournaments.Tournament
-  alias VolleyWeb.TournamentLive.FormComponents
+  alias VolleyWeb.TournamentLive.FormComponent
 
   @impl true
   def render(assigns) do
@@ -22,7 +22,7 @@ defmodule VolleyWeb.TournamentLive.Setup do
         </.header>
 
         <.form for={@form} phx-change="validate" phx-submit="submit">
-          <FormComponents.details form={@form} time_zone_options={@valid_time_zones} />
+          <FormComponent.details form={@form} time_zone_options={@valid_time_zones} />
           <div class="flex justify-end mt-4">
             <.button variant="create">Next</.button>
           </div>
@@ -37,14 +37,21 @@ defmodule VolleyWeb.TournamentLive.Setup do
         </.header>
 
         <.form for={@form} phx-change="validate" phx-submit="submit">
-          <div class="bg-base-300 border border-base-200 w-md px-4 py-2 mx-auto mt-4">
-            <FormComponents.divisions form={@form} />
-          </div>
+          <div class="group">
+            <div class="bg-base-300 border border-base-200 w-md px-4 py-2 mx-auto mt-4 peer/divisions">
+              <FormComponent.divisions form={@form} />
+            </div>
 
-          <div class="flex justify-between mt-4">
-            <.button patch={~p"/tournament/setup/details"}>Back</.button>
+            <div class="flex justify-between mt-4">
+              <.button patch={~p"/tournament/setup/details"}>Back</.button>
 
-            <.button variant="create">Next</.button>
+              <div class="flex flex-col gap-2 items-end">
+                <.button variant="create">Next</.button>
+                <span class="group-focus-within:inline-block hidden text-right text-xs text-base-content/50">
+                  <kbd class="kbd kbd-sm">Shift</kbd> + <kbd class="kbd kbd-sm">Enter</kbd> to submit.
+                </span>
+              </div>
+            </div>
           </div>
         </.form>
       </:step>
@@ -57,7 +64,7 @@ defmodule VolleyWeb.TournamentLive.Setup do
         </.header>
 
         <.form for={@form} phx-change="validate" phx-submit="submit">
-          <FormComponents.registration form={@form} />
+          <FormComponent.registration form={@form} />
 
           <div class="flex justify-between mt-4">
             <.button type="button" patch={~p"/tournament/setup/divisions"}>Back</.button>

@@ -34,7 +34,7 @@ defmodule VolleyWeb.Layouts do
     ~H"""
     <.app_header current_scope={@current_scope} />
 
-    <main class="w-full px-2 sm:px-6 lg:px-8 h-full pt-4">
+    <main class="w-full px-2 sm:px-6 lg:px-8 h-full pt-4 pb-8">
       <div class="bleed-container gap-y-4">
         {render_slot(@inner_block)}
       </div>

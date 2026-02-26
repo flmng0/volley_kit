@@ -1,4 +1,13 @@
 defmodule VolleyWeb.TournamentLive.FormComponent do
+  @moduledoc """
+  Live component to render and validate a tournament forms.
+
+  This also has some function-components that unify the layout
+  of different sections across pages, for example:
+
+  - `details/1`
+  - `divisions/1`
+  """
   use VolleyWeb, :live_component
 
   attr :changeset_fn, {:fun, 1}

@@ -7,7 +7,7 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
   @impl true
   def render(assigns) do
     ~H"""
-    <div phx-mounted={JS.focus(to: "#tournament_name_input")}>
+    <div>
       <.form
         for={@form}
         phx-change="validate"
@@ -88,12 +88,9 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
   defp assign_form(socket, %Ecto.Changeset{} = changeset, opts) do
     clean? = Enum.empty?(changeset.changes)
 
-    socket =
-      socket
-      |> assign(:clean?, clean?)
-      |> assign(:form, to_form(changeset, opts ++ [as: "tournament"]))
-
     socket
+    |> assign(:clean?, clean?)
+    |> assign(:form, to_form(changeset, opts ++ [as: "tournament"]))
   end
 
   defp assign_form(socket, params, opts) do

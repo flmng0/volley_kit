@@ -513,7 +513,11 @@ defmodule VolleyWeb.CoreComponents do
 
     if assigns[:collapsible] do
       ~H"""
-      <details class={["collapse", @wrapper_class]} phx-mounted={JS.ignore_attributes("open")} open>
+      <details
+        class={["collapse collapse-plus", @wrapper_class]}
+        phx-mounted={JS.ignore_attributes("open")}
+        open
+      >
         <summary class="collapse-title">
           <h2 class={@title_class}>{@title}</h2>
         </summary>

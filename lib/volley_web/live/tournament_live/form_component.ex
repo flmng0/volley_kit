@@ -13,7 +13,7 @@ defmodule VolleyWeb.TournamentLive.FormComponent do
   attr :changeset_fn, {:fun, 1}
   attr :submit_fn, {:fun, 1}
 
-  attr :title, :string, required: true
+  attr :title, :string, default: nil
   attr :subtitle, :string, default: nil
 
   slot :inner_block, required: true
@@ -175,6 +175,22 @@ defmodule VolleyWeb.TournamentLive.FormComponent do
     >
       Add Division
     </.button>
+    """
+  end
+
+  attr :form, Phoenix.HTML.Form, required: true
+
+  def teams(assigns) do
+    ~H"""
+    <fieldset class="fieldset">
+      <ul class="list">
+        <.inputs_for :let={team} field={@form[:teams]}>
+          <li class="list-item">
+            <span>{team.name}</span>
+          </li>
+        </.inputs_for>
+      </ul>
+    </fieldset>
     """
   end
 

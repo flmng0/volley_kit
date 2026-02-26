@@ -3,6 +3,8 @@ defmodule Volley.Repo.Migrations.TournamentBaseline do
 
   def change do
     create table(:tournaments) do
+      add :public_id, :uuid
+
       add :name, :string
 
       add :draft, :boolean, null: false

@@ -4,8 +4,11 @@ defmodule Volley.Tournaments.Tournament do
 
   alias Volley.Tournaments.{Division, Team}
 
-  @derive Phoenix.Param
+  @derive {Phoenix.Param, key: :public_id}
+
   schema "tournaments" do
+    field :public_id, Ecto.UUID, autogenerate: true
+
     field :name, :string
 
     field :draft, :boolean, default: true

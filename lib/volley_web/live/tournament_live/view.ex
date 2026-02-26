@@ -22,36 +22,35 @@ defmodule VolleyWeb.TournamentLive.View do
           changeset_fn={&Tournaments.Tournament.overview_changeset(@tournament, &1)}
           submit_fn={&Tournaments.update_tournament_overview(@current_scope, @tournament, &1)}
         >
-          <.section_card title="Basic Details" collapsible>
+          <.section_card title="Basic Details">
             <FormComponent.details form={form} time_zone_options={@valid_time_zones} />
           </.section_card>
           <.section_card title="Registration Settings">
             <FormComponent.registration form={form} />
           </.section_card>
-        </.live_component>
-      </:tab>
-      <:tab
-        name="Teams & Divisions"
-        link={~p"/tournament/#{@tournament}/teams"}
-        active={@live_action == :teams}
-        warning={
-          !assigns[:division_created?] && @tournament.divisions == [] &&
-            "No divisions have been setup"
-        }
-      >
-        <.live_component
-          :let={form}
-          module={FormComponent}
-          id="teams_tab"
-          title="Teams & Divisions"
-          subtitle="Modify teams and divisions for your tournament."
-          changeset_fn={&Tournaments.Tournament.teams_changeset(@tournament, &1)}
-          submit_fn={&Tournaments.update_tournament_teams(@current_scope, @tournament, &1)}
-        >
-          <.section_card title="Divisions" collapsible>
+          <.section_card title="Divisions">
             <FormComponent.divisions form={form} disable_focus? />
           </.section_card>
         </.live_component>
+      </:tab>
+      <:tab
+        name="Manage Teams"
+        link={~p"/tournament/#{@tournament}/teams"}
+        active={@live_action == :teams}
+      >
+        <%!-- <.live_component --%>
+        <%!--   :let={form} --%>
+        <%!--   module={FormComponent} --%>
+        <%!--   id="teams_tab" --%>
+        <%!--   title="Teams & Divisions" --%>
+        <%!--   subtitle="Modify teams and divisions for your tournament." --%>
+        <%!--   changeset_fn={&Tournaments.Tournament.teams_changeset(@tournament, &1)} --%>
+        <%!--   submit_fn={&Tournaments.update_tournament_teams(@current_scope, @tournament, &1)} --%>
+        <%!-- > --%>
+        <%!--   <.section_card title="Teams"> --%>
+        <%!--     <FormComponent.teams form={form} /> --%>
+        <%!--   </.section_card> --%>
+        <%!-- </.live_component> --%>
       </:tab>
     </Layouts.tabbed>
     """

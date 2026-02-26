@@ -501,37 +501,17 @@ defmodule VolleyWeb.CoreComponents do
   end
 
   attr :title, :string, required: true
-  attr :collapsible, :boolean, default: false
   slot :inner_block, required: true
 
   def section_card(assigns) do
-    assigns =
-      assign(assigns,
-        wrapper_class: "bg-base-200 border border-base-300 rounded-md",
-        title_class: "text-md font-semibold"
-      )
-
-    if assigns[:collapsible] do
-      ~H"""
-      <details
-        class={["collapse collapse-plus", @wrapper_class]}
-        phx-mounted={JS.ignore_attributes("open")}
-        open
-      >
-        <summary class="collapse-title">
-          <h2 class={@title_class}>{@title}</h2>
-        </summary>
-        <div class="collapse-content">{render_slot(@inner_block)}</div>
-      </details>
-      """
-    else
-      ~H"""
-      <div class={[@wrapper_class, "p-4"]}>
-        <h2 class={[@title_class, "pb-4"]}>{@title}</h2>
-        <div>{render_slot(@inner_block)}</div>
-      </div>
-      """
-    end
+    ~H"""
+    <div class={[
+      "bg-base-200 border border-base-300 rounded-md p-4"
+    ]}>
+      <h2 class="mb-4 text-md font-semibold">{@title}</h2>
+      {render_slot(@inner_block)}
+    </div>
+    """
   end
 
   attr :id, :string, required: true

@@ -3,7 +3,6 @@ defmodule Volley.Tournaments do
   alias Volley.Accounts.User
 
   alias Volley.Tournaments.Tournament
-  alias Volley.Tournaments.Division
 
   alias Volley.Repo
 
@@ -20,7 +19,7 @@ defmodule Volley.Tournaments do
         where: t.owner_id == ^user.id,
         preload: [:teams, :divisions]
 
-    Repo.get(query, id)
+    Repo.get_by(query, public_id: id)
   end
 
   def complete_tournament_setup!(%Scope{user: user}, %Tournament{} = tournament)
@@ -51,16 +50,6 @@ defmodule Volley.Tournaments do
     tournament
     |> Tournament.teams_changeset(params)
     |> Repo.update()
-  end
-
-  def create_tournament_division(%Scope{} = scope, tournament_id, params) do
-    tournament = get_tournament(scope, tournament_id)
-    true = is_tournament_owner?(scope, tournament)
-
-    tournament
-    |> Ecto.build_assoc(:divisions)
-    |> Division.changeset(params)
-    |> Repo.insert()
   end
 
   def delete_tournament(%Scope{} = scope, %Tournament{} = tournament) do

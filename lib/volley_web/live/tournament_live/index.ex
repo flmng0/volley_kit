@@ -46,6 +46,16 @@ defmodule VolleyWeb.TournamentLive.Index do
       <div class="hidden peer-empty:block">
         <p class="text-center">You currently have no tournaments.</p>
       </div>
+
+      <.modal :if={@delete} id="delete_confirm" auto_open={true} close={JS.push("cancel_delete")}>
+        <.header>Are you sure?</.header>
+        <p>Are you sure you want to delete the tournament {@delete.name}?</p>
+
+        <:action>
+          <.button variant="delete" phx-click="confirm_delete">Yes</.button>
+          <.button>No</.button>
+        </:action>
+      </.modal>
     </Layouts.app>
     """
   end
@@ -54,15 +64,18 @@ defmodule VolleyWeb.TournamentLive.Index do
   def mount(_params, _session, socket) do
     tournaments = Volley.Tournaments.list_tournaments(socket.assigns.current_scope)
 
-    {:ok, stream(socket, :tournaments, tournaments)}
+    socket =
+      socket
+      |> assign(:delete, nil)
+      |> stream(:tournaments, tournaments)
+
+    {:ok, socket}
   end
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     if t = Tournaments.get_tournament(socket.assigns.current_scope, id) do
-      {:ok, t} = Tournaments.delete_tournament(socket.assigns.current_scope, t)
-
-      {:noreply, stream_delete(socket, :tournaments, t)}
+      {:noreply, assign(socket, :delete, t)}
     else
       socket =
         socket
@@ -71,5 +84,16 @@ defmodule VolleyWeb.TournamentLive.Index do
 
       {:noreply, socket}
     end
+  end
+
+  def handle_event("confirm_delete", _params, socket) do
+    {:ok, tournament} =
+      Tournaments.delete_tournament(socket.assigns.current_scope, socket.assigns.delete)
+
+    {:noreply, stream_delete(socket, :tournaments, tournament)}
+  end
+
+  def handle_event("cancel_delete", _params, socket) do
+    {:noreply, assign(socket, :delete, nil)}
   end
 end

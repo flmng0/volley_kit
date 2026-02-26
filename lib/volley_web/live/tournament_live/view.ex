@@ -12,7 +12,7 @@ defmodule VolleyWeb.TournamentLive.View do
       flash={@flash}
       title={@tournament.name || "Unnamed Tournament"}
     >
-      <:tab name="Overview" link={~p"/tournament/#{@tournament}"} active={@live_action == :overview}>
+      <:tab name="Overview" link={~p"/tournaments/#{@tournament}"} active={@live_action == :overview}>
         <.live_component
           :let={form}
           module={FormComponent}
@@ -35,7 +35,7 @@ defmodule VolleyWeb.TournamentLive.View do
       </:tab>
       <:tab
         name="Manage Teams"
-        link={~p"/tournament/#{@tournament}/teams"}
+        link={~p"/tournaments/#{@tournament}/teams"}
         active={@live_action == :teams}
       >
         <%!-- <.live_component --%>
@@ -71,7 +71,7 @@ defmodule VolleyWeb.TournamentLive.View do
         {:noreply, socket}
 
       true ->
-        redirect = if socket.assigns.current_scope, do: ~p"/tournament/", else: ~p"/"
+        redirect = if socket.assigns.current_scope, do: ~p"/tournaments/", else: ~p"/"
 
         socket =
           socket

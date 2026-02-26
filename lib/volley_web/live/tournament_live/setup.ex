@@ -43,7 +43,7 @@ defmodule VolleyWeb.TournamentLive.Setup do
             </div>
 
             <div class="flex justify-between mt-4">
-              <.button patch={~p"/tournament/setup/details"}>Back</.button>
+              <.button patch={~p"/tournaments/setup/details"}>Back</.button>
 
               <div class="flex flex-col gap-2 items-end">
                 <.button variant="create">Next</.button>
@@ -67,7 +67,7 @@ defmodule VolleyWeb.TournamentLive.Setup do
           <FormComponent.registration form={@form} />
 
           <div class="flex justify-between mt-4">
-            <.button type="button" patch={~p"/tournament/setup/divisions"}>Back</.button>
+            <.button type="button" patch={~p"/tournaments/setup/divisions"}>Back</.button>
             <.button variant="create">Create Tournament!</.button>
           </div>
         </.form>
@@ -89,7 +89,7 @@ defmodule VolleyWeb.TournamentLive.Setup do
   @impl true
   def handle_params(_params, _uri, socket) do
     if socket.assigns.live_action != :details && socket.assigns.completed_steps == [] do
-      {:noreply, push_patch(socket, to: ~p"/tournament/setup/details", replace: true)}
+      {:noreply, push_patch(socket, to: ~p"/tournaments/setup/details", replace: true)}
     else
       socket =
         socket
@@ -136,7 +136,7 @@ defmodule VolleyWeb.TournamentLive.Setup do
         socket.assigns.tournament
       )
 
-    push_navigate(socket, to: ~p"/tournament/#{tournament}")
+    push_navigate(socket, to: ~p"/tournaments/#{tournament}")
   end
 
   defp apply_next(socket, action) do
@@ -145,8 +145,8 @@ defmodule VolleyWeb.TournamentLive.Setup do
     |> push_patch(to: next_route(action))
   end
 
-  defp next_route(:details), do: ~p"/tournament/setup/divisions"
-  defp next_route(:divisions), do: ~p"/tournament/setup/registration"
+  defp next_route(:details), do: ~p"/tournaments/setup/divisions"
+  defp next_route(:divisions), do: ~p"/tournaments/setup/registration"
 
   defp changeset(:details), do: &Tournament.details_setup_changeset/2
   defp changeset(:divisions), do: &Tournament.divisions_setup_changeset/2

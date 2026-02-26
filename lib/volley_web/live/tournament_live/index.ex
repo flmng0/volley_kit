@@ -10,7 +10,7 @@ defmodule VolleyWeb.TournamentLive.Index do
       <.header>
         Tournaments
         <:actions>
-          <.button navigate={~p"/tournament/setup"} variant="create">Create New Tournament</.button>
+          <.button navigate={~p"/tournaments/setup"} variant="create">Create New Tournament</.button>
         </:actions>
       </.header>
 
@@ -36,7 +36,7 @@ defmodule VolleyWeb.TournamentLive.Index do
           <.button
             variant="neutral"
             aria-title="Edit Tournament"
-            phx-click={JS.navigate(~p"/tournament/#{tournament}")}
+            phx-click={JS.navigate(~p"/tournaments/#{tournament}")}
           >
             <.icon name="hero-pencil" />
           </.button>
@@ -80,7 +80,7 @@ defmodule VolleyWeb.TournamentLive.Index do
       socket =
         socket
         |> put_flash(:error, "Requested tournament no longer exists!")
-        |> push_navigate(to: ~p"/tournament/")
+        |> push_navigate(to: ~p"/tournaments/")
 
       {:noreply, socket}
     end

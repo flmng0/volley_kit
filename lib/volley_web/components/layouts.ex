@@ -224,11 +224,11 @@ defmodule VolleyWeb.Layouts do
     ~H"""
     <header class={["navbar max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8", @class]} {@rest}>
       <div class="flex flex-row items-center font-semibold text-sm gap-4 md:gap-8">
-        <.link :if={!@hide_home_button} navigate="/" class="flex w-fit items-center gap-2">
+        <.link :if={!@hide_home_button} navigate={~p"/"} class="flex w-fit items-center gap-2">
           <.icon name="hero-home-solid" class="size-6" />
           <span class="text-nowrap">Home</span>
         </.link>
-        <.link navigate="/tournament">
+        <.link navigate={~p"/tournaments/"}>
           Tournaments
         </.link>
       </div>

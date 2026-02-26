@@ -1,7 +1,7 @@
 defmodule VolleyWeb.TournamentLive.TeamsView do
   use VolleyWeb, :live_component
 
-  alias Volley.Tournaments.Division
+  alias Volley.Tournaments.Tournament
 
   @impl true
   def render(assigns) do
@@ -15,40 +15,29 @@ defmodule VolleyWeb.TournamentLive.TeamsView do
   end
 
   @impl true
-  def update(%{tournament: tournament, scope: scope}, socket) do
+  def update(%{tournament: _, scope: _} = assigns, socket) do
     socket =
       socket
-      |> assign(:scope, scope)
-      |> assign(:tournament_id, tournament.id)
-      |> assign(:division, %Division{})
-      |> assign(:divisions_empty?, tournament.divisions == [])
-      |> stream(:divisions, tournament.divisions)
+      |> assign(assigns)
       |> assign_form(%{})
 
     {:ok, socket}
   end
 
   @impl true
-  def handle_event("validate_division", %{"division" => params}, socket) do
+  def handle_event("validate", %{"tournament" => params}, socket) do
     {:noreply, assign_form(socket, params, action: :validate)}
   end
 
-  def handle_event("submit_division", %{"division" => params}, socket) do
-    %{scope: scope, tournament_id: tournament_id} = socket.assigns
+  def handle_event("submit", %{"tournament" => params}, socket) do
+    %{scope: scope, tournament: tournament} = socket.assigns
 
-    case Volley.Tournaments.create_tournament_division(scope, tournament_id, params) do
-      {:ok, division} ->
-        socket =
-          socket
-          |> stream_insert(:divisions, division)
-          |> assign(:divisions_empty?, false)
-          |> assign_form(%{})
-
-        send(self(), :created_division)
-
+    case Volley.Tournaments.update_tournament_teams(scope, tournament, params) do
+      {:ok, tournament} ->
+        send(self(), {:updated_tournament, tournament})
         {:noreply, socket}
 
-      {:error, changeset} ->
+      {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign_form(socket, changeset)}
     end
   end
@@ -56,17 +45,13 @@ defmodule VolleyWeb.TournamentLive.TeamsView do
   defp assign_form(socket, params, opts \\ [])
 
   defp assign_form(socket, %Ecto.Changeset{} = changeset, opts) do
-    assign(socket, :form, to_form(changeset, opts ++ [as: "division"]))
+    assign(socket, :form, to_form(changeset, opts ++ [as: "tournament"]))
   end
 
   defp assign_form(socket, params, opts) do
-    changeset = Division.changeset(socket.assigns.division, params)
+    changeset = Tournament.teams_changeset(socket.assigns.tournament, params)
     assign_form(socket, changeset, opts)
   end
-
-  attr :form, Phoenix.HTML.Form
-  attr :variant, :string, default: "block", values: ~w(block inline)
-  attr :target, :any
 
   defp div_type_text(:mixed), do: "Mixed"
   defp div_type_text(:men), do: "Men's"

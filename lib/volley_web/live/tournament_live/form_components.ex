@@ -88,17 +88,38 @@ defmodule VolleyWeb.TournamentLive.FormComponents do
     ~H"""
     <fieldset class="fieldset">
       <.input field={@form[:registration_price]} label="Registration Price" type="money" />
-      <.input
-        field={@form[:registration_opened_at]}
-        label="Registration Open Date"
-        type="datetime-local"
-      />
-      <.input
-        field={@form[:registration_closed_at]}
-        label="Registration Close Date"
-        type="datetime-local"
-      />
+      <.datetime_input field={@form[:registration_opened_at]} label="Registration Open Date" />
+      <.datetime_input field={@form[:registration_closed_at]} label="Registration Close Date" />
     </fieldset>
+    """
+  end
+
+  attr :field, Phoenix.HTML.FormField, required: true
+  attr :label, :string, required: true
+
+  defp datetime_input(assigns) do
+    ~H"""
+    <.input
+      field={@field}
+      label={@label}
+      type="datetime-local"
+    >
+      <:actions>
+        <.button
+          type="button"
+          phx-click={JS.dispatch("vk:filldate", to: "##{@field.id}")}
+        >
+          Set to Now
+        </.button>
+        <.button
+          variant="neutral"
+          type="button"
+          phx-click={JS.dispatch("vk:clear", to: "##{@field.id}")}
+        >
+          Clear
+        </.button>
+      </:actions>
+    </.input>
     """
   end
 end

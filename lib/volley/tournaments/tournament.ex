@@ -32,27 +32,20 @@ defmodule Volley.Tournaments.Tournament do
     timestamps()
   end
 
-  def create_changeset(tournament, params \\ %{}) do
-    tournament
-    |> cast(params, [:timezone])
-    |> validate_required([:timezone])
-    |> validate_timezone()
-  end
-
-  def details_changeset(tournament, params \\ %{}) do
+  def details_setup_changeset(tournament, params \\ %{}) do
     tournament
     |> cast(params, [:name, :location, :start, :end, :timezone])
     |> validate_required([:name, :timezone])
     |> validate_timezone()
   end
 
-  def divisions_changeset(tournament, params \\ %{}) do
+  def divisions_setup_changeset(tournament, params \\ %{}) do
     tournament
     |> cast(params, [])
-    |> cast_assoc(:divisions, sort_param: :sort_divisions, drop_param: :drop_divisions)
+    |> cast_divisions()
   end
 
-  def registration_changeset(tournament, params \\ %{}) do
+  def registration_setup_changeset(tournament, params \\ %{}) do
     tournament
     |> cast(params, [:registration_opened_at, :registration_closed_at, :registration_price])
   end
@@ -78,13 +71,22 @@ defmodule Volley.Tournaments.Tournament do
   def teams_changeset(tournament, params \\ %{}) do
     tournament
     |> cast(params, [])
-    |> cast_embed(:divisions, sort_param: :sort_divisions, drop_param: :drop_divisions)
-    |> cast_embed(:teams, sort_param: :sort_teams, drop_param: :drop_teams)
+    |> cast_divisions()
+    |> cast_teams()
   end
 
   defp validate_timezone(changeset) do
     valid_timezones = TimeZoneInfo.time_zones()
     validate_inclusion(changeset, :timezone, valid_timezones, message: "not a valid timezone")
+  end
+
+  # For consistent sort_param and drop_param across changesets
+  defp cast_divisions(changeset) do
+    cast_assoc(changeset, :divisions, sort_param: :sort_divisions, drop_param: :drop_divisions)
+  end
+
+  defp cast_teams(changeset) do
+    cast_assoc(changeset, :teams, sort_param: :sort_teams, drop_param: :drop_teams)
   end
 
   def release_changeset(tournament) do

@@ -43,35 +43,6 @@ defmodule VolleyWeb.TournamentLive.OverviewView do
     """
   end
 
-  attr :field, Phoenix.HTML.FormField, required: true
-  attr :label, :string, required: true
-
-  defp datetime_input(assigns) do
-    ~H"""
-    <.input
-      field={@field}
-      label={@label}
-      type="datetime-local"
-    >
-      <:actions>
-        <.button
-          type="button"
-          phx-click={JS.dispatch("vk:filldate", to: "##{@field.id}")}
-        >
-          Set to Now
-        </.button>
-        <.button
-          variant="neutral"
-          type="button"
-          phx-click={JS.dispatch("vk:clear", to: "##{@field.id}")}
-        >
-          Clear
-        </.button>
-      </:actions>
-    </.input>
-    """
-  end
-
   @impl true
   def mount(socket) do
     time_zones = VolleyWeb.Util.collect_timezone_options()

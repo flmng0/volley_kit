@@ -45,6 +45,14 @@ defmodule Volley.Tournaments do
     |> Repo.update()
   end
 
+  def update_tournament_teams(%Scope{} = scope, %Tournament{} = tournament, params) do
+    true = is_tournament_owner?(scope, tournament)
+
+    tournament
+    |> Tournament.teams_changeset(params)
+    |> Repo.update()
+  end
+
   def create_tournament_division(%Scope{} = scope, tournament_id, params) do
     tournament = get_tournament(scope, tournament_id)
     true = is_tournament_owner?(scope, tournament)

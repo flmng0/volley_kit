@@ -141,9 +141,9 @@ defmodule VolleyWeb.TournamentLive.Setup do
   defp next_route(:details), do: ~p"/tournament/setup/divisions"
   defp next_route(:divisions), do: ~p"/tournament/setup/registration"
 
-  defp changeset(:details), do: &Tournament.details_changeset/2
-  defp changeset(:divisions), do: &Tournament.divisions_changeset/2
-  defp changeset(:registration), do: &Tournament.registration_changeset/2
+  defp changeset(:details), do: &Tournament.details_setup_changeset/2
+  defp changeset(:divisions), do: &Tournament.divisions_setup_changeset/2
+  defp changeset(:registration), do: &Tournament.registration_setup_changeset/2
 
   defp assign_form(socket, params_or_changeset, opts \\ [])
 

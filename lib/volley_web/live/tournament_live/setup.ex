@@ -38,7 +38,7 @@ defmodule VolleyWeb.TournamentLive.Setup do
 
         <.form for={@form} phx-change="validate" phx-submit="submit">
           <div class="group">
-            <div class="bg-base-300 border border-base-200 w-md px-4 py-2 mx-auto mt-4 peer/divisions">
+            <div class="bg-base-300 border border-base-200 w-md px-4 py-2 mx-auto mt-4">
               <FormComponent.divisions form={@form} />
             </div>
 
@@ -47,7 +47,7 @@ defmodule VolleyWeb.TournamentLive.Setup do
 
               <div class="flex flex-col gap-2 items-end">
                 <.button variant="create">Next</.button>
-                <span class="group-focus-within:inline-block hidden text-right text-xs text-base-content/50">
+                <span class="group-has-[input:focus]:inline-block hidden text-right text-xs text-base-content/50">
                   <kbd class="kbd kbd-sm">Shift</kbd> + <kbd class="kbd kbd-sm">Enter</kbd> to submit.
                 </span>
               </div>

@@ -1,5 +1,6 @@
 defmodule Volley.Tournaments.Team do
   use Ecto.Schema
+  import Ecto.Changeset
 
   alias Volley.Tournaments.{Division, Player, Tournament}
 
@@ -16,5 +17,11 @@ defmodule Volley.Tournaments.Team do
 
     belongs_to :division, Division
     belongs_to :tournament, Tournament
+  end
+
+  def changeset(team, params \\ %{}) do
+    team
+    |> cast(params, [:name])
+    |> cast_assoc(:division)
   end
 end

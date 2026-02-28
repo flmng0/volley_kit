@@ -75,6 +75,8 @@ defmodule VolleyWeb.Layouts do
     attr :warning, :string
   end
 
+  slot :inner_block, required: true
+
   def tabbed(assigns) do
     ~H"""
     <Layouts.app current_scope={@current_scope} flash={@flash}>
@@ -96,7 +98,7 @@ defmodule VolleyWeb.Layouts do
         </ul>
 
         <div>
-          {render_slot(Enum.find(@tab, &Map.get(&1, :active)))}
+          {render_slot(@inner_block)}
         </div>
       </div>
     </Layouts.app>
@@ -211,6 +213,31 @@ defmodule VolleyWeb.Layouts do
     </main>
 
     <.flash_group flash={@flash} />
+    """
+  end
+
+  attr :tournament, Volley.Tournaments.Tournament
+  attr :view, :atom
+  attr :rest, :global, include: ~w(current_scope flash)
+
+  slot :inner_block, required: false
+
+  def tournament_view(assigns) do
+    ~H"""
+    <.tabbed {@rest} title={@tournament.name || "Unnamed Tournament"}>
+      <:tab
+        name="Overview"
+        link={~p"/tournaments/#{@tournament}"}
+        active={@view == VolleyWeb.TournamentLive.Overview}
+      />
+      <:tab
+        name="Manage Teams"
+        link={~p"/tournaments/#{@tournament}/teams"}
+        active={@view == VolleyWeb.TournamentLive.Teams}
+      />
+
+      {render_slot(@inner_block)}
+    </.tabbed>
     """
   end
 

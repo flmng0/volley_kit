@@ -1,4 +1,4 @@
-defmodule VolleyWeb.TournamentLive.FormComponent do
+defmodule VolleyWeb.TournamentLive.FormComponents do
   @moduledoc """
   Live component to render and validate a tournament forms.
 
@@ -9,93 +9,6 @@ defmodule VolleyWeb.TournamentLive.FormComponent do
   - `divisions/1`
   """
   use VolleyWeb, :live_component
-
-  attr :changeset_fn, {:fun, 1}
-  attr :submit_fn, {:fun, 1}
-
-  attr :title, :string, default: nil
-  attr :subtitle, :string, default: nil
-
-  slot :inner_block, required: true
-
-  @impl true
-  def render(assigns) do
-    ~H"""
-    <div>
-      <.form
-        for={@form}
-        phx-change="validate"
-        phx-submit="submit"
-        phx-target={@myself}
-        class="flex flex-col gap-8"
-      >
-        <.header>
-          {@title}
-          <:subtitle :if={@subtitle}>{@subtitle}</:subtitle>
-          <:actions>
-            <.button variant="save" disabled={@clean?}>Save</.button>
-            <.button
-              type="button"
-              variant="cancel"
-              phx-click="cancel"
-              phx-target={@myself}
-              disabled={@clean?}
-            >
-              Revert Changes
-            </.button>
-          </:actions>
-        </.header>
-
-        {render_slot(@inner_block, @form)}
-      </.form>
-    </div>
-    """
-  end
-
-  @impl true
-  def update(assigns, socket) do
-    socket =
-      socket
-      |> assign(assigns)
-      |> assign_form(%{})
-
-    {:ok, socket}
-  end
-
-  @impl true
-  def handle_event("validate", %{"tournament" => params}, socket) do
-    {:noreply, assign_form(socket, params, action: :validate)}
-  end
-
-  def handle_event("submit", %{"tournament" => params}, socket) do
-    case socket.assigns.submit_fn.(params) do
-      {:ok, tournament} ->
-        send(self(), {:updated_tournament, tournament})
-        {:noreply, socket}
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign_form(socket, changeset)}
-    end
-  end
-
-  def handle_event("cancel", _params, socket) do
-    {:noreply, assign_form(socket, %{})}
-  end
-
-  defp assign_form(socket, params_or_changeset, opts \\ [])
-
-  defp assign_form(socket, %Ecto.Changeset{} = changeset, opts) do
-    clean? = Enum.empty?(changeset.changes)
-
-    socket
-    |> assign(:clean?, clean?)
-    |> assign(:form, to_form(changeset, opts ++ [as: "tournament"]))
-  end
-
-  defp assign_form(socket, params, opts) do
-    changeset = socket.assigns.changeset_fn.(params)
-    assign_form(socket, changeset, opts)
-  end
 
   attr :form, Phoenix.HTML.Form, required: true
   attr :time_zone_options, :list, required: true
@@ -185,11 +98,28 @@ defmodule VolleyWeb.TournamentLive.FormComponent do
     <fieldset class="fieldset">
       <ul class="list">
         <.inputs_for :let={team} field={@form[:teams]}>
-          <li class="list-item">
+          <li class="list-item group">
+            <div class="group-data-editing:block hidden">Test 1</div>
+            <div class="group-data-editing:hidden">Test 2</div>
             <span>{team.name}</span>
+            <.button
+              type="button"
+              phx-click={JS.toggle_attribute({"data-editing", "true"}, to: {:closest, "li"})}
+            >
+              Edit
+            </.button>
           </li>
         </.inputs_for>
       </ul>
+      <.button
+        type="button"
+        name="tournament[sort_teams][]"
+        value="new"
+        phx-click={JS.dispatch("change")}
+        class="dark:btn-soft btn-block"
+      >
+        Add Team
+      </.button>
     </fieldset>
     """
   end

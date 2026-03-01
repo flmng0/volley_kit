@@ -2,7 +2,6 @@ defmodule VolleyWeb.TournamentLive.Setup do
   use VolleyWeb, :live_view
 
   alias Volley.Tournaments.Tournament
-  alias VolleyWeb.TournamentLive.FormComponents
 
   @impl true
   def render(assigns) do
@@ -28,7 +27,7 @@ defmodule VolleyWeb.TournamentLive.Setup do
           changeset_fn={&Tournament.details_setup_changeset(@tournament, &1)}
           message_fn={&{:submit_step, &1}}
         >
-          <FormComponents.details form={form.form} time_zone_options={@valid_time_zones} />
+          <FormComponents.Tournament.details form={form.form} time_zone_options={@valid_time_zones} />
           <div class="flex justify-end mt-4">
             <.button variant="create">Next</.button>
           </div>
@@ -51,7 +50,7 @@ defmodule VolleyWeb.TournamentLive.Setup do
           class="group"
         >
           <div class="bg-base-300 border border-base-200 w-md px-4 py-2 mx-auto mt-4">
-            <FormComponents.divisions form={form.form} />
+            <FormComponents.Tournament.divisions form={form.form} />
           </div>
 
           <div class="flex justify-between mt-4">
@@ -81,7 +80,7 @@ defmodule VolleyWeb.TournamentLive.Setup do
           changeset_fn={&Tournament.registration_setup_changeset(@tournament, &1)}
           message_fn={&{:submit_step, &1}}
         >
-          <FormComponents.registration form={form.form} />
+          <FormComponents.Tournament.registration form={form.form} />
 
           <div class="flex justify-between mt-4">
             <.button type="button" patch={~p"/tournaments/setup/divisions"}>Back</.button>

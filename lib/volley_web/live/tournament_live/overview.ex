@@ -2,7 +2,6 @@ defmodule VolleyWeb.TournamentLive.Overview do
   use VolleyWeb, :live_view
 
   alias Volley.Tournaments
-  alias VolleyWeb.TournamentLive.FormComponents
 
   @impl true
   def render(assigns) do
@@ -39,13 +38,13 @@ defmodule VolleyWeb.TournamentLive.Overview do
         </.header>
 
         <.section_card title="Basic Details">
-          <FormComponents.details form={form.form} time_zone_options={@valid_time_zones} />
+          <FormComponents.Tournament.details form={form.form} time_zone_options={@valid_time_zones} />
         </.section_card>
         <.section_card title="Divisions">
-          <FormComponents.divisions form={form.form} disable_focus? />
+          <FormComponents.Tournament.divisions form={form.form} disable_focus? />
         </.section_card>
         <.section_card title="Registration Settings">
-          <FormComponents.registration form={form.form} />
+          <FormComponents.Tournament.registration form={form.form} />
         </.section_card>
       </.live_component>
     </Layouts.tournament_view>

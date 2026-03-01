@@ -98,6 +98,7 @@ defmodule VolleyWeb do
       # Common modules used in templates
       alias Phoenix.LiveView.JS
       alias VolleyWeb.Layouts
+      alias VolleyWeb.FormComponents
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())

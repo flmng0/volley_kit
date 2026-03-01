@@ -2,7 +2,6 @@ defmodule VolleyWeb.ScratchMatchLive do
   use VolleyWeb, :live_view
 
   import VolleyWeb.MatchComponents
-  alias VolleyWeb.FormComponents
   alias Volley.Scoring
   alias Volley.Scoring.Match
 

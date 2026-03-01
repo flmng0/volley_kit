@@ -4,7 +4,6 @@ defmodule VolleyWeb.HomeLive do
   on_mount {VolleyWeb.UserAuth, :mount_current_scope}
 
   alias Volley.Scoring
-  alias VolleyWeb.FormComponents
 
   @impl true
   def mount(_params, _session, socket) do

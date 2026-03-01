@@ -20,13 +20,15 @@ defmodule VolleyWeb.TournamentLive.Teams do
         </:subtitle>
       </.header>
 
-      <.table id="teams" rows={@streams.teams}>
-        <:col :let={{_, team}} label="Team Name">{team.name}</:col>
-      </.table>
+      <div class="flex flex-col gap-2 mb-8">
+        <.table id="teams" rows={@streams.teams}>
+          <:col :let={{_, team}} label="Team Name">{team.name}</:col>
+        </.table>
 
-      <.button patch={~p"/tournaments/#{@tournament}/teams/new"}>
-        <.icon name="hero-plus" /> Create New Team
-      </.button>
+        <.button patch={~p"/tournaments/#{@tournament}/teams/new"} class="self-end" variant="create">
+          <.icon name="hero-plus" /> Create New Team...
+        </.button>
+      </div>
 
       <.modal
         :if={@live_action == :new}
@@ -43,9 +45,14 @@ defmodule VolleyWeb.TournamentLive.Teams do
 
   @impl true
   def mount(_params, _session, socket) do
+    tournament = socket.assigns.tournament
+
+    divisions = Enum.map(tournament.divisions, & {&1.name, &1.id})
+
     socket =
       socket
-      |> stream(:teams, socket.assigns.tournament.teams)
+      |> stream(:teams, tournament.teams)
+      |> assign(:divisions, divisions)
 
     {:ok, socket}
   end
@@ -74,42 +81,36 @@ defmodule VolleyWeb.TournamentLive.Teams do
       changeset_fn={&Team.changeset(%Team{}, &1)}
       submit_fn={&Tournaments.create_tournament_team(@current_scope, @tournament, &1)}
       message_fn={&{:submit_team, &1}}
-      class="fieldset gap-y-8"
+      class="space-y-8"
     >
-      <.input field={f.form[:name]} type="text" label="Team Name" />
+      <fieldset class="fieldset">
+        <.input field={f.form[:name]} type="text" label="Team Name*" phx-mounted={JS.focus()} />
 
-      <div class="bg-base-200 border border-base-300 p-4">
-        <div class="flex justify-between gap-x-4 items-center">
-          <span class="font-semibold text-lg">Players</span>
-          <.button
-            type="button"
-            name="team[sort_players][]"
-            variant="create"
-            value="new"
-            phx-click={JS.dispatch("change")}
-          >
-            <.icon name="hero-plus" /> Add Player
-          </.button>
-        </div>
+        <.input field={f.form[:division_id]} type="select" options={@divisions} label="Division" :if={not Enum.empty?(@divisions)} />
+      </fieldset>
 
-        <ul class="grid gap-x-2 grid-cols-[1fr_1fr_auto]">
-          <li class="grid grid-cols-subgrid col-span-2 only:hidden mt-4">
-            <span class="fieldset-label">Name</span>
-            <span class="fieldset-label">DOB</span>
+      <div class="bg-base-200 border border-base-300 p-4 flex flex-col gap-y-4">
+        <span class="font-semibold">Players</span>
+
+        <ul class="grid gap-x-2 grid-cols-[1fr_auto]">
+          <li class="grid grid-cols-subgrid col-span-1 only:hidden">
+            <span class="fieldset-label text-xs">Name*</span>
           </li>
           <.inputs_for :let={player} field={f.form[:players]}>
-            <li class="grid grid-cols-subgrid col-span-3">
+            <li class="grid grid-cols-subgrid col-span-2">
               <.input
                 type="text"
+                phx-hook="HijackEnter"
+                data-onenter={JS.exec("phx-click", to: "#add_player")}
                 field={player[:name]}
                 placeholder="Player's name"
                 phx-mounted={JS.focus()}
               />
-              <.input
-                type="date"
-                field={player[:dob]}
-                placeholder="Player's date of birth"
-              />
+              <%!-- TODO: Figure out a nice way to input DOB --%>
+              <%!-- <.input --%>
+              <%!--   type="date" --%>
+              <%!--   field={player[:dob]} --%>
+              <%!-- /> --%>
               <.button
                 type="button"
                 name="team[drop_players][]"
@@ -122,8 +123,19 @@ defmodule VolleyWeb.TournamentLive.Teams do
             </li>
           </.inputs_for>
         </ul>
-
         <input type="hidden" name="team[drop_players][]" />
+
+        <.button
+          type="button"
+          name="team[sort_players][]"
+          variant="create"
+          class="btn-outline"
+          value="new"
+          phx-click={JS.dispatch("change")}
+          id="add_player"
+        >
+          <.icon name="hero-plus" /> Add Player
+        </.button>
       </div>
 
       <details
@@ -131,17 +143,17 @@ defmodule VolleyWeb.TournamentLive.Teams do
         phx-mounted={JS.ignore_attributes("open")}
       >
         <summary class="collapse-title">
-          <p class="font-semibold text-lg">Additional Persons</p>
-          <p class="group-open:hidden text-base-content/50">
+          <p class="font-semibold">Additional Persons</p>
+          <p class="group-open:hidden text-base-content/50 text-sm">
             Coach, assistant coach, trainer, etc...
           </p>
         </summary>
-        <div class="collapse-content">
+        <fieldset class="collapse-content fieldset">
           <.input field={f.form[:coach_name]} type="text" label="Coach" />
           <.input field={f.form[:assistant_coach_name]} type="text" label="Assistant Coach" />
           <.input field={f.form[:trainer_name]} type="text" label="Trainer Name" />
           <.input field={f.form[:medical_doctor_name]} type="text" label="Medical Doctor Name" />
-        </div>
+        </fieldset>
       </details>
 
       <div class="flex justify-end gap-4">

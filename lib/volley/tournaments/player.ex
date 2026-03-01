@@ -11,6 +11,6 @@ defmodule Volley.Tournaments.Player do
   def changeset(player, params \\ %{}) do
     player
     |> cast(params, [:name, :dob, :association_id])
-    |> validate_required([:name, :dob])
+    |> validate_required([:name])
   end
 end

@@ -15,14 +15,21 @@ defmodule Volley.Tournaments.Team do
 
     embeds_many :players, Player
 
-    belongs_to :division, Division
-    belongs_to :tournament, Tournament
+    belongs_to :division, Division, on_replace: :nilify
+    belongs_to :tournament, Tournament, on_replace: :delete
   end
 
-  def changeset(team, params \\ %{}) do
+  def changeset(team, params \\ %{}, opts \\ []) do
+    required =
+      if Keyword.get(opts, :division_required, false) do
+        [:name, :division_id]
+      else
+        [:name]
+      end
+
     team
     |> cast(params, [:name, :division_id])
-    |> validate_required([:name])
+    |> validate_required(required)
     |> cast_embed(:players, sort_param: :sort_players, drop_param: :drop_players)
   end
 end

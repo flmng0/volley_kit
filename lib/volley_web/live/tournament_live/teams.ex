@@ -23,6 +23,29 @@ defmodule VolleyWeb.TournamentLive.Teams do
       <div class="flex flex-col gap-2 mb-8">
         <.table id="teams" rows={@streams.teams}>
           <:col :let={{_, team}} label="Team Name">{team.name}</:col>
+          <:col :let={{_, team}} :if={not Enum.empty?(@tournament.divisions)} label="Division">
+            <span :if={team.division}>{team.division.name}</span>
+            <span :if={is_nil(team.division)} class="badge badge-warning">
+              <.icon name="hero-exclamation-triangle" /> No Division
+            </span>
+          </:col>
+          <:action :let={{_, team}}>
+            <.button
+              variant="delete"
+              aria-label="Delete Team"
+              phx-click="delete"
+              phx-value-id={team.id}
+            >
+              <.icon name="hero-trash" />
+            </.button>
+            <.button
+              variant="neutral"
+              aria-label="Edit Team"
+              phx-click={JS.navigate(~p"/tournaments/#{@tournament}/teams/#{team}")}
+            >
+              <.icon name="hero-pencil" />
+            </.button>
+          </:action>
         </.table>
 
         <.button patch={~p"/tournaments/#{@tournament}/teams/new"} class="self-end" variant="create">
@@ -37,7 +60,61 @@ defmodule VolleyWeb.TournamentLive.Teams do
         close={JS.patch(~p"/tournaments/#{@tournament}/teams")}
       >
         <.header header_tag="h2">Create New Team</.header>
-        <.team_form {assigns} />
+
+        <.live_component
+          :let={f}
+          module={VolleyWeb.LiveForm}
+          id="team_create_form"
+          changeset_fn={&Team.changeset(%Team{}, &1)}
+          submit_fn={&Tournaments.create_team(@current_scope, @tournament, &1)}
+          message_fn={&{:submit_team, &1}}
+          class="space-y-8"
+        >
+          <FormComponents.Tournament.team form={f.form} tournament={@tournament} />
+
+          <div class="flex justify-end gap-4">
+            <.button patch={~p"/tournaments/#{@tournament}/teams"}>Cancel</.button>
+            <.button variant="create">Create Team</.button>
+          </div>
+        </.live_component>
+      </.modal>
+
+      <.modal
+        :if={@live_action == :edit}
+        id="team_edit_form_modal"
+        auto_open
+        close={JS.patch(~p"/tournaments/#{@tournament}/teams")}
+      >
+        <.header header_tag="h2">
+          Edit Team
+          <:subtitle>Editing team: {@team.name}</:subtitle>
+        </.header>
+
+        <.live_component
+          :let={f}
+          module={VolleyWeb.LiveForm}
+          id="team_create_form"
+          changeset_fn={&Team.changeset(@team, &1)}
+          submit_fn={&Tournaments.update_team(@current_scope, @team, &1)}
+          message_fn={&{:submit_team, &1}}
+          class="space-y-8"
+        >
+          <FormComponents.Tournament.team form={f.form} tournament={@tournament} />
+          <div class="flex justify-end gap-4">
+            <.button patch={~p"/tournaments/#{@tournament}/teams"}>Cancel</.button>
+            <.button variant="create">Save Team</.button>
+          </div>
+        </.live_component>
+      </.modal>
+
+      <.modal :if={@delete} id="delete_confirm" auto_open={true} close={JS.push("cancel_delete")}>
+        <.header>Are you sure?</.header>
+        <p>Are you sure you want to delete the team {@delete.name}?</p>
+
+        <:action>
+          <.button variant="delete" phx-click="confirm_delete">Yes</.button>
+          <.button>No</.button>
+        </:action>
       </.modal>
     </Layouts.tournament_view>
     """
@@ -47,120 +124,69 @@ defmodule VolleyWeb.TournamentLive.Teams do
   def mount(_params, _session, socket) do
     tournament = socket.assigns.tournament
 
-    divisions = Enum.map(tournament.divisions, & {&1.name, &1.id})
-
     socket =
       socket
-      |> stream(:teams, tournament.teams)
-      |> assign(:divisions, divisions)
+      |> stream(:teams, Tournaments.list_teams(socket.assigns.current_scope, tournament))
+      |> assign(:delete, nil)
 
     {:ok, socket}
   end
 
   @impl true
-  def handle_params(_params, _uri, socket) do
-    {:noreply, socket}
+  def handle_params(params, _uri, socket) do
+    {:noreply, apply_action(socket, params, socket.assigns.live_action)}
+  end
+
+  defp apply_action(socket, _params, :new) do
+    assign(socket, :team, %Team{})
+  end
+
+  defp apply_action(socket, %{"team_id" => team_id}, :edit) do
+    if team = Tournaments.get_team(socket.assigns.current_scope, team_id) do
+      assign(socket, :team, team)
+    else
+      socket
+      |> put_flash(:error, "Team with that ID was not found")
+      |> push_patch(to: ~p"/tournaments/#{socket.assigns.tournament}/teams")
+    end
+  end
+
+  defp apply_action(socket, _params, _action) do
+    socket
+  end
+
+  @impl true
+  def handle_event("delete", %{"id" => id}, socket) do
+    if t = Tournaments.get_team(socket.assigns.current_scope, id) do
+      {:noreply, assign(socket, :delete, t)}
+    else
+      socket
+      |> put_flash(:error, "Team with that ID no longer exists")
+      |> push_patch(to: ~p"/tournaments/#{socket.assigns.tournament}/teams")
+
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("confirm_delete", _params, socket) do
+    {:ok, team} = Tournaments.delete_team(socket.assigns.current_scope, socket.assigns.delete)
+
+    {:noreply, stream_delete(socket, :teams, team)}
+  end
+
+  def handle_event("cancel_delete", _params, socket) do
+    {:noreply, assign(socket, :delete, nil)}
   end
 
   @impl true
   def handle_info({:submit_team, %Team{} = team}, socket) do
+    IO.inspect(team)
+
     socket =
       socket
       |> stream_insert(:teams, team)
       |> push_patch(to: ~p"/tournaments/#{socket.assigns.tournament}/teams")
 
     {:noreply, socket}
-  end
-
-  defp team_form(assigns) do
-    ~H"""
-    <.live_component
-      :let={f}
-      module={VolleyWeb.LiveForm}
-      id="team_create_form"
-      changeset_fn={&Team.changeset(%Team{}, &1)}
-      submit_fn={&Tournaments.create_tournament_team(@current_scope, @tournament, &1)}
-      message_fn={&{:submit_team, &1}}
-      class="space-y-8"
-    >
-      <fieldset class="fieldset">
-        <.input field={f.form[:name]} type="text" label="Team Name*" phx-mounted={JS.focus()} />
-
-        <.input field={f.form[:division_id]} type="select" options={@divisions} label="Division" :if={not Enum.empty?(@divisions)} />
-      </fieldset>
-
-      <div class="bg-base-200 border border-base-300 p-4 flex flex-col gap-y-4">
-        <span class="font-semibold">Players</span>
-
-        <ul class="grid gap-x-2 grid-cols-[1fr_auto]">
-          <li class="grid grid-cols-subgrid col-span-1 only:hidden">
-            <span class="fieldset-label text-xs">Name*</span>
-          </li>
-          <.inputs_for :let={player} field={f.form[:players]}>
-            <li class="grid grid-cols-subgrid col-span-2">
-              <.input
-                type="text"
-                phx-hook="HijackEnter"
-                data-onenter={JS.exec("phx-click", to: "#add_player")}
-                field={player[:name]}
-                placeholder="Player's name"
-                phx-mounted={JS.focus()}
-              />
-              <%!-- TODO: Figure out a nice way to input DOB --%>
-              <%!-- <.input --%>
-              <%!--   type="date" --%>
-              <%!--   field={player[:dob]} --%>
-              <%!-- /> --%>
-              <.button
-                type="button"
-                name="team[drop_players][]"
-                value={player.index}
-                phx-click={JS.dispatch("change")}
-              >
-                <.icon name="hero-trash" />
-              </.button>
-              <input type="hidden" name="team[sort_players][]" value={player.index} />
-            </li>
-          </.inputs_for>
-        </ul>
-        <input type="hidden" name="team[drop_players][]" />
-
-        <.button
-          type="button"
-          name="team[sort_players][]"
-          variant="create"
-          class="btn-outline"
-          value="new"
-          phx-click={JS.dispatch("change")}
-          id="add_player"
-        >
-          <.icon name="hero-plus" /> Add Player
-        </.button>
-      </div>
-
-      <details
-        class="collapse collapse-plus bg-base-200 border-base-300 group"
-        phx-mounted={JS.ignore_attributes("open")}
-      >
-        <summary class="collapse-title">
-          <p class="font-semibold">Additional Persons</p>
-          <p class="group-open:hidden text-base-content/50 text-sm">
-            Coach, assistant coach, trainer, etc...
-          </p>
-        </summary>
-        <fieldset class="collapse-content fieldset">
-          <.input field={f.form[:coach_name]} type="text" label="Coach" />
-          <.input field={f.form[:assistant_coach_name]} type="text" label="Assistant Coach" />
-          <.input field={f.form[:trainer_name]} type="text" label="Trainer Name" />
-          <.input field={f.form[:medical_doctor_name]} type="text" label="Medical Doctor Name" />
-        </fieldset>
-      </details>
-
-      <div class="flex justify-end gap-4">
-        <.button patch={~p"/tournaments/#{@tournament}/teams"}>Cancel</.button>
-        <.button variant="create">Create Team</.button>
-      </div>
-    </.live_component>
-    """
   end
 end

@@ -92,7 +92,7 @@ defmodule VolleyWeb.FormComponents do
               type="text"
               field={div[:name]}
               placeholder="Name of division"
-              phx-hook="HijackEnter"
+              phx-hook={not @disable_focus? && "HijackEnter"}
               phx-mounted={not @disable_focus? && JS.focus()}
               data-onenter={JS.exec("phx-click", to: "#add_division")}
             >
@@ -128,35 +128,94 @@ defmodule VolleyWeb.FormComponents do
     end
 
     attr :form, Phoenix.HTML.Form, required: true
+    attr :tournament, Volley.Tournaments.Tournament
 
-    def teams(assigns) do
+    def team(assigns) do
+      assigns =
+        assign_new(assigns, :divisions, fn %{tournament: %{divisions: ds}} ->
+          Enum.map(ds, &{&1.name, &1.id})
+        end)
+
       ~H"""
       <fieldset class="fieldset">
-        <ul class="list">
-          <.inputs_for :let={team} field={@form[:teams]}>
-            <li class="list-item group">
-              <div class="group-data-editing:block hidden">Test 1</div>
-              <div class="group-data-editing:hidden">Test 2</div>
-              <span>{team.name}</span>
+        <.input field={@form[:name]} type="text" label="Team Name*" phx-mounted={JS.focus()} />
+
+        <.input
+          :if={not Enum.empty?(@divisions)}
+          prompt="Select division..."
+          field={@form[:division_id]}
+          type="select"
+          options={@divisions}
+          label="Division"
+        />
+      </fieldset>
+
+      <div class="bg-base-200 border border-base-300 p-4 flex flex-col gap-y-4">
+        <span class="font-semibold">Players</span>
+
+        <ul class="grid gap-x-2 grid-cols-[1fr_auto]">
+          <li class="grid grid-cols-subgrid col-span-1 only:hidden">
+            <span class="fieldset-label text-xs">Name*</span>
+          </li>
+          <.inputs_for :let={player} field={@form[:players]}>
+            <li class="grid grid-cols-subgrid col-span-2">
+              <.input
+                type="text"
+                phx-hook="HijackEnter"
+                data-onenter={JS.exec("phx-click", to: "#add_player")}
+                field={player[:name]}
+                placeholder="Player's name"
+                phx-mounted={JS.focus()}
+              />
+              <%!-- TODO: Figure out a nice way to input DOB --%>
+              <%!-- <.input --%>
+              <%!--   type="date" --%>
+              <%!--   field={player[:dob]} --%>
+              <%!-- /> --%>
               <.button
                 type="button"
-                phx-click={JS.toggle_attribute({"data-editing", "true"}, to: {:closest, "li"})}
+                name="team[drop_players][]"
+                value={player.index}
+                phx-click={JS.dispatch("change")}
               >
-                Edit
+                <.icon name="hero-trash" />
               </.button>
+              <input type="hidden" name="team[sort_players][]" value={player.index} />
             </li>
           </.inputs_for>
         </ul>
+        <input type="hidden" name="team[drop_players][]" />
+
         <.button
           type="button"
-          name="tournament[sort_teams][]"
+          name="team[sort_players][]"
+          variant="create"
+          class="btn-outline"
           value="new"
           phx-click={JS.dispatch("change")}
-          class="dark:btn-soft btn-block"
+          id="add_player"
         >
-          Add Team
+          <.icon name="hero-plus" /> Add Player
         </.button>
-      </fieldset>
+      </div>
+
+      <details
+        class="collapse collapse-plus bg-base-200 border-base-300 group"
+        phx-mounted={JS.ignore_attributes("open")}
+      >
+        <summary class="collapse-title">
+          <p class="font-semibold">Additional Persons</p>
+          <p class="group-open:hidden text-base-content/50 text-sm">
+            Coach, assistant coach, trainer, etc...
+          </p>
+        </summary>
+        <fieldset class="collapse-content fieldset">
+          <.input field={@form[:coach_name]} type="text" label="Coach" />
+          <.input field={@form[:assistant_coach_name]} type="text" label="Assistant Coach" />
+          <.input field={@form[:trainer_name]} type="text" label="Trainer Name" />
+          <.input field={@form[:medical_doctor_name]} type="text" label="Medical Doctor Name" />
+        </fieldset>
+      </details>
       """
     end
 

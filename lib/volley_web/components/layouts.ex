@@ -234,6 +234,10 @@ defmodule VolleyWeb.Layouts do
         name="Manage Teams"
         link={~p"/tournaments/#{@tournament}/teams"}
         active={@view == VolleyWeb.TournamentLive.Teams}
+        warning={
+          Volley.Tournaments.Tournament.teams_need_attention?(@tournament) &&
+            "Teams not assigned a division"
+        }
       />
 
       {render_slot(@inner_block)}

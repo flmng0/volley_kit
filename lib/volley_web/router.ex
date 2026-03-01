@@ -48,8 +48,10 @@ defmodule VolleyWeb.Router do
       live "/tournaments/setup/registration", TournamentLive.Setup, :registration
 
       live "/tournaments/:id", TournamentLive.Overview
+
       live "/tournaments/:id/teams", TournamentLive.Teams
       live "/tournaments/:id/teams/new", TournamentLive.Teams, :new
+      live "/tournaments/:id/teams/:team_id", TournamentLive.Teams, :edit
     end
   end
 

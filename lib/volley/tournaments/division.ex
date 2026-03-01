@@ -3,6 +3,7 @@ defmodule Volley.Tournaments.Division do
   import Ecto.Changeset
 
   alias Volley.Tournaments.Tournament
+  alias Volley.Tournaments.Team
 
   @types [:mixed, :men, :women]
 
@@ -11,6 +12,7 @@ defmodule Volley.Tournaments.Division do
   schema "divisions" do
     field :name, :string
 
+    has_many :teams, Team
     belongs_to :tournament, Tournament
   end
 

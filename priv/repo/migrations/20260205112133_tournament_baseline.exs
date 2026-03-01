@@ -41,7 +41,7 @@ defmodule Volley.Repo.Migrations.TournamentBaseline do
 
       add :players, :map
 
-      add :division_id, references(:divisions)
+      add :division_id, references(:divisions, on_delete: :nilify_all)
       add :tournament_id, references(:tournaments)
     end
   end

@@ -27,15 +27,15 @@ defmodule VolleyWeb.TournamentLive.Index do
           </div>
           <.button
             variant="delete"
-            aria-title="Delete Tournament"
+            aria-label="Delete Tournament"
             phx-click="delete"
-            phx-value-id={tournament.id}
+            phx-value-id={tournament.public_id}
           >
             <.icon name="hero-trash" />
           </.button>
           <.button
             variant="neutral"
-            aria-title="Edit Tournament"
+            aria-label="Edit Tournament"
             phx-click={JS.navigate(~p"/tournaments/#{tournament}")}
           >
             <.icon name="hero-pencil" />

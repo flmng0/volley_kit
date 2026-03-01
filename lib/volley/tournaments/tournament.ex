@@ -27,8 +27,8 @@ defmodule Volley.Tournaments.Tournament do
     # Stored in AUD Cents
     field :registration_price, :integer
 
-    has_many :divisions, Division, on_replace: :delete, on_delete: :delete_all
-    has_many :teams, Team
+    has_many :divisions, Division, on_replace: :delete
+    has_many :teams, Team, on_replace: :delete
 
     belongs_to :owner, Volley.Accounts.User
 
@@ -69,12 +69,12 @@ defmodule Volley.Tournaments.Tournament do
     |> validate_timezone()
     |> validate_required([:name, :timezone])
     |> validate_number(:registration_price, greater_than: 0)
+    |> cast_divisions()
   end
 
   def teams_changeset(tournament, params \\ %{}) do
     tournament
     |> cast(params, [])
-    |> cast_divisions()
     |> cast_teams()
   end
 
@@ -102,5 +102,10 @@ defmodule Volley.Tournaments.Tournament do
 
       change(tournament, registration_opened_at: now)
     end
+  end
+
+  def teams_need_attention?(%__MODULE__{} = tournament) do
+    tournament = Volley.Repo.preload(tournament, [:divisions, :teams])
+    tournament.divisions != [] and Enum.any?(tournament.teams, &is_nil(&1.division_id))
   end
 end

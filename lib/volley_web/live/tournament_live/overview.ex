@@ -13,22 +13,25 @@ defmodule VolleyWeb.TournamentLive.Overview do
       tournament={@tournament}
       view={__MODULE__}
     >
-      <.form
-        for={@form}
-        phx-change="validate"
-        phx-submit="submit"
+      <.live_component
+        :let={form}
+        module={VolleyWeb.LiveForm}
+        id="overview_form"
+        changeset_fn={&Tournaments.Tournament.overview_changeset(@tournament, &1)}
+        submit_fn={&Tournaments.update_tournament_overview(@current_scope, @tournament, &1)}
+        message_fn={&{:updated_tournament, &1}}
         class="flex flex-col gap-8"
       >
         <.header>
           Overview
           <:subtitle>Adjust basic settings for your tournament.</:subtitle>
           <:actions>
-            <.button variant="save" disabled={@clean?}>Save</.button>
+            <.button variant="save" disabled={form.clean?}>Save</.button>
             <.button
               type="button"
               variant="cancel"
-              phx-click="cancel"
-              disabled={@clean?}
+              phx-click={form.cancel}
+              disabled={form.clean?}
             >
               Revert Changes
             </.button>
@@ -36,69 +39,28 @@ defmodule VolleyWeb.TournamentLive.Overview do
         </.header>
 
         <.section_card title="Basic Details">
-          <FormComponents.details form={@form} time_zone_options={@valid_time_zones} />
-        </.section_card>
-        <.section_card title="Registration Settings">
-          <FormComponents.registration form={@form} />
+          <FormComponents.details form={form.form} time_zone_options={@valid_time_zones} />
         </.section_card>
         <.section_card title="Divisions">
-          <FormComponents.divisions form={@form} disable_focus? />
+          <FormComponents.divisions form={form.form} disable_focus? />
         </.section_card>
-      </.form>
+        <.section_card title="Registration Settings">
+          <FormComponents.registration form={form.form} />
+        </.section_card>
+      </.live_component>
     </Layouts.tournament_view>
     """
   end
 
   @impl true
   def mount(_params, _session, socket) do
-    socket =
-      socket
-      |> assign(:valid_time_zones, VolleyWeb.Util.collect_timezone_options())
-      |> assign_form(%{})
+    time_zone_opts = VolleyWeb.Util.collect_timezone_options()
 
-    {:ok, socket}
+    {:ok, assign(socket, :valid_time_zones, time_zone_opts)}
   end
 
   @impl true
-  def handle_event("validate", %{"tournament" => params}, socket) do
-    {:noreply, assign_form(socket, params, action: :validate)}
-  end
-
-  def handle_event("submit", %{"tournament" => params}, socket) do
-    case Tournaments.update_tournament_overview(
-           socket.assigns.current_scope,
-           socket.assigns.tournament,
-           params
-         ) do
-      {:ok, tournament} ->
-        socket =
-          socket
-          |> assign(:tournament, tournament)
-          |> assign_form(%{})
-
-        {:noreply, socket}
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign_form(socket, changeset)}
-    end
-  end
-
-  def handle_event("cancel", _params, socket) do
-    {:noreply, assign_form(socket, %{})}
-  end
-
-  defp assign_form(socket, params_or_changeset, opts \\ [])
-
-  defp assign_form(socket, %Ecto.Changeset{} = changeset, opts) do
-    clean? = Enum.empty?(changeset.changes)
-
-    socket
-    |> assign(:clean?, clean?)
-    |> assign(:form, to_form(changeset, opts ++ [as: "tournament"]))
-  end
-
-  defp assign_form(socket, params, opts) do
-    changeset = Tournaments.Tournament.overview_changeset(socket.assigns.tournament, params)
-    assign_form(socket, changeset, opts)
+  def handle_info({:updated_tournament, tournament}, socket) do
+    {:noreply, assign(socket, :tournament, tournament)}
   end
 end

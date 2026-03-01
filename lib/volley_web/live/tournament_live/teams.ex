@@ -74,17 +74,67 @@ defmodule VolleyWeb.TournamentLive.Teams do
       changeset_fn={&Team.changeset(%Team{}, &1)}
       submit_fn={&Tournaments.create_tournament_team(@current_scope, @tournament, &1)}
       message_fn={&{:submit_team, &1}}
-      class="fieldset"
+      class="fieldset gap-y-8"
     >
       <.input field={f.form[:name]} type="text" label="Team Name" />
+
+      <div class="bg-base-200 border border-base-300 p-4">
+        <div class="flex justify-between gap-x-4 items-center">
+          <span class="font-semibold text-lg">Players</span>
+          <.button
+            type="button"
+            name="team[sort_players][]"
+            variant="create"
+            value="new"
+            phx-click={JS.dispatch("change")}
+          >
+            <.icon name="hero-plus" /> Add Player
+          </.button>
+        </div>
+
+        <ul class="grid gap-x-2 grid-cols-[1fr_1fr_auto]">
+          <li class="grid grid-cols-subgrid col-span-2 only:hidden mt-4">
+            <span class="fieldset-label">Name</span>
+            <span class="fieldset-label">DOB</span>
+          </li>
+          <.inputs_for :let={player} field={f.form[:players]}>
+            <li class="grid grid-cols-subgrid col-span-3">
+              <.input
+                type="text"
+                field={player[:name]}
+                placeholder="Player's name"
+                phx-mounted={JS.focus()}
+              />
+              <.input
+                type="date"
+                field={player[:dob]}
+                placeholder="Player's date of birth"
+              />
+              <.button
+                type="button"
+                name="team[drop_players][]"
+                value={player.index}
+                phx-click={JS.dispatch("change")}
+              >
+                <.icon name="hero-trash" />
+              </.button>
+              <input type="hidden" name="team[sort_players][]" value={player.index} />
+            </li>
+          </.inputs_for>
+        </ul>
+
+        <input type="hidden" name="team[drop_players][]" />
+      </div>
 
       <details
         class="collapse collapse-plus bg-base-200 border-base-300 group"
         phx-mounted={JS.ignore_attributes("open")}
       >
         <summary class="collapse-title">
-          <span class="font-semibold">Additional Persons</span>
-          <span class="group-open:hidden ">Coach, assistant coach, trainer, etc...</span>
+          <p class="font-semibold text-lg">Additional Persons</p>
+          <p class="group-open:hidden text-base-content/50">
+            Coach, assistant coach, trainer, etc...
+          </p>
         </summary>
         <div class="collapse-content">
           <.input field={f.form[:coach_name]} type="text" label="Coach" />

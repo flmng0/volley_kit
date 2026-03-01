@@ -22,6 +22,8 @@ defmodule Volley.Tournaments.Team do
   def changeset(team, params \\ %{}) do
     team
     |> cast(params, [:name])
+    |> validate_required([:name])
+    |> cast_embed(:players, sort_param: :sort_players, drop_param: :drop_players)
     |> cast_assoc(:division)
   end
 end

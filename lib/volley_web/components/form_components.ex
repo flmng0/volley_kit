@@ -87,26 +87,28 @@ defmodule VolleyWeb.FormComponents do
       ~H"""
       <ul>
         <.inputs_for :let={div} field={@form[:divisions]}>
-          <.input
-            type="text"
-            field={div[:name]}
-            placeholder="Name of division"
-            phx-hook="HijackEnter"
-            phx-mounted={not @disable_focus? && JS.focus()}
-            data-onenter={JS.exec("phx-click", to: "#add_division")}
-          >
-            <:actions>
-              <.button
-                type="button"
-                name="tournament[drop_divisions][]"
-                value={div.index}
-                phx-click={JS.dispatch("change")}
-              >
-                <.icon name="hero-trash" />
-              </.button>
-            </:actions>
-          </.input>
-          <input type="hidden" name="tournament[sort_divisions][]" value={div.index} />
+          <li>
+            <.input
+              type="text"
+              field={div[:name]}
+              placeholder="Name of division"
+              phx-hook="HijackEnter"
+              phx-mounted={not @disable_focus? && JS.focus()}
+              data-onenter={JS.exec("phx-click", to: "#add_division")}
+            >
+              <:actions>
+                <.button
+                  type="button"
+                  name="tournament[drop_divisions][]"
+                  value={div.index}
+                  phx-click={JS.dispatch("change")}
+                >
+                  <.icon name="hero-trash" />
+                </.button>
+              </:actions>
+            </.input>
+            <input type="hidden" name="tournament[sort_divisions][]" value={div.index} />
+          </li>
         </.inputs_for>
       </ul>
 

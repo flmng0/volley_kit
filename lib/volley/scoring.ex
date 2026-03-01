@@ -54,7 +54,7 @@ defmodule Volley.Scoring do
   end
 
   @doc "Start a new match, and associate it with the given scope."
-  def start_match(%Scope{} = scope, settings \\ %{}) do
+  def start_match(%Scope{} = scope, %Match.Settings{} = settings) do
     associate_owner =
       if scope.anonymous do
         &Changeset.put_change(&1, :anonymous_owner_id, scope.user.id)
@@ -63,7 +63,7 @@ defmodule Volley.Scoring do
       end
 
     %Match{}
-    |> Match.start_changeset(%{"settings" => settings})
+    |> Ecto.Changeset.change(settings: settings)
     |> then(associate_owner)
     |> Repo.insert()
   end
@@ -120,10 +120,10 @@ defmodule Volley.Scoring do
   This is due to a change of `:set_limit` invalidating previous `:set_won`
   events.
   """
-  def update_match_settings(%Scope{} = scope, %Match{} = match, settings) do
+  def update_match_settings(%Scope{} = scope, %Match{} = match, %Match.Settings{} = settings) do
     true = is_match_owner?(scope, match)
 
-    changeset = Match.update_settings_changeset(match, %{"settings" => settings})
+    changeset = Ecto.Changeset.change(match, settings: settings)
 
     if settings_changeset = Changeset.get_change(changeset, :settings) do
       reset? = Changeset.changed?(settings_changeset, :set_limit)

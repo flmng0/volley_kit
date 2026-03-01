@@ -80,12 +80,15 @@
   <.header header_tag="h3">Edit Match Settings</.header>
 
   <.live_component
+    :let={form}
     id="settingsEditForm"
-    module={VolleyWeb.MatchSettingsForm}
-    type={:update}
-    settings={@match.settings}
+    module={VolleyWeb.LiveForm}
+    changeset_fn={&Match.settings_changeset(@match.settings, &1)}
+    message_fn={&{:submit_settings, &1}}
     class="w-full"
-  />
+  >
+    <FormComponents.Match.settings form={form.form} type="update" />
+  </.live_component>
 </.modal>
 
 <.modal

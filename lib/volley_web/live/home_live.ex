@@ -4,6 +4,7 @@ defmodule VolleyWeb.HomeLive do
   on_mount {VolleyWeb.UserAuth, :mount_current_scope}
 
   alias Volley.Scoring
+  alias VolleyWeb.FormComponents
 
   @impl true
   def mount(_params, _session, socket) do
@@ -142,10 +143,15 @@ defmodule VolleyWeb.HomeLive do
       actions_class="text-right"
     >
       <.live_component
-        id="scratch-match-create-form"
-        module={VolleyWeb.MatchSettingsForm}
+        :let={form}
+        id="scratch_match_create_form"
+        module={VolleyWeb.LiveForm}
         type={:create}
-      />
+        changeset_fn={&Scoring.Match.settings_changeset(%Scoring.Match.Settings{}, &1)}
+        message_fn={&{:submit_settings, &1}}
+      >
+        <FormComponents.Match.settings form={form.form} type="create" />
+      </.live_component>
     </.hero_card>
     """
   end

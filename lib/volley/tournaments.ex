@@ -3,6 +3,7 @@ defmodule Volley.Tournaments do
   alias Volley.Accounts.User
 
   alias Volley.Tournaments.Tournament
+  alias Volley.Tournaments.Team
 
   alias Volley.Repo
 
@@ -30,6 +31,8 @@ defmodule Volley.Tournaments do
     |> Repo.insert!()
   end
 
+  def is_tournament_owner?(scope, tournament)
+
   def is_tournament_owner?(%Scope{user: %User{id: user_id}}, %Tournament{owner_id: user_id}),
     do: true
 
@@ -44,12 +47,12 @@ defmodule Volley.Tournaments do
     |> Repo.update()
   end
 
-  def update_tournament_teams(%Scope{} = scope, %Tournament{} = tournament, params) do
+  def create_tournament_team(%Scope{} = scope, %Tournament{} = tournament, params) do
     true = is_tournament_owner?(scope, tournament)
 
-    tournament
-    |> Tournament.teams_changeset(params)
-    |> Repo.update()
+    %Team{tournament_id: tournament.id}
+    |> Team.changeset(params)
+    |> Repo.insert()
   end
 
   def delete_tournament(%Scope{} = scope, %Tournament{} = tournament) do

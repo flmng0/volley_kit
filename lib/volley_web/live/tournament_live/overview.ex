@@ -12,8 +12,13 @@ defmodule VolleyWeb.TournamentLive.Overview do
       tournament={@tournament}
       view={__MODULE__}
     >
+      <div :if={@stale_divisions?} class="alert alert-warning mb-4">
+        <.icon name="hero-exclamation-triangle" />
+        <p>Some teams no longer have an associated division!</p>
+      </div>
+
       <.live_component
-        :let={form}
+        :let={f}
         module={VolleyWeb.LiveForm}
         id="overview_form"
         changeset_fn={&Tournaments.Tournament.overview_changeset(@tournament, &1)}
@@ -25,12 +30,17 @@ defmodule VolleyWeb.TournamentLive.Overview do
           Overview
           <:subtitle>Adjust basic settings for your tournament.</:subtitle>
           <:actions>
-            <.button variant="save" disabled={form.clean?}>Save</.button>
+            <.button
+              variant="save"
+              disabled={f.clean?}
+            >
+              Save
+            </.button>
             <.button
               type="button"
               variant="cancel"
-              phx-click={form.cancel}
-              disabled={form.clean?}
+              phx-click={f.cancel}
+              disabled={f.clean?}
             >
               Revert Changes
             </.button>
@@ -38,13 +48,13 @@ defmodule VolleyWeb.TournamentLive.Overview do
         </.header>
 
         <.section_card title="Basic Details">
-          <FormComponents.Tournament.details form={form.form} time_zone_options={@valid_time_zones} />
+          <FormComponents.Tournament.details form={f.form} time_zone_options={@valid_time_zones} />
         </.section_card>
         <.section_card title="Divisions">
-          <FormComponents.Tournament.divisions form={form.form} disable_focus? />
+          <FormComponents.Tournament.divisions form={f.form} disable_focus? />
         </.section_card>
         <.section_card title="Registration Settings">
-          <FormComponents.Tournament.registration form={form.form} />
+          <FormComponents.Tournament.registration form={f.form} />
         </.section_card>
       </.live_component>
     </Layouts.tournament_view>
@@ -55,11 +65,23 @@ defmodule VolleyWeb.TournamentLive.Overview do
   def mount(_params, _session, socket) do
     time_zone_opts = VolleyWeb.Util.collect_timezone_options()
 
-    {:ok, assign(socket, :valid_time_zones, time_zone_opts)}
+    {:ok, assign(socket, valid_time_zones: time_zone_opts, stale_divisions?: false)}
   end
 
   @impl true
   def handle_info({:updated_tournament, tournament}, socket) do
-    {:noreply, assign(socket, :tournament, tournament)}
+    {:noreply,
+     assign(socket, tournament: tournament, stale_divisions?: has_stale_divisions?(tournament))}
+  end
+
+  defp has_stale_divisions?(tournament) do
+    tournament_division_ids = tournament.divisions |> Enum.map(& &1.id) |> MapSet.new()
+
+    team_div_ids =
+      tournament.teams
+      |> Enum.map(& &1.division_id)
+      |> MapSet.new()
+
+    MapSet.difference(tournament_division_ids, team_div_ids)
   end
 end

@@ -23,8 +23,7 @@ defmodule VolleyWeb.LiveForm do
           form: @form,
           cid: @myself,
           clean?: @clean?,
-          cancel: JS.push("cancel", target: @myself),
-          submit: JS.push("submit", target: @myself)
+          cancel: JS.push("cancel", target: @myself)
         })}
       </.form>
     </div>

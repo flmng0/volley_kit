@@ -106,6 +106,13 @@ defmodule Volley.Tournaments.Tournament do
 
   def teams_need_attention?(%__MODULE__{} = tournament) do
     tournament = Volley.Repo.preload(tournament, [:divisions, :teams])
-    tournament.divisions != [] and Enum.any?(tournament.teams, &is_nil(&1.division_id))
+
+    division_ids = tournament.divisions |> Enum.map(& &1.id) |> MapSet.new()
+
+    stale_division = fn %Team{} = team ->
+      team.division_id == nil || not MapSet.member?(division_ids, team.division_id)
+    end
+
+    tournament.divisions != [] and Enum.any?(tournament.teams, stale_division)
   end
 end

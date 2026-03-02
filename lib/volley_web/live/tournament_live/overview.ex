@@ -12,11 +12,6 @@ defmodule VolleyWeb.TournamentLive.Overview do
       tournament={@tournament}
       view={__MODULE__}
     >
-      <div :if={@stale_divisions?} class="alert alert-warning mb-4">
-        <.icon name="hero-exclamation-triangle" />
-        <p>Some teams no longer have an associated division!</p>
-      </div>
-
       <.live_component
         :let={f}
         module={VolleyWeb.LiveForm}
@@ -65,23 +60,11 @@ defmodule VolleyWeb.TournamentLive.Overview do
   def mount(_params, _session, socket) do
     time_zone_opts = VolleyWeb.Util.collect_timezone_options()
 
-    {:ok, assign(socket, valid_time_zones: time_zone_opts, stale_divisions?: false)}
+    {:ok, assign(socket, valid_time_zones: time_zone_opts)}
   end
 
   @impl true
   def handle_info({:updated_tournament, tournament}, socket) do
-    {:noreply,
-     assign(socket, tournament: tournament, stale_divisions?: has_stale_divisions?(tournament))}
-  end
-
-  defp has_stale_divisions?(tournament) do
-    tournament_division_ids = tournament.divisions |> Enum.map(& &1.id) |> MapSet.new()
-
-    team_div_ids =
-      tournament.teams
-      |> Enum.map(& &1.division_id)
-      |> MapSet.new()
-
-    MapSet.difference(tournament_division_ids, team_div_ids)
+    {:noreply, assign(socket, tournament: tournament)}
   end
 end

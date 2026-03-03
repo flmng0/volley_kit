@@ -1,0 +1,110 @@
+<Layouts.tournament_view
+  current_scope={@current_scope}
+  flash={@flash}
+  tournament={@tournament}
+  view={__MODULE__}
+>
+  <.header>
+    Manage Teams
+    <:subtitle>
+      View, accept, and edit teams that have registered for your tournament. You may also add your own teams if you'd like from here.
+    </:subtitle>
+  </.header>
+
+  <div class="flex flex-col gap-2 mb-8">
+    <.table id="teams" rows={@streams.teams}>
+      <:col :let={{_, team}} label="Team Name">{team.name}</:col>
+      <:col :let={{_, team}} :if={not Enum.empty?(@tournament.divisions)} label="Division">
+        <span :if={team.division}>{team.division.name}</span>
+        <span :if={is_nil(team.division)} class="badge badge-warning">
+          <.icon name="hero-exclamation-triangle" /> No Division
+        </span>
+      </:col>
+      <:action :let={{_, team}}>
+        <.button
+          variant="delete"
+          aria-label="Delete Team"
+          phx-click="delete"
+          phx-value-id={team.id}
+        >
+          <.icon name="hero-trash" />
+        </.button>
+        <.button
+          variant="neutral"
+          aria-label="Edit Team"
+          phx-click={JS.navigate(~p"/tournaments/#{@tournament}/teams/#{team}")}
+        >
+          <.icon name="hero-pencil" />
+        </.button>
+      </:action>
+    </.table>
+
+    <.button patch={~p"/tournaments/#{@tournament}/teams/new"} class="self-end" variant="create">
+      <.icon name="hero-plus" /> Create New Team...
+    </.button>
+  </div>
+
+  <.modal
+    :if={@live_action == :new}
+    id="team_create_form_modal"
+    auto_open
+    close={JS.patch(~p"/tournaments/#{@tournament}/teams")}
+  >
+    <.header header_tag="h2">Create New Team</.header>
+
+    <.live_component
+      :let={f}
+      module={VolleyWeb.LiveForm}
+      id="team_create_form"
+      changeset_fn={&Team.changeset(%Team{}, &1)}
+      submit_fn={&Tournaments.create_team(@current_scope, @tournament, &1)}
+      message_fn={&{:submit_team, &1}}
+      class="space-y-8"
+    >
+      <FormComponents.Tournament.team form={f.form} tournament={@tournament} />
+
+      <div class="flex justify-end gap-4">
+        <.button patch={~p"/tournaments/#{@tournament}/teams"}>Cancel</.button>
+        <.button variant="create">Create Team</.button>
+      </div>
+    </.live_component>
+  </.modal>
+
+  <.modal
+    :if={@live_action == :edit}
+    id="team_edit_form_modal"
+    auto_open
+    close={JS.patch(~p"/tournaments/#{@tournament}/teams")}
+  >
+    <.header header_tag="h2">
+      Edit Team
+      <:subtitle>Editing team: {@team.name}</:subtitle>
+    </.header>
+
+    <.live_component
+      :let={f}
+      module={VolleyWeb.LiveForm}
+      id="team_create_form"
+      changeset_fn={&Team.changeset(@team, &1)}
+      submit_fn={&Tournaments.update_team(@current_scope, @team, &1)}
+      message_fn={&{:submit_team, &1}}
+      class="space-y-8"
+    >
+      <FormComponents.Tournament.team form={f.form} tournament={@tournament} />
+      <div class="flex justify-end gap-4">
+        <.button patch={~p"/tournaments/#{@tournament}/teams"}>Cancel</.button>
+        <.button variant="create">Save Team</.button>
+      </div>
+    </.live_component>
+  </.modal>
+
+  <.modal :if={@delete} id="delete_confirm" auto_open={true} close={JS.push("cancel_delete")}>
+    <.header>Are you sure?</.header>
+    <p>Are you sure you want to delete the team {@delete.name}?</p>
+
+    <:action>
+      <.button variant="delete" phx-click="confirm_delete">Yes</.button>
+      <.button>No</.button>
+    </:action>
+  </.modal>
+</Layouts.tournament_view>

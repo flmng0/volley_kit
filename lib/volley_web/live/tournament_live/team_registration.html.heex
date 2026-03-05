@@ -1,0 +1,15 @@
+<Layouts.app
+  current_scope={@current_scope}
+  flash={@flash}
+>
+  <.header>
+    Team Registration
+    <:subtitle>Register your team to for: {@tournament.name}</:subtitle>
+  </.header>
+
+  <.section_card title="Tournament Details">
+    <p>{@tournament.name}</p>
+    <p>Start Date: {@tournament.start}</p>
+    <p>End Date: {@tournament.end}</p>
+  </.section_card>
+</Layouts.app>

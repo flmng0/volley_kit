@@ -1,5 +1,6 @@
 defmodule VolleyWeb.TournamentLive.Teams do
   use VolleyWeb, :live_view
+  on_mount VolleyWeb.TournamentLive.PutTournament
 
   alias Volley.Tournaments
   alias Volley.Tournaments.Team

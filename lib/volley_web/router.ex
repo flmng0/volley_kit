@@ -25,21 +25,20 @@ defmodule VolleyWeb.Router do
     live_session :mount_user,
       on_mount: [{VolleyWeb.UserAuth, :mount_current_scope}] do
       live "/", HomeLive
+
       live "/scratch/:id", ScratchMatchLive
       live "/scratch/:id/share", ScratchMatchLive, :share
       live "/scratch/:id/reset", ScratchMatchLive, :reset
       live "/scratch/:id/settings", ScratchMatchLive, :settings
+
+      live "/tournaments/:id/register_team", TournamentLive.TeamRegistration
     end
   end
 
   scope "/", VolleyWeb do
     pipe_through [:browser, :require_authenticated_user]
 
-    live_session :tournament,
-      on_mount: [
-        {VolleyWeb.UserAuth, :require_authenticated},
-        VolleyWeb.TournamentLive.PutTournament
-      ] do
+    live_session :tournament, on_mount: [{VolleyWeb.UserAuth, :require_authenticated}] do
       live "/tournaments/", TournamentLive.Index
 
       live "/tournaments/setup", TournamentLive.Setup

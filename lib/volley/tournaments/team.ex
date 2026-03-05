@@ -5,6 +5,7 @@ defmodule Volley.Tournaments.Team do
   alias Volley.Tournaments.Division
   alias Volley.Tournaments.Player
   alias Volley.Tournaments.Tournament
+  alias Volley.Tournaments.Registration
 
   schema "teams" do
     field :name, :string
@@ -15,9 +16,9 @@ defmodule Volley.Tournaments.Team do
     field :trainer_name, :string
     field :medical_doctor_name, :string
 
-    field :accepted_at, :utc_datetime
-
     embeds_many :players, Player
+
+    has_one :registration, Registration
 
     belongs_to :division, Division, on_replace: :nilify
     belongs_to :tournament, Tournament, on_replace: :delete

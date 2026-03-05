@@ -41,12 +41,19 @@ defmodule Volley.Repo.Migrations.TournamentBaseline do
 
       add :players, :map
 
-      add :accepted_at, :utc_datetime
-
       add :division_id, references(:divisions, on_delete: :nilify_all)
       add :tournament_id, references(:tournaments), null: false
 
       timestamps()
+    end
+
+    create table(:registrations) do
+      add :email, :string, null: false
+      add :accepted_at, :utc_datetime
+
+      add :team_id, references(:teams), null: false
+
+      timestamps(updated_at: false)
     end
   end
 end

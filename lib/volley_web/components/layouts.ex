@@ -80,27 +80,20 @@ defmodule VolleyWeb.Layouts do
   def tabbed(assigns) do
     ~H"""
     <Layouts.app current_scope={@current_scope} flash={@flash}>
-      <div class="grid lg:grid-cols-subgrid lg:col-span-2 gap-6">
-        <ul class="menu bg-base-200 min-w-48 border border-base-300 shadow-sm menu-horizontal lg:menu-vertical lg:justify-self-end lg:self-start">
-          <li class="menu-title">{@title}</li>
-          <li :for={tab <- @tab} class={tab.active && "menu-active"}>
-            <.link patch={tab.link}>
-              {tab.name}
-              <span
-                :if={Map.get(tab, :warning)}
-                class="badge badge-warning tooltip tooltip-bottom"
-                data-tip={tab.warning}
-              >
-                <.icon name="hero-exclamation-triangle" />
-              </span>
-            </.link>
-          </li>
-        </ul>
+      <nav class="tabs tabs-border w-full border-b border-base-300 mb-2">
+        <.link :for={tab <- @tab} class={["tab", tab.active && "tab-active"]} navigate={tab.link}>
+          {tab.name}
+          <span
+            :if={Map.get(tab, :warning)}
+            class="badge badge-warning tooltip tooltip-bottom"
+            data-tip={tab.warning}
+          >
+            <.icon name="hero-exclamation-triangle" />
+          </span>
+        </.link>
+      </nav>
 
-        <div>
-          {render_slot(@inner_block)}
-        </div>
-      </div>
+      {render_slot(@inner_block)}
     </Layouts.app>
     """
   end

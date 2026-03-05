@@ -2,7 +2,8 @@ defmodule Volley.Tournaments.Tournament do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Volley.Tournaments.{Division, Team}
+  alias Volley.Tournaments.Division
+  alias Volley.Tournaments.Team
 
   @derive {Phoenix.Param, key: :public_id}
 
@@ -24,7 +25,7 @@ defmodule Volley.Tournaments.Tournament do
     field :registration_open, :boolean, virtual: true
 
     # Consider adding currency for registration. Currently AUD is assumed.
-    # Stored in AUD Cents
+    # Stored in AUD dollars
     field :registration_price, :integer
 
     has_many :divisions, Division, on_replace: :delete

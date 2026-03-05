@@ -2,7 +2,9 @@ defmodule Volley.Tournaments.Team do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Volley.Tournaments.{Division, Player, Tournament}
+  alias Volley.Tournaments.Division
+  alias Volley.Tournaments.Player
+  alias Volley.Tournaments.Tournament
 
   schema "teams" do
     field :name, :string
@@ -13,10 +15,14 @@ defmodule Volley.Tournaments.Team do
     field :trainer_name, :string
     field :medical_doctor_name, :string
 
+    field :accepted_at, :utc_datetime
+
     embeds_many :players, Player
 
     belongs_to :division, Division, on_replace: :nilify
     belongs_to :tournament, Tournament, on_replace: :delete
+
+    timestamps()
   end
 
   def changeset(team, params \\ %{}, opts \\ []) do

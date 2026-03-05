@@ -2,8 +2,8 @@ defmodule Volley.Tournaments.Division do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Volley.Tournaments.Tournament
   alias Volley.Tournaments.Team
+  alias Volley.Tournaments.Tournament
 
   @types [:mixed, :men, :women]
 

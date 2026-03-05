@@ -3,12 +3,12 @@ defmodule Volley.Repo.Migrations.TournamentBaseline do
 
   def change do
     create table(:tournaments) do
-      add :public_id, :uuid
+      add :public_id, :uuid, null: false
 
-      add :name, :string
+      add :name, :string, null: false
 
       add :draft, :boolean, null: false
-      add :timezone, :string
+      add :timezone, :string, null: false
 
       add :location, :string
 
@@ -20,7 +20,7 @@ defmodule Volley.Repo.Migrations.TournamentBaseline do
       add :registration_closed_at, :naive_datetime
       add :registration_price, :integer
 
-      add :owner_id, references(:users)
+      add :owner_id, references(:users), null: false
 
       timestamps()
     end
@@ -32,7 +32,7 @@ defmodule Volley.Repo.Migrations.TournamentBaseline do
     end
 
     create table(:teams) do
-      add :name, :string
+      add :name, :string, null: false
 
       add :coach_name, :string
       add :assistant_coach_name, :string
@@ -41,8 +41,12 @@ defmodule Volley.Repo.Migrations.TournamentBaseline do
 
       add :players, :map
 
+      add :accepted_at, :utc_datetime
+
       add :division_id, references(:divisions, on_delete: :nilify_all)
-      add :tournament_id, references(:tournaments)
+      add :tournament_id, references(:tournaments), null: false
+
+      timestamps()
     end
   end
 end

@@ -147,19 +147,21 @@ defmodule VolleyWeb.Layouts do
   def user_buttons(assigns) do
     ~H"""
     <%= if Accounts.known_user?(@current_scope) do %>
-      <li>
-        {@current_scope.user.email}
-      </li>
-      <li>
-        <.button variant="ghost" href={~p"/users/settings"}>Settings</.button>
-      </li>
-      <li>
-        <.button variant="ghost" href={~p"/users/log-out"} method="delete">Log out</.button>
-      </li>
+      <div class="dropdown dropdown-end z-1">
+        <div tabindex="0" class="btn">
+          <span class="md:inline hidden">{@current_scope.user.email}</span>
+          <.icon name="hero-user-solid" />
+        </div>
+        <div tabindex="-1" class="menu dropdown-content z-1 px-4 bg-base-200">
+          <li class="menu-title md:hidden">{@current_scope.user.email}</li>
+
+          <li><.button variant="ghost" href={~p"/users/settings"}>Settings</.button></li>
+          <li>
+            <.button variant="ghost" href={~p"/users/log-out"} method="delete">Log out</.button>
+          </li>
+        </div>
+      </div>
     <% else %>
-      <li>
-        <.button variant="ghost" href={~p"/users/register"}>Register</.button>
-      </li>
       <li>
         <.button variant="ghost" href={~p"/users/log-in"}>Log in</.button>
       </li>

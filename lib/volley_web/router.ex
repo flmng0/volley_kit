@@ -15,6 +15,15 @@ defmodule VolleyWeb.Router do
     plug :fetch_current_scope_for_anonymous_user
   end
 
+  pipeline :public_form do
+    plug :accepts, ["html"]
+    plug :fetch_session
+    plug :fetch_live_flash
+    plug :put_root_layout, html: {VolleyWeb.Layouts, :public_form}
+    plug :protect_from_forgery
+    plug :put_secure_browser_headers
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -30,9 +39,13 @@ defmodule VolleyWeb.Router do
       live "/scratch/:id/share", ScratchMatchLive, :share
       live "/scratch/:id/reset", ScratchMatchLive, :reset
       live "/scratch/:id/settings", ScratchMatchLive, :settings
-
-      live "/tournaments/:id/register_team", TournamentLive.TeamRegistration
     end
+  end
+
+  scope "/", VolleyWeb do
+    pipe_through :public_form
+
+    live "/tournaments/:id/register_team", TournamentLive.TeamRegistration
   end
 
   scope "/", VolleyWeb do
@@ -51,6 +64,8 @@ defmodule VolleyWeb.Router do
       live "/tournaments/:id/teams", TournamentLive.Teams
       live "/tournaments/:id/teams/new", TournamentLive.Teams, :new
       live "/tournaments/:id/teams/:team_id", TournamentLive.Teams, :edit
+
+      live "/tournaments/:id/publish", TournamentLive.Publish
     end
   end
 

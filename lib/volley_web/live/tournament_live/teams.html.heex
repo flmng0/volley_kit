@@ -56,7 +56,7 @@
       :let={f}
       module={VolleyWeb.LiveForm}
       id="team_create_form"
-      changeset_fn={&Team.changeset(%Team{}, &1)}
+      changeset_fn={&Tournaments.team_changeset(@tournament, %Team{}, &1)}
       submit_fn={&Tournaments.create_team(@current_scope, @tournament, &1)}
       message_fn={&{:submit_team, &1}}
       class="space-y-8"
@@ -85,7 +85,7 @@
       :let={f}
       module={VolleyWeb.LiveForm}
       id="team_create_form"
-      changeset_fn={&Team.changeset(@team, &1)}
+      changeset_fn={&Tournaments.team_changeset(@tournament, @team, &1)}
       submit_fn={&Tournaments.update_team(@current_scope, @team, &1)}
       message_fn={&{:submit_team, &1}}
       class="space-y-8"

@@ -34,6 +34,8 @@ defmodule Volley.Repo.Migrations.TournamentBaseline do
     create table(:teams) do
       add :name, :string, null: false
 
+      add :contact_email, :string
+
       add :coach_name, :string
       add :assistant_coach_name, :string
       add :trainer_name, :string

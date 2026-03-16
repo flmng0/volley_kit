@@ -129,6 +129,7 @@ defmodule VolleyWeb.FormComponents do
 
     attr :form, Phoenix.HTML.Form, required: true
     attr :tournament, Volley.Tournaments.Tournament
+    attr :email_required, :boolean, default: false
 
     def team(assigns) do
       assigns =
@@ -139,6 +140,11 @@ defmodule VolleyWeb.FormComponents do
       ~H"""
       <fieldset class="fieldset">
         <.input field={@form[:name]} type="text" label="Team Name*" phx-mounted={JS.focus()} />
+        <.input
+          field={@form[:contact_email]}
+          type="email"
+          label={if(@email_required, do: "Contact Email*", else: "Contact Email")}
+        />
 
         <.input
           :if={not Enum.empty?(@divisions)}

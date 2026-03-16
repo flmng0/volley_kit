@@ -1,15 +1,32 @@
-<Layouts.app
-  current_scope={@current_scope}
-  flash={@flash}
->
-  <.header>
-    Team Registration
-    <:subtitle>Register your team to for: {@tournament.name}</:subtitle>
-  </.header>
+<div class="flex flex-col gap-16 max-w-screen w-md px-4 md:mb-8 mt-4">
+  <header>
+    <div class="flex flex-row-reverse flex-wrap gap-2 items-start justify-between">
+      <Layouts.theme_toggle />
+      <.header class="flex-grow">
+        Team Registration Form
+        <:subtitle>
+          You are registering for
+          <.link class="link" href={~p"/tournaments/#{@tournament}"}>{@tournament.name}</.link>
+        </:subtitle>
+      </.header>
+    </div>
+    <.section_card title="Tournament Details">
+      <p>{@tournament.name}</p>
+      <p>Start Date: {@tournament.start}</p>
+      <p>End Date: {@tournament.end}</p>
+    </.section_card>
+  </header>
 
-  <.section_card title="Tournament Details">
-    <p>{@tournament.name}</p>
-    <p>Start Date: {@tournament.start}</p>
-    <p>End Date: {@tournament.end}</p>
-  </.section_card>
-</Layouts.app>
+  <main>
+    <.header header_tag="h2">Your Team Details</.header>
+    <.live_component
+      :let={f}
+      id="team_registration_form"
+      module={VolleyWeb.LiveForm}
+      changeset_fn={&Tournaments.team_changeset(@tournament, @team, &1, email_required: true)}
+      class="space-y-8"
+    >
+      <FormComponents.Tournament.team form={f.form} tournament={@tournament} />
+    </.live_component>
+  </main>
+</div>

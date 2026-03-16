@@ -5,6 +5,7 @@ defmodule VolleyWeb.LiveForm do
   attr :submit_fn, {:fun, 1}
   attr :message_fn, {:fun, 1}
   attr :class, :string, default: nil
+  attr :form_opts, :list, default: []
 
   slot :inner_block, required: true
 
@@ -71,6 +72,8 @@ defmodule VolleyWeb.LiveForm do
 
   defp assign_form(socket, %Ecto.Changeset{} = changeset, opts) do
     clean? = Enum.empty?(changeset.changes)
+
+    opts = opts ++ (socket.assigns[:form_opts] || [])
 
     socket
     |> assign(:clean?, clean?)

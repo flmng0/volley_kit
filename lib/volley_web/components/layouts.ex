@@ -66,7 +66,9 @@ defmodule VolleyWeb.Layouts do
   attr :flash, :map, required: true
   attr :current_scope, :map, default: nil
 
-  attr :title, :string
+  slot :title do
+    attr :class, :string
+  end
 
   slot :tab do
     attr :name, :string
@@ -80,18 +82,24 @@ defmodule VolleyWeb.Layouts do
   def tabbed(assigns) do
     ~H"""
     <Layouts.app current_scope={@current_scope} flash={@flash}>
-      <nav class="tabs tabs-border w-full border-b border-base-300 mb-2">
-        <.link :for={tab <- @tab} class={["tab", tab.active && "tab-active"]} navigate={tab.link}>
-          {tab.name}
-          <span
-            :if={Map.get(tab, :warning)}
-            class="badge badge-warning tooltip tooltip-bottom"
-            data-tip={tab.warning}
-          >
-            <.icon name="hero-exclamation-triangle" />
-          </span>
-        </.link>
-      </nav>
+      <div class="flex justify-between items-end border-b border-base-300 mb-2">
+        <div :for={title <- @title} class={Map.get(title, :class)}>
+          {render_slot(@title)}
+        </div>
+
+        <nav class="tabs tabs-border">
+          <.link :for={tab <- @tab} class={["tab", tab.active && "tab-active"]} navigate={tab.link}>
+            {tab.name}
+            <span
+              :if={Map.get(tab, :warning)}
+              class="badge badge-warning tooltip tooltip-bottom"
+              data-tip={tab.warning}
+            >
+              <.icon name="hero-exclamation-triangle" />
+            </span>
+          </.link>
+        </nav>
+      </div>
 
       {render_slot(@inner_block)}
     </Layouts.app>
@@ -217,7 +225,13 @@ defmodule VolleyWeb.Layouts do
 
   def tournament_view(assigns) do
     ~H"""
-    <.tabbed {@rest} title={@tournament.name || "Unnamed Tournament"}>
+    <.tabbed {@rest}>
+      <:title class="flex gap-2 items-center px-2 py-1">
+        <h1 class="font-semibold">
+          {@tournament.name}
+        </h1>
+        <span :if={@tournament.draft} class="italic text-base-content/50">Draft</span>
+      </:title>
       <:tab
         name="Overview"
         link={~p"/tournaments/#{@tournament}"}
@@ -231,6 +245,12 @@ defmodule VolleyWeb.Layouts do
           Volley.Tournaments.Tournament.teams_need_attention?(@tournament) &&
             "Teams not assigned a division"
         }
+      />
+      <:tab
+        :if={@tournament.draft}
+        name="Publish"
+        link={~p"/tournaments/#{@tournament}/publish"}
+        active={@view == VolleyWeb.TournamentLive.Publish}
       />
 
       {render_slot(@inner_block)}

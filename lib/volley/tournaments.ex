@@ -11,6 +11,13 @@ defmodule Volley.Tournaments do
   alias Ecto.Changeset
   import Ecto.Query, only: [from: 2]
 
+  def team_changeset(%Tournament{} = tournament, %Team{} = team, params \\ %{}, opts \\ []) do
+    division_required = tournament.divisions != []
+    opts = [division_required: division_required] ++ opts
+
+    Team.changeset(team, params, opts)
+  end
+
   def is_tournament_owner?(scope, tournament)
 
   def is_tournament_owner?(%Scope{user: %User{id: user_id}}, %Tournament{owner_id: user_id}),
@@ -43,7 +50,16 @@ defmodule Volley.Tournaments do
   def get_tournament(%Scope{user: user}, id) when is_struct(user, User) do
     query =
       from t in Tournament,
-        where: t.owner_id == ^user.id,
+        where: not t.draft or t.owner_id == ^user.id,
+        preload: [:teams, :divisions]
+
+    Repo.get_by(query, public_id: id)
+  end
+
+  def get_tournament(_, id) do
+    query =
+      from t in Tournament,
+        where: t.draft == false,
         preload: [:teams, :divisions]
 
     Repo.get_by(query, public_id: id)
@@ -94,6 +110,14 @@ defmodule Volley.Tournaments do
     changeset
     |> Repo.update()
     |> maybe_preload(:division, force: force_preload)
+  end
+
+  def publish_tournament!(%Scope{} = scope, %Tournament{} = tournament) do
+    true = is_tournament_owner?(scope, tournament)
+
+    tournament
+    |> Tournament.publish_changeset()
+    |> Repo.update!()
   end
 
   def delete_tournament(%Scope{} = scope, %Tournament{} = tournament) do

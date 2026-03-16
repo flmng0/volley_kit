@@ -10,6 +10,8 @@ defmodule Volley.Tournaments.Team do
   schema "teams" do
     field :name, :string
 
+    field :contact_email, :string
+
     # Additional names listed on a scoresheet
     field :coach_name, :string
     field :assistant_coach_name, :string
@@ -28,14 +30,15 @@ defmodule Volley.Tournaments.Team do
 
   def changeset(team, params \\ %{}, opts \\ []) do
     required =
-      if Keyword.get(opts, :division_required, false) do
-        [:name, :division_id]
-      else
-        [:name]
-      end
+      [
+        :name,
+        opts[:division_required] && :division_id,
+        opts[:email_required] && :contact_email
+      ]
+      |> Enum.reject(&is_nil/1)
 
     team
-    |> cast(params, [:name, :division_id])
+    |> cast(params, [:name, :division_id, :contact_email])
     |> validate_required(required)
     |> cast_embed(:players, sort_param: :sort_players, drop_param: :drop_players)
   end

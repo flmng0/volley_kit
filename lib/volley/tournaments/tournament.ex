@@ -79,6 +79,19 @@ defmodule Volley.Tournaments.Tournament do
     |> cast_teams()
   end
 
+  def publish_confirm_changeset(params \\ %{}) do
+    data = %{}
+    types = %{confirmation: :boolean}
+
+    {data, types}
+    |> cast(params, Map.keys(types))
+    |> validate_acceptance(:confirmation, message: "Please confirm you have read the disclaimer.")
+  end
+
+  def publish_changeset(tournament) do
+    change(tournament, draft: false)
+  end
+
   defp validate_timezone(changeset) do
     valid_timezones = TimeZoneInfo.time_zones()
     validate_inclusion(changeset, :timezone, valid_timezones, message: "not a valid timezone")
@@ -91,10 +104,6 @@ defmodule Volley.Tournaments.Tournament do
 
   defp cast_teams(changeset) do
     cast_assoc(changeset, :teams, sort_param: :sort_teams, drop_param: :drop_teams)
-  end
-
-  def release_changeset(tournament) do
-    change(tournament, draft: false)
   end
 
   def open_registration_changeset(tournament) do

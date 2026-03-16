@@ -356,6 +356,7 @@ defmodule VolleyWeb.CoreComponents do
   Renders a header with title.
   """
   attr :header_tag, :string, default: "h1", values: ~w(h1 h2 h3)
+  attr :class, :string, default: nil
 
   slot :inner_block, required: true
   slot :subtitle
@@ -363,7 +364,7 @@ defmodule VolleyWeb.CoreComponents do
 
   def header(assigns) do
     ~H"""
-    <header class={[@actions != [] && "flex items-center justify-between gap-6", "pb-4"]}>
+    <header class={[@actions != [] && "flex items-center justify-between gap-6", "pb-4", @class]}>
       <div>
         <.dynamic_tag tag_name={@header_tag} class="text-lg font-semibold leading-8">
           {render_slot(@inner_block)}

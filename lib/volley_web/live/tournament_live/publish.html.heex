@@ -1,0 +1,57 @@
+<Layouts.tournament_view
+  current_scope={@current_scope}
+  flash={@flash}
+  tournament={@tournament}
+  view={__MODULE__}
+>
+  <.header>
+    Publish Tournament
+  </.header>
+
+  <p>
+    Do you wish to publish your tournament <span class="font-semibold">"{@tournament.name}"</span>?
+  </p>
+
+  <.section_card title="Disclaimer">
+    <div class="prose">
+      <p>Publishing your tournament will mean the following:</p>
+
+      <ul>
+        <li>
+          You will no longer be able to edit
+          <a href="#basicDetailsDfn" class="not-prose underline decoration-dashed">
+            Basic Details
+          </a>
+          in the Overview for your tournament.
+        </li>
+        <li>
+          Teams may begin registering for your tournament (within your set registration period).
+        </li>
+      </ul>
+    </div>
+  </.section_card>
+
+  <.live_component
+    :let={f}
+    module={VolleyWeb.LiveForm}
+    id="submit_confirm_form"
+    changeset_fn={&Tournament.publish_confirm_changeset/1}
+    message_fn={fn _ -> :publish_tournament end}
+    form_opts={[as: "confirmation"]}
+  >
+    <.input
+      type="checkbox"
+      field={f.form[:confirmation]}
+      label="I have read and I understand the above disclaimer."
+    />
+
+    <.button variant="create" class="btn-block">Publish My Tournament!</.button>
+  </.live_component>
+
+  <footer class="text-sm border border-base-300 shadow-xs p-4 rounded-md">
+    <dfn id="basicDetailsDfn" class="target:animate-attention">
+      Basic Details are located in the Overview tab, and include the following: Tournament Name, Location, Time zone, Start and End...
+    </dfn>
+  </footer>
+</Layouts.tournament_view>
+

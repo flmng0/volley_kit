@@ -125,6 +125,13 @@
   --size-score-min: 3rem;
   --container-score-min: var(--size-score-min);
   --font-score: "Noto Sans";
+
+  --animate-attention: attention 500ms ease-in-out 4;
+
+  @keyframes attention {
+    0%, 100% { filter: invert(0); }
+    50% { filter: invert(1); }
+  }
 }
 
 @utility bleed-container {
@@ -139,3 +146,8 @@
 @utility full-bleed {
   grid-column: 1 / -1;
 }
+
+:root {
+  height: 100%;
+}
+

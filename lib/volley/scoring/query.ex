@@ -29,18 +29,16 @@ defmodule Volley.Scoring.Query do
       on: e.id == se.id,
       select: %{
         event: e,
-        snapshot: %MatchSnapshot{
-          a_sets: count() |> filter(e.type == :set_won and e.team == :a) |> over(:sets),
-          b_sets: count() |> filter(e.type == :set_won and e.team == :b) |> over(:sets),
-          a_score: count() |> filter(e.type == :score and e.team == :a) |> over(:score),
-          b_score: count() |> filter(e.type == :score and e.team == :b) |> over(:score)
-        }
+        current_set: se.set,
+        a_sets: count() |> filter(e.type == :set_won and e.team == :a) |> over(:sets),
+        b_sets: count() |> filter(e.type == :set_won and e.team == :b) |> over(:sets),
+        a_score: count() |> filter(e.type == :score and e.team == :a) |> over(:score),
+        b_score: count() |> filter(e.type == :score and e.team == :b) |> over(:score)
       },
       windows: [
         sets: [order_by: se.set],
         score: [partition_by: se.set, order_by: e.id]
       ],
-      order_by: [desc: e.id],
       where: e.match_id == ^match.id
   end
 end

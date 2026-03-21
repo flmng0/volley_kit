@@ -25,6 +25,9 @@ defmodule VolleyWeb.MatchSettingsForm do
           placeholder="25"
         />
 
+        <.input field={@form[:total_sets]} label="Total Sets" />
+        <.input field={@form[:final_set_limit]} label="Final Set Limit" />
+
         <div class="mt-6 flex justify-end items-center gap-4">
           <%= if @type == :create do %>
             <.button type="submit" variant="primary" class="btn-block">

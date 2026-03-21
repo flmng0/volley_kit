@@ -38,9 +38,16 @@ defmodule Volley.Scoring.Match do
     |> cast_embed(:settings, required: true)
   end
 
-  def winning_team(%__MODULE__{} = match), do: winning_team(match, match.settings.set_limit)
+  def winning_team(%__MODULE__{} = match) do
+    current_set = current_set(match)
 
-  def winning_team(%__MODULE__{} = match, set_limit) do
+    set_limit =
+      if match.settings.total_sets == current_set + 1 do
+        match.settings.final_set_limit || match.settings.set_limit
+      else
+        match.settings.set_limit
+      end
+
     cond do
       match.a_score >= set_limit and match.a_score >= match.b_score + 2 ->
         :a

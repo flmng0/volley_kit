@@ -188,11 +188,7 @@ defmodule Volley.Scoring do
   defp reset_match_with_events(%Match{} = match) do
     query = match |> Query.score_timeline() |> Ecto.Query.limit(1)
 
-    snapshot =
-      case Repo.one(query) do
-        %{snapshot: snapshot} -> snapshot
-        nil -> %MatchSnapshot{a_score: 0, b_score: 0, a_sets: 0, b_sets: 0}
-      end
+    snapshot = Repo.one(query) || %MatchSnapshot{}
 
     changes = Map.take(snapshot, [:a_score, :b_score, :a_sets, :b_sets])
 

@@ -22,9 +22,12 @@ defmodule VolleyWeb.Router do
   scope "/", VolleyWeb do
     pipe_through :browser
 
+    get "/", PageController, :home
+    get "/scratch/new", ScratchController, :new
+    delete "/scratch/:id", ScratchController, :delete
+
     live_session :mount_user,
       on_mount: [{VolleyWeb.UserAuth, :mount_current_scope}] do
-      live "/", HomeLive
       live "/scratch/:id", ScratchMatchLive
       live "/scratch/:id/share", ScratchMatchLive, :share
       live "/scratch/:id/reset", ScratchMatchLive, :reset

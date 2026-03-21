@@ -433,49 +433,61 @@ defmodule VolleyWeb.CoreComponents do
   attr :auto_open, :boolean, default: false
   attr :rest, :global, include: ~w(open)
 
+  attr :noportal, :boolean, default: false
+
   slot :inner_block, required: true
   slot :action
 
   def modal(assigns) do
-    ~H"""
-    <.portal id={"#{@id}Portal"} target="body">
-      <dialog
-        id={@id}
-        {@rest}
-        class="modal"
-        data-onclose={@close}
-        closedby={@close || "none"}
-        phx-mounted={@auto_open && show_modal(@id)}
-      >
-        <div class={[@class, "modal-box"]}>
-          {render_slot(@inner_block)}
+    template = ~H"""
+    <dialog
+      id={@id}
+      {@rest}
+      class="modal"
+      data-onclose={@close}
+      closedby={@close || "none"}
+      phx-mounted={@auto_open && show_modal(@id)}
+    >
+      <div class={[@class, "modal-box"]}>
+        {render_slot(@inner_block)}
 
-          <div :if={@action != []} class="modal-action">
-            <form
-              method="dialog"
-              class="flex flex-col w-full sm:flex-row sm:justify-end flex-wrap gap-2"
-            >
-              <%= for action <- @action do %>
-                {render_slot(action)}
-              <% end %>
-            </form>
-          </div>
-          <form :if={@close} method="dialog">
-            <.button
-              class="btn-sm btn-circle btn-ghost absolute right-2 top-2"
-              aria-label="close"
-              autofocus
-            >
-              <.icon name="hero-x-mark" class="size-5 text-base-content/50" />
-            </.button>
+        <div :if={@action != []} class="modal-action">
+          <form
+            method="dialog"
+            class="flex flex-col w-full sm:flex-row sm:justify-end flex-wrap gap-2"
+          >
+            <%= for action <- @action do %>
+              {render_slot(action)}
+            <% end %>
           </form>
         </div>
-        <form :if={@close} method="dialog" class="modal-backdrop">
-          <button>close</button>
+        <form :if={@close} method="dialog">
+          <.button
+            class="btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            aria-label="close"
+            autofocus
+          >
+            <.icon name="hero-x-mark" class="size-5 text-base-content/50" />
+          </.button>
         </form>
-      </dialog>
-    </.portal>
+      </div>
+      <form :if={@close} method="dialog" class="modal-backdrop">
+        <button>close</button>
+      </form>
+    </dialog>
     """
+
+    assigns = assign(assigns, :template, template)
+
+    if assigns[:noportal] do
+      ~H"{@template}"
+    else
+      ~H"""
+      <.portal id={"#{@id}Portal"} target="body">
+        {@template}
+      </.portal>
+      """
+    end
   end
 
   attr :value, :string, required: true

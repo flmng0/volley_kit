@@ -14,6 +14,28 @@ defmodule Volley.Scoring.Settings do
     field :final_set_limit, :integer
   end
 
+  defp best_of_three,
+    do: %{
+      title: "Best of 3",
+      set_limit: 25,
+      total_sets: 3
+    }
+
+  defp best_of_five,
+    do: %{
+      title: "Best of 5",
+      set_limit: 25,
+      total_sets: 5,
+      final_set_limit: 15
+    }
+
+  def presets() do
+    [
+      bo3: best_of_three(),
+      bo5: best_of_five()
+    ]
+  end
+
   def changeset(settings, params \\ %{}) do
     settings
     |> cast(params, [:a_name, :b_name, :set_limit, :total_sets, :final_set_limit])

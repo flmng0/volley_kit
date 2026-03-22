@@ -12,6 +12,11 @@ defmodule VolleyWeb.Layouts do
   # and other static content.
   embed_templates "layouts/*"
 
+  attr :status, :any
+  slot :inner_block, required: true
+
+  def error(assigns)
+
   @doc """
   Renders your app layout.
 

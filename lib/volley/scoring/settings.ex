@@ -29,10 +29,17 @@ defmodule Volley.Scoring.Settings do
       final_set_limit: 15
     }
 
+  defp scratch,
+    do: %{
+      title: "Scratch",
+      set_limit: 25
+    }
+
   def presets() do
     [
       bo3: best_of_three(),
-      bo5: best_of_five()
+      bo5: best_of_five(),
+      scratch: scratch()
     ]
   end
 

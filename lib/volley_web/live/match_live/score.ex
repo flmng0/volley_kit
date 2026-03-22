@@ -1,4 +1,4 @@
-defmodule VolleyWeb.ScratchMatchLive do
+defmodule VolleyWeb.MatchLive.Score do
   use VolleyWeb, :live_view
 
   import VolleyWeb.MatchComponents
@@ -7,17 +7,21 @@ defmodule VolleyWeb.ScratchMatchLive do
 
   require Integer
 
-  @impl true
-  def handle_params(%{"id" => match_id}, _uri, socket) do
-    if match = Scoring.get_match_by_public_id(socket.assigns.current_scope, match_id) do
-      scorer? = Scoring.can_score_match?(socket.assigns.current_scope, match)
+  on_mount VolleyWeb.MatchLive.PutMatch
 
-      {:noreply, assign_new_match(socket, match, scorer?)}
+  @impl true
+  def handle_params(_params, _uri, socket) do
+    %{match: match, current_scope: scope} = socket.assigns
+
+    if Scoring.can_score_match?(scope, match) do
+      Scoring.subscribe(match)
+
+      {:noreply, assign_match(socket, match)}
     else
       socket =
         socket
-        |> put_flash(:error, "Match with saved ID no longer exists")
-        |> redirect(to: ~p"/")
+        |> put_flash(:error, "You aren't allowed to score for this match.")
+        |> push_navigate(to: ~p"/match/#{socket.assigns.match}")
 
       {:noreply, socket}
     end
@@ -32,18 +36,17 @@ defmodule VolleyWeb.ScratchMatchLive do
     end
   end
 
-  def handle_info({:submit_settings, settings}, socket) do
-    {:ok, match} =
-      Scoring.update_match_settings(socket.assigns.current_scope, socket.assigns.match, settings)
-
-    socket =
-      socket
-      |> assign(:editing?, false)
-      |> assign_match(match, true)
-      |> push_patch(to: ~p"/scratch/#{match}")
-
-    {:noreply, socket}
-  end
+  # def handle_info({:submit_settings, settings}, socket) do
+  #   {:ok, match} =
+  #     Scoring.update_match_settings(socket.assigns.current_scope, socket.assigns.match, settings)
+  #
+  #   socket =
+  #     socket
+  #     |> assign_match(match, true)
+  #     |> push_patch(to: ~p"/scratch/#{match}")
+  #
+  #   {:noreply, socket}
+  # end
 
   @impl true
   def handle_event("score", %{"team" => team}, socket) do
@@ -107,27 +110,10 @@ defmodule VolleyWeb.ScratchMatchLive do
 
     assign(socket,
       match: match,
+      share_link: url(socket, ~p"/match/#{match}"),
       winning_team: winning_team,
       current_set: current_set,
       page_title: "#{match.settings.a_name} vs. #{match.settings.b_name}"
     )
-  end
-
-  defp assign_new_match(socket, %Match{} = match, scorer?) do
-    if connected?(socket) do
-      if old_match = socket.assigns[:match] do
-        Scoring.unsubscribe(old_match)
-      end
-
-      Scoring.subscribe(match)
-    end
-
-    share_link = url(socket, ~p"/scratch/#{match}")
-
-    socket
-    |> assign(:share_link, share_link)
-    |> assign(:scorer?, scorer?)
-    |> assign(:editing?, false)
-    |> assign_match(match)
   end
 end

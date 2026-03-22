@@ -3,7 +3,7 @@ defmodule VolleyWeb.MatchComponents do
 
   attr :match, Volley.Scoring.Match
 
-  attr :event, :string, required: true
+  attr :event, :string, default: nil
   attr :can_score, :boolean, default: false
   attr :editing, :boolean, default: false
   attr :swap, :boolean, default: false

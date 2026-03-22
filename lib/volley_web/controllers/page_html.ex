@@ -50,7 +50,7 @@ defmodule VolleyWeb.PageHTML do
       actions_class="flex flex-row flex-wrap justify-stretch gap-2"
     >
       <:action>
-        <.button navigate={~p"/scratch/#{@match}"} variant="neutral" class="grow max-w-full">
+        <.button navigate={~p"/match/#{@match}"} variant="neutral" class="grow max-w-full">
           {@match.settings.a_name} vs. {@match.settings.b_name}
         </.button>
       </:action>
@@ -65,26 +65,12 @@ defmodule VolleyWeb.PageHTML do
       <p>Are you sure you want to delete this scratch match?</p>
 
       <:action>
-        <.button variant="delete" href={~p"/scratch/#{@match}"} method="delete">Yes, delete</.button>
+        <.button variant="delete" href={~p"/match/#{@match}"} method="delete">Yes, delete</.button>
       </:action>
       <:action>
         <.button>Cancel</.button>
       </:action>
     </.modal>
-    """
-  end
-
-  defp start_match_card(assigns) do
-    ~H"""
-    <.hero_card
-      title="Start A Scratch Match!"
-      subtitle="Jump straight into scoring a new volleyball match, no additional config required."
-      actions_class="text-right"
-    >
-      <.button navigate={~p"/scratch/new"} variant="primary" class="btn-block">
-        Start Match <.icon name="hero-flag" class="size-4 ml-2" />
-      </.button>
-    </.hero_card>
     """
   end
 end

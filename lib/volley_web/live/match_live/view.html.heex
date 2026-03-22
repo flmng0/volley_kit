@@ -1,0 +1,14 @@
+<div data-fullscreen="true" class="fixed inset-0">
+  <VolleyWeb.MatchComponents.score_container
+    match={@match}
+    swap={Integer.is_odd(Match.current_set(@match))}
+  />
+</div>
+
+<.button
+  :if={@include_scorer_link?}
+  href={~p"/match/#{@match}/score"}
+  class="fixed z-10 top-2 right-2 bg-base-200"
+>
+  <.icon name="hero-chevron-left" />Back to Scoring
+</.button>

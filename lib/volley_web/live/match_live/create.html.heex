@@ -1,0 +1,58 @@
+<Layouts.app
+  current_scope={@current_scope}
+  flash={@flash}
+>
+  <.form
+    for={@form}
+    phx-change="validate"
+    phx-submit="submit"
+  >
+    <div class="grid grid-cols-2 gap-2">
+      <.input field={@form[:a_name]} label="Team A's Name" placeholder="Team A" />
+      <.input field={@form[:b_name]} label="Team B's Name" placeholder="Team B" />
+    </div>
+
+    <fieldset
+      class="bg-base-300 mt-4 px-4 py-3"
+      phx-mounted={JS.ignore_attributes("open")}
+    >
+      <p class="text-lg">Match Configuration</p>
+
+      <span class="label text-sm">Want to apply a preset?</span>
+      <div class="flex flex-row flex-wrap gap-1 justify-between mb-2">
+        <.button
+          :for={{key, preset} <- Settings.presets()}
+          variant="neutral"
+          type="button"
+          class="flex-grow"
+          phx-click="select_preset"
+          phx-value-key={key}
+        >
+          {preset.title}
+        </.button>
+      </div>
+
+      <.input
+        field={@form[:set_limit]}
+        label="Set Limit"
+        type="text"
+        inputmode="numeric"
+        placeholder="25"
+      />
+
+      <.input field={@form[:total_sets]} label="Total Sets" placeholder="Unlimited" />
+      <.input
+        field={@form[:final_set_limit]}
+        label="Final Set Limit"
+        placeholder="Same as other sets"
+        disabled={final_set_disabled(@form)}
+      />
+    </fieldset>
+
+    <div class="mt-6 flex justify-end items-center gap-4">
+      <.button type="submit" variant="primary" class="btn-block">
+        Start Match <.icon name="hero-flag" class="size-4 ml-2" />
+      </.button>
+    </div>
+  </.form>
+</Layouts.app>

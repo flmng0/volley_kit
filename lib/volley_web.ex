@@ -17,6 +17,14 @@ defmodule VolleyWeb do
   those modules here.
   """
 
+  defmodule RequestError do
+    defexception [:message, plug_status: 400]
+  end
+
+  defmodule NotFoundError do
+    defexception [:message, plug_status: 404]
+  end
+
   def static_paths, do: ~w(assets fonts images favicon.ico robots.txt)
 
   def router do

@@ -4,12 +4,12 @@ defmodule Volley.Scoring.MatchSnapshot do
   @primary_key false
 
   embedded_schema do
-    field :a_score, :integer
-    field :b_score, :integer
+    field :a_score, :integer, default: 0
+    field :b_score, :integer, default: 0
 
-    field :a_sets, :integer
-    field :b_sets, :integer
+    field :a_sets, :integer, default: 0
+    field :b_sets, :integer, default: 0
 
-    field :current_set, :integer
+    field :current_set, :integer, default: 0
   end
 end

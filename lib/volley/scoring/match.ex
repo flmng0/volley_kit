@@ -60,6 +60,7 @@ defmodule Volley.Scoring.Match do
     end
   end
 
+  # Zero-indexed current set
   def current_set(%__MODULE__{} = match) do
     match.a_sets + match.b_sets
   end

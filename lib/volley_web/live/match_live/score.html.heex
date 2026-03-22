@@ -1,37 +1,37 @@
 <Layouts.scorer flash={@flash} current_scope={@current_scope}>
   <.score_container
     match={@match}
-    can_score={@scorer?}
+    can_score={true}
     event="score"
     swap={Integer.is_odd(@current_set)}
   />
   <:action>
-    <.button variant="scorer-action" patch={~p"/scratch/#{@match}/share"}>
+    <.button variant="scorer-action" patch={~p"/match/#{@match}/score/share"}>
       <.icon name="hero-share" /> Share...
     </.button>
   </:action>
-  <:action :if={@scorer?}>
+  <:action>
     <.button variant="scorer-action" phx-click="undo">
       <.icon name="hero-arrow-uturn-left" /> Undo
     </.button>
   </:action>
-  <:action :if={@scorer?}>
-    <.button variant="scorer-action" patch={~p"/scratch/#{@match}/reset"}>
+  <:action>
+    <.button variant="scorer-action" patch={~p"/match/#{@match}/score/reset"}>
       <.icon name="hero-stop-solid" /> Reset...
     </.button>
   </:action>
-  <:action :if={@scorer?} show_in_fullscreen?={false}>
-    <.button variant="scorer-action" patch={~p"/scratch/#{@match}/settings"}>
-      <.icon name="hero-adjustments-vertical" /> Settings...
-    </.button>
-  </:action>
+  <%!-- <:action show_in_fullscreen?={false}> --%>
+  <%!--   <.button variant="scorer-action" patch={~p"/match/#{@match}/settings"}> --%>
+  <%!--     <.icon name="hero-adjustments-vertical" /> Settings... --%>
+  <%!--   </.button> --%>
+  <%!-- </:action> --%>
 </Layouts.scorer>
 
 <.modal
   :if={@live_action == :share}
   id="shareModal"
   class="flex flex-col items-center text-sm md:text-base z-10"
-  close={JS.patch(~p"/scratch/#{@match}")}
+  close={JS.patch(~p"/match/#{@match}/score")}
   auto_open
 >
   <.header header_tag="h3">
@@ -47,9 +47,9 @@
 </.modal>
 
 <.modal
-  :if={@scorer? && @live_action == :reset}
+  :if={@live_action == :reset}
   id="resetConfirmModal"
-  close={JS.patch(~p"/scratch/#{@match}")}
+  close={JS.patch(~p"/match/#{@match}/score")}
   auto_open
 >
   <.header header_tag="h3">Are you sure?</.header>
@@ -70,26 +70,26 @@
   </:action>
 </.modal>
 
-<.modal
-  :if={@live_action == :settings}
-  id="settingsModal"
-  class="flex flex-col items-center text-sm md:text-base z-10"
-  close={JS.patch(~p"/scratch/#{@match}")}
-  auto_open
->
-  <.header header_tag="h3">Edit Match Settings</.header>
+<%!-- <.modal --%>
+<%!--   :if={@live_action == :settings} --%>
+<%!--   id="settingsModal" --%>
+<%!--   class="flex flex-col items-center text-sm md:text-base z-10" --%>
+<%!--   close={JS.patch(~p"/match/#{@match}")} --%>
+<%!--   auto_open --%>
+<%!-- > --%>
+<%!--   <.header header_tag="h3">Edit Match Settings</.header> --%>
+<%!----%>
+<%!--   <.live_component --%>
+<%!--     id="settingsEditForm" --%>
+<%!--     module={VolleyWeb.MatchSettingsForm} --%>
+<%!--     type={:update} --%>
+<%!--     settings={@match.settings} --%>
+<%!--     class="w-full" --%>
+<%!--   /> --%>
+<%!-- </.modal> --%>
 
-  <.live_component
-    id="settingsEditForm"
-    module={VolleyWeb.MatchSettingsForm}
-    type={:update}
-    settings={@match.settings}
-    class="w-full"
-  />
-</.modal>
-
 <.modal
-  :if={@scorer? and @winning_team in [:a, :b]}
+  :if={@winning_team in [:a, :b]}
   id="setCompleteModal"
   auto_open
 >

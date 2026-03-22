@@ -23,26 +23,16 @@ defmodule VolleyWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
-    get "/scratch/new", ScratchController, :new
-    delete "/scratch/:id", ScratchController, :delete
 
     live_session :mount_user,
       on_mount: [{VolleyWeb.UserAuth, :mount_current_scope}] do
-      live "/scratch/:id", ScratchMatchLive
-      live "/scratch/:id/share", ScratchMatchLive, :share
-      live "/scratch/:id/reset", ScratchMatchLive, :reset
-      live "/scratch/:id/settings", ScratchMatchLive, :settings
-    end
-  end
+      live "/match/create", MatchLive.Create
 
-  scope "/", VolleyWeb do
-    pipe_through [:browser, :require_authenticated_user]
+      live "/match/:id", MatchLive.View
 
-    live_session :tournament,
-      on_mount: [{VolleyWeb.UserAuth, :require_authenticated}] do
-      live "/tournament/", TournamentLive, :index
-      live "/tournament/new", TournamentLive, :new
-      live "/tournament/:id", TournamentLive, :view
+      live "/match/:id/score", MatchLive.Score
+      live "/match/:id/score/share", MatchLive.Score, :share
+      live "/match/:id/score/reset", MatchLive.Score, :reset
     end
   end
 

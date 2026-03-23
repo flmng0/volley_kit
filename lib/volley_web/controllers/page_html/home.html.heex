@@ -18,49 +18,14 @@
       </ul>
     </div>
 
-    <div
-      :if={@match && not Accounts.known_user?(@current_scope)}
-      class="self-end flex flex-col items-center gap-2"
-    >
-      <div>
-        <.button variant="cta" navigate={~p"/match/#{@match}/score"} class="text-center">
-          {@match.settings.a_name} vs. {@match.settings.b_name}
-        </.button>
-        <.button
-          onclick="deleteConfirmation.showModal()"
-          variant="delete"
-          class="btn-soft btn-square"
-        >
-          <.icon name="hero-trash" />
-        </.button>
-      </div>
-      <span class="text-base-content/50 text-sm">
-        Return to Existing Match
-      </span>
-
-      <.modal noportal id="deleteConfirmation" close>
-        <.header header_tag="h3">
-          Are you sure?
-          <:subtitle>
-            Are you want to delete your match between {@match.settings.a_name} and {@match.settings.b_name}?
-          </:subtitle>
-        </.header>
-        <:action>
-          <.button type="dialog">Cancel</.button>
-          <.button
-            variant="delete"
-            method="delete"
-            href={~p"/match/#{@match}"}
-          >
-            Yes, Delete My Match
-          </.button>
-        </:action>
-      </.modal>
-    </div>
     <div :if={!@match} class="self-end" phx-hook="WhimsyJiggle" id="homeCta">
       <.button variant="cta" navigate={~p"/match/create"}>
         Create A New Match!
       </.button>
     </div>
+    <.continue_match
+      :if={not Accounts.known_user?(@current_scope) && @match}
+      match={@match}
+    />
   </div>
 </Layouts.app>

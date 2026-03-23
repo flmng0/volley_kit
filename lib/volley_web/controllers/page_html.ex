@@ -43,33 +43,41 @@ defmodule VolleyWeb.PageHTML do
 
   attr :match, Volley.Scoring.Match
 
-  defp continue_match_card(assigns) do
+  defp continue_match(assigns) do
     ~H"""
-    <.hero_card
-      title="Continue Scoring"
-      subtitle="Jump back in where you left off, or press Delete to start a new one."
-      actions_class="flex flex-row flex-wrap justify-stretch gap-2"
-    >
-      <:action>
-        <.button navigate={~p"/match/#{@match}"} variant="neutral" class="grow max-w-full">
+    <div class="self-end flex flex-col items-center gap-2">
+      <div>
+        <.button variant="cta" navigate={~p"/match/#{@match}/score"} class="text-center">
           {@match.settings.a_name} vs. {@match.settings.b_name}
         </.button>
-      </:action>
-      <:action>
-        <.button onclick="deleteConfirmation.showModal()" variant="delete" class="flex-[1_1_0]">
-          Delete <.icon name="hero-trash" />
+        <.button
+          onclick="deleteConfirmation.showModal()"
+          variant="delete"
+          class="btn-soft btn-square"
+        >
+          <.icon name="hero-trash" />
         </.button>
-      </:action>
-    </.hero_card>
-    <.modal id="deleteConfirmation" noportal>
-      <.header header_tag="h3">Are you sure?</.header>
-      <p>Are you sure you want to delete this scratch match?</p>
-
+      </div>
+      <span class="text-base-content/50 text-sm">
+        Return to Existing Match
+      </span>
+    </div>
+    <.modal noportal id="deleteConfirmation" close={%JS{}}>
+      <.header header_tag="h3">
+        Are you sure?
+        <:subtitle>
+          Are you want to delete your match between {@match.settings.a_name} and {@match.settings.b_name}?
+        </:subtitle>
+      </.header>
       <:action>
-        <.button variant="delete" href={~p"/match/#{@match}"} method="delete">Yes, delete</.button>
-      </:action>
-      <:action>
-        <.button>Cancel</.button>
+        <.button type="dialog">Cancel</.button>
+        <.button
+          variant="delete"
+          method="delete"
+          href={~p"/match/#{@match}"}
+        >
+          Yes, Delete My Match
+        </.button>
       </:action>
     </.modal>
     """

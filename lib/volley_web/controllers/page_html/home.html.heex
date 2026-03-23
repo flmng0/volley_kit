@@ -19,8 +19,17 @@
     </div>
 
     <div :if={!@match} class="self-end" phx-hook="WhimsyJiggle" id="homeCta">
-      <.button variant="cta" navigate={~p"/match/create"}>
-        Create A New Match!
+      <.button
+        variant="cta"
+        navigate={~p"/match/create"}
+        class="grid overflow-hidden group *:transition-[translate]"
+      >
+        <span class="row-span-full col-span-full group-hover:-translate-y-[120%]">
+          Create a New Match!
+        </span>
+        <span class="row-span-full col-span-full not-group-hover:translate-y-[120%]">
+          I Promise It's Easy!
+        </span>
       </.button>
     </div>
     <.continue_match

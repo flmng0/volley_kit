@@ -2,6 +2,8 @@
   current_scope={@current_scope}
   flash={@flash}
 >
+  <.return_link :if={@return_to} navigate={@return_to} name="Back To Matches" />
+
   <.header>
     Create A One-Off Match
     <:subtitle>
@@ -57,8 +59,12 @@
     </fieldset>
 
     <div class="mt-6 flex justify-end items-center gap-4">
-      <.button type="submit" variant="primary" class="btn-block">
-        Start Match <.icon name="hero-flag" class="size-4 ml-2" />
+      <.button
+        variant={if @return_to, do: "create", else: "primary"}
+        class={@return_to || "btn-block"}
+      >
+        {if @return_to, do: "Create Match", else: "Start Match"}
+        <.icon name="hero-flag" class="size-4 ml-2" />
       </.button>
     </div>
   </.form>

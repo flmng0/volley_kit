@@ -90,7 +90,10 @@ defmodule VolleyWeb.CoreComponents do
   """
   attr :rest, :global, include: ~w(href navigate patch method download name value disabled)
   attr :class, :any, default: ""
-  attr :variant, :string, values: ~w(cta primary secondary neutral delete ghost scorer-action)
+
+  attr :variant, :string,
+    values: ~w(cta primary secondary neutral create delete ghost scorer-action)
+
   slot :inner_block, required: true
 
   def button(%{rest: rest} = assigns) do
@@ -99,6 +102,7 @@ defmodule VolleyWeb.CoreComponents do
       "primary" => "btn-primary",
       "secondary" => "btn-secondary",
       "neutral" => "btn-neutral",
+      "create" => "btn-success",
       "delete" => "btn-error",
       "ghost" => "btn-ghost",
       "scorer-action" => "btn-block btn-md p-4",
@@ -121,6 +125,18 @@ defmodule VolleyWeb.CoreComponents do
       </button>
       """
     end
+  end
+
+  attr :name, :string, default: nil
+  attr :rest, :global, include: ~w(href navigate patch method download)
+
+  def return_link(assigns) do
+    ~H"""
+    <.link class="flex w-fit items-center gap-4 text-md text-base-content/75 group" {@rest}>
+      <.icon name="hero-arrow-up" class="size-4 -rotate-90 group-hover:animate-bounce" />
+      {if @name, do: "Return to #{@name}", else: "Go Back"}
+    </.link>
+    """
   end
 
   @doc """

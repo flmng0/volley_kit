@@ -1,9 +1,17 @@
 defmodule Volley.Scoring.Query do
   import Ecto.Query, only: [from: 2]
 
-  alias Volley.Scoring.MatchSnapshot
+  alias Volley.Accounts.Scope
+
+  # alias Volley.Scoring.MatchSnapshot
   alias Volley.Scoring.Event
   alias Volley.Scoring.Match
+
+  def matches_for_user(%Scope{} = scope) do
+    owner_key = if scope.anonymous, do: :anonymous_owner_id, else: :owner_id
+    filters = [{owner_key, scope.user.id}]
+    Ecto.Query.where(Match, ^filters)
+  end
 
   def match_events(%Match{id: match_id}) do
     from e in Event,

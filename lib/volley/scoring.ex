@@ -89,20 +89,15 @@ defmodule Volley.Scoring do
     is_match_owner?(scope, match)
   end
 
-  def get_users_last_match(%Scope{} = scope) do
+  def list_matches(%Scope{} = scope) do
+    Repo.all(Query.matches_for_user(scope))
+  end
+
+  def get_recent_match(%Scope{} = scope) do
     query =
-      from m in Match,
+      from m in Query.matches_for_user(scope),
         limit: 1,
         order_by: [desc: m.updated_at]
-
-    user_id = scope.user.id
-
-    query =
-      if scope.anonymous do
-        from m in query, where: m.anonymous_owner_id == ^user_id
-      else
-        from m in query, where: m.owner_id == ^user_id
-      end
 
     Repo.one(query)
   end

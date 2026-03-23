@@ -27,6 +27,7 @@ defmodule VolleyWeb.Router do
 
     live_session :mount_user,
       on_mount: [{VolleyWeb.UserAuth, :mount_current_scope}] do
+      live "/match", MatchLive.Index
       live "/match/create", MatchLive.Create
 
       live "/match/:id", MatchLive.View

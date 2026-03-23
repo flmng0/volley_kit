@@ -1,16 +1,22 @@
 defmodule VolleyWeb.MatchLive.Create do
   use VolleyWeb, :live_view
+
+  alias Volley.Accounts
   alias Volley.Scoring
   alias Volley.Scoring.Settings
 
   @impl true
-  def mount(_params, _session, socket) do
-    existing_match = Scoring.get_users_last_match(socket.assigns.current_scope)
+  def mount(params, _session, socket) do
+    existing_match =
+      not Accounts.known_user?(socket.assigns.current_scope) &&
+        Scoring.get_recent_match(socket.assigns.current_scope)
+
     settings = %Settings{}
     changeset = Settings.changeset(settings)
 
     socket =
       socket
+      |> assign(:return_to, params["return_to"])
       |> assign(:existing_match, existing_match)
       |> assign(:settings, settings)
       |> assign_form(changeset)
@@ -36,10 +42,12 @@ defmodule VolleyWeb.MatchLive.Create do
   def handle_event("submit", %{"settings" => params}, socket) do
     case Scoring.start_match(socket.assigns.current_scope, params) do
       {:ok, match} ->
+        navigate_to = socket.assigns.return_to || ~p"/match/#{match}/score"
+
         socket =
           socket
           |> put_flash(:info, "Created match successfully")
-          |> push_navigate(to: ~p"/match/#{match}/score")
+          |> push_navigate(to: navigate_to)
 
         {:noreply, socket}
 

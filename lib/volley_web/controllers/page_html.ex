@@ -42,6 +42,7 @@ defmodule VolleyWeb.PageHTML do
   end
 
   attr :match, Volley.Scoring.Match
+  attr :known_user, :boolean
 
   defp continue_match(assigns) do
     ~H"""
@@ -59,7 +60,7 @@ defmodule VolleyWeb.PageHTML do
         </.button>
       </div>
       <span class="text-base-content/50 text-sm">
-        Return to Existing Match
+        Return to {if @known_user, do: "Latest", else: "Existing"} Match
       </span>
     </div>
     <.modal noportal id="deleteConfirmation" close={%JS{}}>

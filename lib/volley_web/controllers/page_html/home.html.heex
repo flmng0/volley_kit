@@ -33,8 +33,9 @@
       </.button>
     </div>
     <.continue_match
-      :if={not Accounts.known_user?(@current_scope) && @match}
+      :if={@match}
       match={@match}
+      known_user={Accounts.known_user?(@current_scope)}
     />
   </div>
 </Layouts.app>

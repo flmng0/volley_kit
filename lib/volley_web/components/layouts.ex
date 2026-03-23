@@ -132,12 +132,24 @@ defmodule VolleyWeb.Layouts do
   def app_header(assigns) do
     ~H"""
     <header class={["navbar max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8", @class]} {@rest}>
-      <div class="">
-        <.link :if={!@hide_home_button} navigate="/" class="flex w-fit items-center gap-2">
+      <div class="grid gap-4 md:gap-8 auto-cols-auto grid-flow-col text-sm font-semibold justify-center">
+        <.link
+          :if={!@hide_home_button}
+          navigate="/"
+          class="grid grid-cols-subgrid col-span-2 w-fit gap-x-2"
+        >
           <.icon name="hero-home-solid" class="size-6" />
-          <%!-- <img src={~p"/images/logo.svg"} width="36" /> --%>
-          <span class="text-sm font-semibold text-nowrap">Home</span>
+          <span class="text-nowrap">Home</span>
         </.link>
+
+        <.link :if={Accounts.known_user?(@current_scope)} navigate={~p"/match"}>Matches</.link>
+        <span
+          :if={not Accounts.known_user?(@current_scope)}
+          class="text-base-content/50 cursor-not-allowed tooltip tooltip-bottom"
+          data-tip="Must be signed in"
+        >
+          Matches
+        </span>
       </div>
       <ul class="menu menu-horizontal w-full relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
         <.theme_toggle />

@@ -5,7 +5,7 @@ defmodule VolleyWeb.MatchLive.Create do
 
   @impl true
   def mount(_params, _session, socket) do
-    existing_match = Scoring.get_match(socket.assigns.current_scope)
+    existing_match = Scoring.get_users_last_match(socket.assigns.current_scope)
     settings = %Settings{}
     changeset = Settings.changeset(settings)
 

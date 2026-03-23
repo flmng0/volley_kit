@@ -4,7 +4,7 @@ defmodule VolleyWeb.PageController do
   def home(conn, _params) do
     match =
       if scope = conn.assigns.current_scope do
-        Volley.Scoring.get_match(scope)
+        Volley.Scoring.get_users_last_match(scope)
       end
 
     render(conn, :home, match: match)

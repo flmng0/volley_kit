@@ -2,6 +2,13 @@
   current_scope={@current_scope}
   flash={@flash}
 >
+  <.header>
+    Create A One-Off Match
+    <:subtitle>
+      Create a match to score along with your friends.
+    </:subtitle>
+  </.header>
+
   <.form
     for={@form}
     phx-change="validate"
@@ -55,4 +62,18 @@
       </.button>
     </div>
   </.form>
+
+  <.modal :if={@existing_match} auto_open id="existingMatchWarning">
+    <.header>
+      You have a match in progress!
+      <:subtitle>
+        Since you can only (currently) own one match at a time, you can either return to that match, or delete it and make another one.
+      </:subtitle>
+    </.header>
+
+    <:action>
+      <.button navigate={~p"/match/#{@existing_match}"}>Go To Match</.button>
+      <.button variant="delete" phx-click="delete_existing">Delete Existing Match</.button>
+    </:action>
+  </.modal>
 </Layouts.app>

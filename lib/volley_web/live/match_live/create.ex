@@ -5,11 +5,13 @@ defmodule VolleyWeb.MatchLive.Create do
 
   @impl true
   def mount(_params, _session, socket) do
+    existing_match = Scoring.get_match(socket.assigns.current_scope)
     settings = %Settings{}
     changeset = Settings.changeset(settings)
 
     socket =
       socket
+      |> assign(:existing_match, existing_match)
       |> assign(:settings, settings)
       |> assign_form(changeset)
 
@@ -52,6 +54,13 @@ defmodule VolleyWeb.MatchLive.Create do
     changeset = Settings.changeset(socket.assigns.settings, preset)
 
     {:noreply, assign_form(socket, changeset)}
+  end
+
+  def handle_event("delete_existing", _params, socket) do
+    {:ok, _match} =
+      Scoring.delete_match(socket.assigns.current_scope, socket.assigns.existing_match)
+
+    {:noreply, assign(socket, :existing_match, nil)}
   end
 
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do

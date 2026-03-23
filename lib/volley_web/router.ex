@@ -23,6 +23,7 @@ defmodule VolleyWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    delete "/match/:id", MatchController, :delete
 
     live_session :mount_user,
       on_mount: [{VolleyWeb.UserAuth, :mount_current_scope}] do

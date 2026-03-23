@@ -5,6 +5,7 @@ defmodule VolleyWeb.PageHTML do
   See the `page_html` directory for all templates available.
   """
   use VolleyWeb, :html
+  alias Volley.Accounts
 
   embed_templates "page_html/*"
 

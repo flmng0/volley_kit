@@ -9,10 +9,11 @@ defmodule VolleyWeb.MatchLive.View do
   on_mount VolleyWeb.MatchLive.PutMatch
 
   @impl true
-  def mount(params, _session, socket) do
-    Volley.Scoring.subscribe(socket.assigns.match)
+  def mount(_params, _session, socket) do
+    Scoring.subscribe(socket.assigns.match)
+    scorer? = Scoring.can_score_match?(socket.assigns.current_scope, socket.assigns.match)
 
-    {:ok, assign(socket, :include_scorer_link?, params["from_scorer"])}
+    {:ok, assign(socket, :scorer?, scorer?)}
   end
 
   @impl true

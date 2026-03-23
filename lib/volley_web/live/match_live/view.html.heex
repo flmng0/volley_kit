@@ -6,7 +6,7 @@
 </div>
 
 <.button
-  :if={@include_scorer_link?}
+  :if={@scorer?}
   href={~p"/match/#{@match}/score"}
   class="fixed z-10 top-2 right-2 bg-base-200"
 >

@@ -1,6 +1,26 @@
 /** @type {import("phoenix_live_view").HooksOptions} */
 const Hooks = {};
 
+Hooks.WhimsyJiggle = {
+  mounted() {
+    const animation = [
+      { transform: 'rotate(0deg)' },
+      { transform: 'rotate(-3deg)' },
+      { transform: 'rotate(3deg)' },
+      { transform: 'rotate(0deg)' },
+    ]
+    const duration = 250;
+
+    const timeoutInterval = () => (5 + Math.random() * 10) * 1000
+    const doAnimation = () => {
+      this.el.animate(animation, { duration })
+      setTimeout(doAnimation, timeoutInterval())
+    }
+
+    setTimeout(doAnimation, timeoutInterval())
+  }
+}
+
 Hooks.ScoreCard = {
   mounted() {
     /** @type {import("./elements").ScoreCard} */

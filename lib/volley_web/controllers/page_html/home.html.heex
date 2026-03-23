@@ -1,1 +1,27 @@
-<Layouts.app flash={@flash} current_scope={@current_scope} hide_home_button={true}></Layouts.app>
+<Layouts.app flash={@flash} current_scope={@current_scope} hide_home_button={true}>
+  <div class="full-bleed justify-center flex flex-col gap-12 max-w-xl mx-auto">
+    <div class="text-left prose">
+      <hgroup>
+        <h1 class="mb-0">Volley Kit</h1>
+        <p class="text-base-content/50 mt-1">
+          Real-time scoring companion, designed with volleyball in mind.
+        </p>
+      </hgroup>
+
+      <ul class="text-left">
+        <li>
+          Quickly score a scratch match amongst friends.
+        </li>
+        <li>
+          Run a full-blown tournament with real-time statistics and FIVB scoresheet generation.
+        </li>
+      </ul>
+    </div>
+
+    <div class="self-end" phx-hook="WhimsyJiggle" id="homeCta">
+      <.button variant="cta" navigate={~p"/match/create"}>
+        Create A New Match!
+      </.button>
+    </div>
+  </div>
+</Layouts.app>

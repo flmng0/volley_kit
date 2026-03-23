@@ -90,11 +90,12 @@ defmodule VolleyWeb.CoreComponents do
   """
   attr :rest, :global, include: ~w(href navigate patch method download name value disabled)
   attr :class, :any, default: ""
-  attr :variant, :string, values: ~w(primary secondary neutral delete ghost scorer-action)
+  attr :variant, :string, values: ~w(cta primary secondary neutral delete ghost scorer-action)
   slot :inner_block, required: true
 
   def button(%{rest: rest} = assigns) do
     variants = %{
+      "cta" => "btn-accent",
       "primary" => "btn-primary",
       "secondary" => "btn-secondary",
       "neutral" => "btn-neutral",

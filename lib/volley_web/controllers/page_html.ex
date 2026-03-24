@@ -52,18 +52,27 @@ defmodule VolleyWeb.PageHTML do
           {@match.settings.a_name} vs. {@match.settings.b_name}
         </.button>
         <.button
+          :if={not @known_user}
           onclick="deleteConfirmation.showModal()"
           variant="delete"
           class="btn-soft btn-square"
         >
           <.icon name="hero-trash" />
         </.button>
+        <.button
+          :if={@known_user}
+          class="btn-soft btn-square"
+          navigate={~p"/match"}
+          title="View your matches"
+        >
+          <.icon name="hero-list-bullet" />
+        </.button>
       </div>
       <span class="text-base-content/50 text-sm">
         Return to {if @known_user, do: "Latest", else: "Existing"} Match
       </span>
     </div>
-    <.modal noportal id="deleteConfirmation" close={%JS{}}>
+    <.modal :if={not @known_user} noportal id="deleteConfirmation" close={%JS{}}>
       <.header header_tag="h3">
         Are you sure?
         <:subtitle>

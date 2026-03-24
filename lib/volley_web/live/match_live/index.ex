@@ -36,13 +36,15 @@ defmodule VolleyWeb.MatchLive.Index do
       <ul class="flex flex-col gap-4">
         <li
           :for={match <- @matches}
-          class="grid grid-cols-[1fr_auto_1fr] border border-base-300 bg-base-200 rounded-lg p-4 gap-x-2"
+          class="border border-base-300 bg-base-200 rounded-lg p-4"
         >
-          <span class="text-center tracking-wide">{match.settings.a_name}</span>
-          <span class="text-base-content/50">vs.</span>
-          <span class="text-center tracking-wide">{match.settings.b_name}</span>
-
-          <footer class="grid grid-cols-[auto_1fr_auto] items-center col-span-3 border-t mt-4 pt-4 border-base-content/25 text-sm">
+          <main class="grid grid-cols-[1fr_auto_1fr] gap-x-2">
+            <span class="text-center tracking-wide">{match.settings.a_name}</span>
+            <span class="text-base-content/50">vs.</span>
+            <span class="text-center tracking-wide">{match.settings.b_name}</span>
+          </main>
+          <div class="divider my-4"></div>
+          <footer class="grid grid-cols-[auto_1fr_auto] items-center px-2 border-base-content/25 text-sm">
             <span class="text-base-content/50 me-2">Last Updated:</span>
             <span
               phx-hook="LocalTimeDisplay"

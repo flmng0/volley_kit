@@ -1,6 +1,13 @@
 /** @type {import("phoenix_live_view").HooksOptions} */
 const Hooks = {};
 
+Hooks.LocalTimeDisplay = {
+  mounted() {
+    const time = new Date(this.el.dataset.time);
+    this.el.textContent = time.toLocaleString();
+  }
+}
+
 Hooks.WhimsyJiggle = {
   mounted() {
     const animation = [

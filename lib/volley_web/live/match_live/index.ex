@@ -33,8 +33,25 @@ defmodule VolleyWeb.MatchLive.Index do
         <span class="font-semibold">Your Matches</span>
         <.create_button />
       </div>
-      <ul>
-        <li :for={match <- @matches}>{match.settings.a_name} vs. {match.settings.b_name}</li>
+      <ul class="flex flex-col gap-4">
+        <li
+          :for={match <- @matches}
+          class="grid grid-cols-[1fr_auto_1fr] border border-base-300 bg-base-200 rounded-lg p-4 gap-x-2"
+        >
+          <span class="text-center tracking-wide">{match.settings.a_name}</span>
+          <span class="text-base-content/50">vs.</span>
+          <span class="text-center tracking-wide">{match.settings.b_name}</span>
+
+          <footer class="grid grid-cols-[auto_1fr_auto] items-center col-span-3 border-t mt-4 pt-4 border-base-content/25 text-sm">
+            <span class="text-base-content/50 me-2">Last Updated:</span>
+            <span
+              phx-hook="LocalTimeDisplay"
+              data-time={match.updated_at}
+              id={"matchUpdated#{match.id}"}
+            />
+            <.link class="link" navigate={~p"/match/#{match}/score"}>Open Match</.link>
+          </footer>
+        </li>
       </ul>
     </div>
     """

@@ -29,7 +29,7 @@ export class ScoreCard extends HTMLElement {
 
     const root = svg`
       <svg 
-        class="${this.getAttribute("class")}"
+        class="${this.getAttribute('class')}"
         viewBox="0 0 24 16"
         stroke="none"
         fill="currentColor"

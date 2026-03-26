@@ -134,7 +134,7 @@ defmodule VolleyWeb.CoreComponents do
     ~H"""
     <.link class="flex w-fit items-center gap-4 text-md text-base-content/75 group" {@rest}>
       <.icon name="hero-arrow-up" class="size-4 -rotate-90 group-hover:animate-bounce" />
-      {if @name, do: "Return to #{@name}", else: "Go Back"}
+      {@name || "Go Back"}
     </.link>
     """
   end

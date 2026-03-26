@@ -2,7 +2,7 @@
   current_scope={@current_scope}
   flash={@flash}
 >
-  <.return_link :if={@return_to} navigate={@return_to} name="Back To Matches" />
+  <.return_link :if={@return_to} navigate={@return_to} name="Return To Matches" />
 
   <.header>
     Create A One-Off Match
@@ -16,7 +16,8 @@
     phx-change="validate"
     phx-submit="submit"
   >
-    <div class="grid grid-cols-2 gap-2">
+    <div class="bg-base-300 px-4 py-3 grid grid-cols-2 gap-2">
+      <p class="text-lg col-span-2">Team Information</p>
       <.input field={@form[:a_name]} label="Team A's Name" placeholder="Team A" />
       <.input field={@form[:b_name]} label="Team B's Name" placeholder="Team B" />
     </div>

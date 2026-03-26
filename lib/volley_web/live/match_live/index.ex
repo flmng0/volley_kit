@@ -38,10 +38,10 @@ defmodule VolleyWeb.MatchLive.Index do
           :for={match <- @matches}
           class="border border-base-300 bg-base-200 rounded-lg p-4"
         >
-          <main class="grid grid-cols-[1fr_auto_1fr] gap-x-2">
-            <span class="text-center tracking-wide">{match.settings.a_name}</span>
+          <main class="grid grid-cols-[1fr_auto_1fr] gap-x-2 pt-2">
+            <span class="text-lg text-center tracking-wide">{match.settings.a_name}</span>
             <span class="text-base-content/50">vs.</span>
-            <span class="text-center tracking-wide">{match.settings.b_name}</span>
+            <span class="text-lg text-center tracking-wide">{match.settings.b_name}</span>
           </main>
           <div class="divider my-4"></div>
           <footer class="grid grid-cols-[auto_1fr_auto] items-center px-2 border-base-content/25 text-sm">
@@ -51,11 +51,42 @@ defmodule VolleyWeb.MatchLive.Index do
               data-time={match.updated_at}
               id={"matchUpdated#{match.id}"}
             />
-            <.link class="link" navigate={~p"/match/#{match}/score"}>Open Match</.link>
+            <div class="flex gap-2 items-center">
+              <.button variant="neutral" navigate={~p"/match/#{match}/score"}>
+                Score Match
+              </.button>
+              <.button
+                variant="delete"
+                class="btn-square btn-sm"
+                phx-click="delete_match"
+                phx-value-id={match.id}
+              >
+                <.icon name="hero-trash" class="size-4" />
+              </.button>
+            </div>
           </footer>
         </li>
       </ul>
     </div>
     """
+  end
+
+  @impl true
+  def handle_event("delete_match", %{"id" => id}, socket) do
+    find_fn = fn match -> "#{match.id}" == id end
+
+    if match = Enum.find(socket.assigns.matches, find_fn) do
+      {:ok, _match} = Scoring.delete_match(socket.assigns.current_scope, match)
+      matches = Enum.reject(socket.assigns.matches, find_fn)
+
+      socket =
+        socket
+        |> assign(:matches, matches)
+        |> put_flash(:info, "Delete Match Successfully")
+
+      {:noreply, socket}
+    else
+      {:noreply, put_flash(socket, :error, "Match Not Found!")}
+    end
   end
 end

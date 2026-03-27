@@ -20,6 +20,11 @@ defmodule Volley.Scoring.Match do
     belongs_to :owner, Volley.Accounts.User
     field :anonymous_owner_id, Ecto.UUID
 
+    field :status, Ecto.Enum,
+      values: [:in_progress, :completed],
+      virtual: true,
+      default: :in_progress
+
     has_many :events, Volley.Scoring.Event, on_replace: :delete
 
     timestamps()
@@ -39,10 +44,8 @@ defmodule Volley.Scoring.Match do
   end
 
   def winning_team(%__MODULE__{} = match) do
-    current_set = current_set(match)
-
     set_limit =
-      if match.settings.total_sets == current_set + 1 do
+      if match.a_sets == match.b_sets && match.a_sets + 1 == match.settings.sets_to_win do
         match.settings.final_set_limit || match.settings.set_limit
       else
         match.settings.set_limit
@@ -63,5 +66,11 @@ defmodule Volley.Scoring.Match do
   # Zero-indexed current set
   def current_set(%__MODULE__{} = match) do
     match.a_sets + match.b_sets
+  end
+
+  @doc "Checks whether the game is finished, and assumes that there is a winning_team"
+  def game_over?(%__MODULE__{} = match) do
+    match.a_sets + 1 == match.settings.sets_to_win ||
+      match.b_sets + 1 == match.settings.sets_to_win
   end
 end

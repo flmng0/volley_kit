@@ -24,10 +24,12 @@ defmodule VolleyWeb.MatchLive.Create do
     {:ok, socket}
   end
 
-  defp final_set_disabled(form) do
-    total_sets = Phoenix.HTML.Form.input_value(form, :total_sets)
-    not is_integer(total_sets) || total_sets < 2
+  defp has_sets_to_win?(form) do
+    sets_to_win = Phoenix.HTML.Form.input_value(form, :sets_to_win)
+    is_integer(sets_to_win) && sets_to_win > 1
   end
+
+  defp total_sets(sets_to_win), do: sets_to_win * 2 - 1
 
   @impl true
   def handle_event("validate", %{"settings" => params}, socket) do

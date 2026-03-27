@@ -10,7 +10,7 @@ defmodule Volley.Scoring.Settings do
 
     field :set_limit, :integer, default: 25
 
-    field :total_sets, :integer
+    field :sets_to_win, :integer
     field :final_set_limit, :integer
   end
 
@@ -18,14 +18,22 @@ defmodule Volley.Scoring.Settings do
     do: %{
       title: "Best of 3",
       set_limit: 25,
-      total_sets: 3
+      sets_to_win: 2
+    }
+
+  defp test_of_three,
+    do: %{
+      title: "Test of 3",
+      set_limit: 7,
+      sets_to_win: 2,
+      final_set_limit: 5
     }
 
   defp best_of_five,
     do: %{
       title: "Best of 5",
       set_limit: 25,
-      total_sets: 5,
+      sets_to_win: 3,
       final_set_limit: 15
     }
 
@@ -35,17 +43,27 @@ defmodule Volley.Scoring.Settings do
       set_limit: 25
     }
 
-  def presets() do
-    [
-      bo3: best_of_three(),
-      bo5: best_of_five(),
-      scratch: scratch()
-    ]
+  if Mix.env() == :dev do
+    def presets() do
+      [
+        to3: test_of_three(),
+        bo5: best_of_five(),
+        scratch: scratch()
+      ]
+    end
+  else
+    def presets() do
+      [
+        bo3: best_of_three(),
+        bo5: best_of_five(),
+        scratch: scratch()
+      ]
+    end
   end
 
   def changeset(settings, params \\ %{}) do
     settings
-    |> cast(params, [:a_name, :b_name, :set_limit, :total_sets, :final_set_limit])
+    |> cast(params, [:a_name, :b_name, :set_limit, :sets_to_win, :final_set_limit])
     |> validate_required([:a_name, :b_name, :set_limit])
     |> validate_length(:a_name, @team_name_length)
     |> validate_length(:b_name, @team_name_length)

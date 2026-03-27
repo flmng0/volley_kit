@@ -66,6 +66,7 @@ config :volley, VolleyWeb.Endpoint,
 # Enable dev routes for dashboard and mailbox
 config :volley, dev_routes: true
 config :volley, skip_admin_check: true
+config :volley, include_test_preset: true
 
 # Use test email for admin
 config :volley, admin_email: "admin@email.com"

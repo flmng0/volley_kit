@@ -1,4 +1,6 @@
 <Layouts.app current_scope={@current_scope} flash={@flash}>
   <.no_matches_display :if={@matches == []} />
   <.match_list :if={@matches != []} matches={@matches} />
+
+  <.delete_modal :if={@delete} match={@delete} />
 </Layouts.app>

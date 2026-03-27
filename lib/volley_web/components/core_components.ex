@@ -127,10 +127,20 @@ defmodule VolleyWeb.CoreComponents do
     end
   end
 
-  attr :name, :string, default: nil
+  attr :name, :string
   attr :rest, :global, include: ~w(href navigate patch method download)
 
   def return_link(assigns) do
+    route_names = %{
+      "/match" => "Return to Matches"
+    }
+
+    assigns =
+      assign_new(assigns, :name, fn %{rest: rest} ->
+        route = rest[:href] || rest[:navigate] || rest[:path]
+        route_names[route]
+      end)
+
     ~H"""
     <.link class="flex w-fit items-center gap-4 text-md text-base-content/75 group" {@rest}>
       <.icon name="hero-arrow-up" class="size-4 -rotate-90 group-hover:animate-bounce" />

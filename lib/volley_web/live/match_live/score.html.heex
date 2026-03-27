@@ -89,7 +89,7 @@
 <%!-- </.modal> --%>
 
 <.modal
-  :if={@winning_team in [:a, :b]}
+  :if={@winning_team in [:a, :b] && not Match.game_over?(@match)}
   id="setCompleteModal"
   auto_open
 >
@@ -101,9 +101,29 @@
   </hgroup>
 
   <:action>
-    <.button phx-click="undo">Undo</.button>
+    <.button phx-click="undo">Cancel</.button>
   </:action>
   <:action>
     <.button phx-click="next_set" variant="neutral">Continue To Next Set!</.button>
+  </:action>
+</.modal>
+
+<.modal
+  :if={@winning_team in [:a, :b] && Match.game_over?(@match) |> IO.inspect(label: "game over?")}
+  id="gameCompleteModal"
+  auto_open
+>
+  <hgroup>
+    <h3 class="text-lg font-bold">Game Complete!</h3>
+    <p>
+      {if @winning_team == :a, do: @match.settings.a_name, else: @match.settings.b_name} has won the game.
+    </p>
+  </hgroup>
+
+  <:action>
+    <.button phx-click="undo">Cancel</.button>
+  </:action>
+  <:action>
+    <.button phx-click="game_over" variant="neutral">Continue to Signatures</.button>
   </:action>
 </.modal>

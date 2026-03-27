@@ -36,18 +36,6 @@ defmodule VolleyWeb.MatchLive.Score do
     end
   end
 
-  # def handle_info({:submit_settings, settings}, socket) do
-  #   {:ok, match} =
-  #     Scoring.update_match_settings(socket.assigns.current_scope, socket.assigns.match, settings)
-  #
-  #   socket =
-  #     socket
-  #     |> assign_match(match, true)
-  #     |> push_patch(to: ~p"/scratch/#{match}")
-  #
-  #   {:noreply, socket}
-  # end
-
   @impl true
   def handle_event("score", %{"team" => team}, socket) do
     if socket.assigns.winning_team in [:a, :b] do
